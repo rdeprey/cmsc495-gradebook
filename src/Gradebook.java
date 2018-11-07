@@ -1,4 +1,4 @@
-package temp;/* JTabbedPane starter code from: https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial/uiswing/examples/components/TabbedPaneDemoProject/src/components/TabbedPaneDemo.java */
+/* JTabbedPane starter code from: https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial/uiswing/examples/components/TabbedPaneDemoProject/src/components/TabbedPaneDemo.java */
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +18,7 @@ public class Gradebook extends JFrame {
         String date = "date";
         String greetingMessage = determineGreeting();
 
-        JFrame frame = new JFrame("temp.Gradebook");
+        JFrame frame = new JFrame("Gradebook");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel contentPane = new JPanel(new GridBagLayout());

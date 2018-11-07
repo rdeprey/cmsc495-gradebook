@@ -22,7 +22,7 @@ public class Gradebook extends JFrame {
         String date = "date";
         String greetingMessage = determineGreeting();
 
-        JFrame frame = new JFrame("temp.Gradebook");
+        JFrame frame = new JFrame("Gradebook");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel contentPane = new JPanel(new GridBagLayout());
