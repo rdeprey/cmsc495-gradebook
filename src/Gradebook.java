@@ -3,9 +3,9 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.Calendar;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class Gradebook extends JFrame {
@@ -188,36 +188,27 @@ public class Gradebook extends JFrame {
 
     }
 
-    protected  static JComponent makeTextPanel(String text) {
-        JPanel panel = new JPanel(false);
-        JLabel filler = new JLabel(text);
-        filler.setHorizontalAlignment(JLabel.CENTER);
-        panel.setLayout(new GridLayout(1, 1));
-        panel.add(filler);
-        return panel;
-    }
-
     protected static String determineGreeting(){
-        //There has to be better way to differentiate time...
         String greeting;
-        int hour = Calendar.HOUR;
-        int AMPM = Calendar.AM_PM; // AM = 0, PM = 1
-        System.out.println(Calendar.HOUR);
+        DateFormat dateFormat = new SimpleDateFormat("HH");
+        Date dateObj = new Date();
+        int hour = Integer.parseInt(dateFormat.format(dateObj));
 
-        //Good Morning 6am to 11:59 pm
-        if((AMPM == 0 && hour >=6) && (AMPM == 1 & hour<12)) {
-            return greeting = "Good Morning";
+        if(hour >= 6 && hour<12) {
+            //Good Morning 6am to 11am
+            greeting = "Good Morning";
         }
-        //Good Afternoon 12 to 4:59 pm
-        if((AMPM == 1 && hour >=12) && (AMPM == 1 && hour<17)) {
-            return greeting = "Good Afternoon";
+        else if(hour >=12 && hour<17) {
+            //Good Afternoon 12 to 4pm
+            greeting = "Good Afternoon";
         }
-        //Good Evening 5pm to 8 pm
-        if((AMPM == 1 && hour >=17) && (AMPM == 1 && hour<=20)) {
-            return greeting = "Good Morning";
+        else if(hour >=17 && hour<=20) {
+            //Good Evening 5pm to 8 pm
+            greeting = "Good Evening";
+        } else {
+            //Good Night 8 pm to 5am
+            greeting = "Good Night";
         }
-        //Good Night 8 pm to 5:59am
-        greeting = "Good Night";
 
         return greeting;
     }
