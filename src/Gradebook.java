@@ -1,3 +1,4 @@
+/* Connecting to the database: https://www.homeandlearn.co.uk/java/connect_to_a_database_using_java_code.html */
 /* JTabbedPane starter code from: https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial/uiswing/examples/components/TabbedPaneDemoProject/src/components/TabbedPaneDemo.java */
 
 import javax.swing.*;
@@ -7,11 +8,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
 public class Gradebook extends JFrame {
     
     //main method
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        DatabaseConnection dbCon = new DatabaseConnection();
         Gradebook gradebook = new Gradebook();
     }
 

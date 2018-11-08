@@ -1,2 +1,4 @@
 .idea/
 /gradebookClone/
+src/dbconnection.txt
+out/production/gradebook/dbconnection.txt
