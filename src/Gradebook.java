@@ -98,9 +98,6 @@ public class Gradebook extends JFrame {
         c.gridy = 1;
         c.gridwidth = 3;
         c.gridheight = 20;
-      
-<<<<<< HaemeeNabors-GUI-patch-1
-        
         
         // Create tabbed pane container
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -186,54 +183,8 @@ public class Gradebook extends JFrame {
         // Add the tabbed pane to contentPane
         contentPane.add(tabbedPane,c);
 
-        frame.add(panel);
         frame.setSize(1000, 800);
         frame.setVisible(true);
-=======
-
-//         //TabbedPanel
-//         JTabbedPane tabbedPane = new JTabbedPane();
-//         tabbedPane.setPreferredSize(new Dimension (600,700));
-
-
-//         //Create tab 1
-//         JComponent panel1 = makeTextPanel("Panel #1");
-//         tabbedPane.addTab("Class A", null, panel1, "Placeholder 1"); // Add tab to tab container
-//         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1); // keyboard event
-
-//         // Create tab 2
-//         JComponent panel2 = makeTextPanel("Panel #2");
-//         tabbedPane.addTab("Class B", null, panel2, "Placeholder 2"); // Add tab to tab container
-//         tabbedPane.setMnemonicAt(0, KeyEvent.VK_2); // keyboard event
-
-//         // Create tab 3
-//         JComponent panel3 = makeTextPanel("Panel #3");
-//         tabbedPane.addTab("New Tab", null, panel3, "Placeholder 3"); // Add tab to tab container
-//         tabbedPane.setMnemonicAt(0, KeyEvent.VK_3); // keyboard event
-
-//         JComponent panel4 = makeTextPanel(" ");
-//         JPanel mPanel = new JPanel();
-//         JTextField classField = new JTextField(5);
-//         JTextField assField = new JTextField(5);
-
-//         mPanel.add(new JLabel("Assignments: "));
-//         mPanel.add(assField);
-//         tabbedPane.addTab("New Class", null, panel4, "Placeholder");
-//         tabbedPane.addChangeListener(new ChangeListener(){
-//             @Override
-//             public void stateChanged(ChangeEvent ce){
-//                 String nClass = JOptionPane.showInputDialog(frame, "What is the name of your class?");
-//                 int numAssign = JOptionPane.showConfirmDialog(frame,mPanel, "How many assignments?", JOptionPane.OK_CANCEL_OPTION);
-//             }
-//         });
-
-//         contentPane.add(tabbedPane, c);
-
-
-
-//         frame.setSize(1000,800);
-//         frame.setVisible(true);
-
 
     }
 
