@@ -1,7 +1,6 @@
-
 package Login;
 
-
+import com.nimbusds.jose.crypto.AESEncrypter;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -15,30 +14,22 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Random;
-import java.util.Properties;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.io.*;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.Properties;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileNotFoundException;
 
 
-public class HW2Part2 extends Application {
+public class Login extends Application {
 
     private Object httpSession;
     
@@ -173,7 +164,7 @@ public class HW2Part2 extends Application {
                         try {
                             secure();
                         } catch (Exception ex) {
-                            Logger.getLogger(HW2Part2.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         boolean authen = confirmation(userTextField.getText(), emailcode.getText());
                         if(authen == false){
@@ -256,8 +247,7 @@ public class HW2Part2 extends Application {
             AESEncrypter encrypter = new AESEncrypter(key);
             BufferedReader br = new BufferedReader(new FileReader(filename));
             while((line = br.readLine()) != null) {
-                encrypter.encrypt(line);
-                
+                //encrypter.encrypt(line);
             }
         }
         catch (NoSuchAlgorithmException e) {
