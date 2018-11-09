@@ -11,6 +11,7 @@ import java.util.Date;
 public class Gradebook extends JFrame {
     
     //main method
+    // test comment :)
     public static void main(String[] args) throws Exception {
         DatabaseConnection dbCon = new DatabaseConnection();
         Gradebook gradebook = new Gradebook();
@@ -21,6 +22,7 @@ public class Gradebook extends JFrame {
         String userName = "username";
         String date = "date";
         String greetingMessage = determineGreeting();
+        String str = "Plz work";
 
         JFrame frame = new JFrame("Gradebook");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
