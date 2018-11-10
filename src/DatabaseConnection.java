@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-    public DatabaseConnection() throws Exception {
+    public Connection getConnection() throws Exception {
         // Get the file with the connection data
         File jarFile = new File(Gradebook.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         String path = jarFile + File.separator + "dbconnection.txt";
@@ -22,7 +22,7 @@ public class DatabaseConnection {
         int count = 0;
         while ((st = bufferedReader.readLine()) != null) {
             if (count == 0) {
-                host = "jdbc:derby://" + st;
+                host = "jdbc:sqlserver://" + st;
             } else if (count == 1) {
                 username = st;
             } else if (count == 2) {
@@ -31,10 +31,14 @@ public class DatabaseConnection {
             count++;
         }
 
+        String jdbcUrl = host + ":1433;DatabaseName=gradebookdb";
+
         try {
-            Connection con = DriverManager.getConnection(host, username, password);
+            Connection con = DriverManager.getConnection(jdbcUrl, username, password);
+            return con;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
+            throw new RuntimeException("Error connecting to the database", ex);
         }
     }
 }

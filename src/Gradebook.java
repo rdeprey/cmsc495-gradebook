@@ -9,20 +9,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Gradebook extends JFrame {
-    
-    //main method
-    // test comment :)
     public static void main(String[] args) throws Exception {
-        DatabaseConnection dbCon = new DatabaseConnection();
+        // Create the gradebook GUI
         Gradebook gradebook = new Gradebook();
     }
 
     //creates GUI
-    public Gradebook(){
-        String userName = "username";
-        String date = "date";
+    public Gradebook() throws Exception {
+        User user = User.getUser("testuser@test.com");
+
+        String userName = user.getUsername();
+        String date = new SimpleDateFormat("EEEEE MMMMM d, yyyy").format(new Date());
         String greetingMessage = determineGreeting();
-        String str = "Plz work";
 
         JFrame frame = new JFrame("Gradebook");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
