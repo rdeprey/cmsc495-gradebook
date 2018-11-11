@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component LANGUAGE_LEVEL="JDK_1_5" jdk="11.0" jdk_type="JavaSDK">
+	<output-test url="file://$MODULE_DIR$/target/test-classes"/>
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<lib name="unirest-java-1.4.9.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/unirest-java-1.4.9.jar!/"/>
+	</lib>
+	<lib name="commons-codec-1.10.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/commons-codec-1.10.jar!/"/>
+	</lib>
+	<lib name="commons-logging-1.2.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/commons-logging-1.2.jar!/"/>
+	</lib>
+	<lib name="fluent-hc-4.5.6.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/fluent-hc-4.5.6.jar!/"/>
+	</lib>
+	<lib name="httpclient-4.5.6.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/httpclient-4.5.6.jar!/"/>
+	</lib>
+	<lib name="httpclient-cache-4.5.6.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/httpclient-cache-4.5.6.jar!/"/>
+	</lib>
+	<lib name="httpclient-win-4.5.6.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/httpclient-win-4.5.6.jar!/"/>
+	</lib>
+	<lib name="httpcore-4.4.10.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/httpcore-4.4.10.jar!/"/>
+	</lib>
+	<lib name="httpmime-4.5.6.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/httpmime-4.5.6.jar!/"/>
+	</lib>
+	<lib name="jna-4.4.0.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/jna-4.4.0.jar!/"/>
+	</lib>
+	<lib name="jna-platform-4.4.0.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/jna-platform-4.4.0.jar!/"/>
+	</lib>
+	<lib name="mssql-jdbc-7.0.0.jre10.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/sqljdbc_7.0/enu/mssql-jdbc-7.0.0.jre10.jar!/"/>
+	</lib>
+	<lib name="javax.mail-api-1.6.2.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/javax/mail/javax.mail-api/1.6.2/javax.mail-api-1.6.2.jar!/"/>
+	</lib>
+	<lib name="junit-5.0-SNAPSHOT.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/junit/junit/5.0-SNAPSHOT/junit-5.0-SNAPSHOT.jar!/"/>
+	</lib>
+	<lib name="nimbus-jose-jwt-6.3.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/com/nimbusds/nimbus-jose-jwt/6.3/nimbus-jose-jwt-6.3.jar!/"/>
+	</lib>
+	<levels>
+		<level name="javafx-swt" value="project"/>
+	</levels>
+</component>
