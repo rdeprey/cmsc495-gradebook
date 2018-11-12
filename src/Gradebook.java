@@ -1,23 +1,21 @@
 /* Connecting to the database: https://www.homeandlearn.co.uk/java/connect_to_a_database_using_java_code.html */
 /* JTabbedPane starter code from: https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial/uiswing/examples/components/TabbedPaneDemoProject/src/components/TabbedPaneDemo.java */
+/* Verify string is integer from: https://stackoverflow.com/questions/5439529/determine-if-a-string-is-an-integer-in-java */
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Gradebook extends JFrame {
-    public static void main(String[] args) throws Exception {
-        // Create the gradebook GUI
-        Gradebook gradebook = new Gradebook();
-    }
-
     //creates GUI
-    public Gradebook() throws Exception {
-        User user = User.getUser("testuser@test.com");
-
+    public Gradebook(final User user) throws Exception {
         String userName = user.getUsername();
         String date = new SimpleDateFormat("EEEEE MMMMM d, yyyy").format(new Date());
         String greetingMessage = determineGreeting();
@@ -76,6 +74,14 @@ public class Gradebook extends JFrame {
         currentClassesLabel.setFont(f2);
         currentClassesPanel.add(currentClassesLabel);
         progressPanel.add(currentClassesPanel);
+
+        ArrayList<Class> currentClasses = Class.getCurrentClasses();
+        if (!currentClasses.isEmpty()) {
+            for (int i = 0; i < currentClasses.size(); i++) {
+                progressPanel.add(createClassProgressPanel(currentClasses.get(i).getClassName(), currentClasses.get(i).convertToLetterGrade(), 40, 100));
+            }
+        }
+
         progressPanel.add(createClassProgressPanel("Class A", "A", 40, 100));
         progressPanel.add(createClassProgressPanel("Class B", "A", 15, 80));
         progressPanel.add(createClassProgressPanel("Class C", "B", 10, 90));
@@ -123,23 +129,66 @@ public class Gradebook extends JFrame {
         newClassFormPanel.add(classNameLabel,e);
 
         e.gridy++;
-        JLabel numberOfAssignmentsLabel = new JLabel("Number of Assignments: ");
+        final JLabel numberOfAssignmentsLabel = new JLabel("Number of Assignments: ");
         newClassFormPanel.add(numberOfAssignmentsLabel, e);
 
         e.gridx = 1;
         e.gridy = 1;
         e.anchor = GridBagConstraints.LINE_START;
-        JTextField nameTextField = new JTextField(10);
+        final JTextField nameTextField = new JTextField(10);
         newClassFormPanel.add(nameTextField, e);
 
         e.gridy++;
-        JTextField numOfAssignmentsTextField = new JTextField(5);
+        final JTextField numOfAssignmentsTextField = new JTextField(5);
         newClassFormPanel.add(numOfAssignmentsTextField, e);
 
         e.gridx = 0;
         e.gridy++;
         e.gridwidth = 2;
         JButton createNewClassTemplate = new JButton("Create Class Template");
+
+        // Create Class Template event handler
+        createNewClassTemplate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String className = nameTextField.getText();
+                String numOfAssignments = numOfAssignmentsTextField.getText();
+
+                if (className == "" || numOfAssignments == "") {
+                    // Show an error message
+                }
+
+                // Verify that the number of assignments is actually an integer value
+                for (int i = 0; i < numOfAssignments.length(); i++) {
+                    if (i == 0 && numOfAssignments.charAt(i) == '-') {
+                        if (numOfAssignments.length() == 1) {
+                            // Show error message - not an integer
+                            return;
+                        }
+                        continue;
+                    }
+                    if (Character.digit(numOfAssignments.charAt(i), 10) < 0) {
+                        // Show error message - not an integer
+                        return;
+                    }
+                }
+
+                // This means it's an integer
+                int assignmentsInt = Integer.parseInt(numOfAssignments);
+
+                // Create a class object
+                Calendar c = Calendar.getInstance();
+                c.setTime(new Date());
+                c.add(Calendar.DATE, 90);
+                Class classX = new Class(user.getUserId(), className, assignmentsInt, new Date(), c.getTime());
+                try {
+                    Class.addClass(classX);
+                } catch (Exception ex) {
+                    // Show error in GUI if class isn't saved to database; don't allow user to continue in application
+                    return;
+                }
+            }
+        });
+
         newClassFormPanel.add(createNewClassTemplate, e);
 
         tabbedPane.addTab("New Class", null, newClassFormPanel); // Add tab to tab container

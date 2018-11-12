@@ -18,6 +18,7 @@ public class Login extends javax.swing.JFrame {
     private int attempts;
 
     private String timestamp;
+    private User user;
 
     /**
      * Creates new form Login
@@ -103,7 +104,7 @@ public class Login extends javax.swing.JFrame {
         });
 
         label3.setFont(new java.awt.Font("Lucida Grande", 3, 24)); // NOI18N
-        label3.setText("SDEV460: User Login ");
+        label3.setText("Gradebook: User Login ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -190,10 +191,8 @@ public class Login extends javax.swing.JFrame {
             jPassword.setText(null);
             jtxtUserName.setText(null);
         } else {
-            Login_s Info = new Login_s();
+            Login_s Info = new Login_s(user);
             Info.setVisible(true);
-
-
         }
     }// GEN-LAST:event_jtbnSubmitActionPerformed
 
@@ -228,7 +227,7 @@ public class Login extends javax.swing.JFrame {
             return false;
         }
 
-        User user = User.getUser(username, password);
+        user = User.getUser(username, password);
 
         if (user != null) {
             jtxtUserName.setText(null);

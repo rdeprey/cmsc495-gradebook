@@ -9,11 +9,13 @@
  * @author H.Giles
  */
 public class Login_s extends javax.swing.JFrame {
+    private User user;
 
     /**
      * Creates new form Login_s
      */
-    public Login_s() {
+    public Login_s(User user) {
+        this.user = user;
         initComponents();
     }
 
@@ -66,7 +68,7 @@ public class Login_s extends javax.swing.JFrame {
 
     private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
         try {
-            Gradebook gradebook = new Gradebook();
+            Gradebook gradebook = new Gradebook(user);
         } catch (Exception ex) {
             System.out.println("Couldn't load the Gradebook GUI " + ex);
         }
@@ -80,7 +82,7 @@ public class Login_s extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -100,12 +102,7 @@ public class Login_s extends javax.swing.JFrame {
         }
         //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Login_s().setVisible(true);
-            }
-        });
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
