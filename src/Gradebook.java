@@ -97,6 +97,14 @@ public class Gradebook extends JFrame {
         compClassLabel.setFont(f2);
         compClassTitlePanel.add(compClassLabel);
         completedPanel.add(compClassTitlePanel);
+
+        ArrayList<Class> completedClasses = Class.getCompletedClasses();
+        if (!completedClasses.isEmpty()) {
+            for (int i = 0; i < completedClasses.size(); i++) {
+                completedPanel.add(createCompClassPanel(completedClasses.get(i).getClassName(), completedClasses.get(i).convertToLetterGrade()));
+            }
+        }
+
         completedPanel.add(createCompClassPanel("Class D", "A"));
         completedPanel.add(createCompClassPanel("Class E", "B"));
         contentPane.add(completedPanel, c);

@@ -154,4 +154,27 @@ public class Class {
 
         return null;
     }
+
+    public static ArrayList<Class> getCompletedClasses() throws Exception {
+        Connection dbCon = new DatabaseConnection().getConnection();
+        try {
+            Statement stmt = dbCon.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Classes WHERE classEndDate < GETDATE()");
+
+            ArrayList<Class> classes = new ArrayList<Class>();
+
+            while (rs.next()) {
+                Class classX = getClassFromResultSet(rs);
+                classes.add(classX);
+            }
+
+            return classes;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            dbCon.close();
+        }
+
+        return null;
+    }
 }
