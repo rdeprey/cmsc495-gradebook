@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/11.0"/>
-	<classpathentry kind="src" path="/gradebook/src"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/unirest-java-1.4.9.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/httpcomponents-client-4.5.6/lib/commons-codec-1.10.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/httpcomponents-client-4.5.6/lib/commons-logging-1.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/httpcomponents-client-4.5.6/lib/fluent-hc-4.5.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/httpcomponents-client-4.5.6/lib/httpclient-4.5.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/httpcomponents-client-4.5.6/lib/httpclient-cache-4.5.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/httpcomponents-client-4.5.6/lib/httpclient-win-4.5.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/httpcomponents-client-4.5.6/lib/httpcore-4.4.10.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/httpcomponents-client-4.5.6/lib/httpmime-4.5.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/httpcomponents-client-4.5.6/lib/jna-4.4.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/httpcomponents-client-4.5.6/lib/jna-platform-4.4.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/sqljdbc_7.0/enu/mssql-jdbc-7.0.0.jre10.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="libraries/unirest-java-1.4.9.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/commons-codec-1.10.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/commons-logging-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/fluent-hc-4.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/httpclient-4.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/httpclient-cache-4.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/httpclient-win-4.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/httpcore-4.4.10.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/httpmime-4.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/jna-4.4.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/jna-platform-4.4.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/sqljdbc_7.0/enu/mssql-jdbc-7.0.0.jre10.jar"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/javafx-swt"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/javax/mail/javax.mail-api/1.6.2/javax.mail-api-1.6.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/junit/junit/5.0-SNAPSHOT/junit-5.0-SNAPSHOT.jar"/>
-	<classpathentry exported="true" kind="lib" path="/gradebook/libraries/com/nimbusds/nimbus-jose-jwt/6.3/nimbus-jose-jwt-6.3.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry exported="true" kind="lib" path="libraries/javax/mail/javax.mail-api/1.6.2/javax.mail-api-1.6.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/junit/junit/5.0-SNAPSHOT/junit-5.0-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/com/nimbusds/nimbus-jose-jwt/6.3/nimbus-jose-jwt-6.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/httpcore-nio-4.4.10.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/httpasyncclient-4.0-beta4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libraries/httpcomponents-client-4.5.6/lib/json-20180813.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

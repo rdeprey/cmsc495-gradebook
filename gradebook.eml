@@ -47,6 +47,15 @@
 	<lib name="nimbus-jose-jwt-6.3.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/com/nimbusds/nimbus-jose-jwt/6.3/nimbus-jose-jwt-6.3.jar!/"/>
 	</lib>
+	<lib name="httpcore-nio-4.4.10.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/httpcore-nio-4.4.10.jar!/"/>
+	</lib>
+	<lib name="httpasyncclient-4.0-beta4.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/httpasyncclient-4.0-beta4.jar!/"/>
+	</lib>
+	<lib name="json-20180813.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/httpcomponents-client-4.5.6/lib/json-20180813.jar!/"/>
+	</lib>
 	<levels>
 		<level name="javafx-swt" value="project"/>
 	</levels>

@@ -1,7 +1,5 @@
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Assignment {
@@ -115,26 +113,26 @@ public class Assignment {
         return false;
     }
 
-//    public static ArrayList<Assignment> getAssignmentsForClass(int ) throws Exception {
-//        Connection dbCon = new DatabaseConnection().getConnection();
-//        try {
-//            Statement stmt = dbCon.createStatement();
-//            ResultSet rs = stmt.executeQuery("SELECT * FROM Assignments WHERE classEndDate >= GETDATE()");
-//
-//            ArrayList<Assignment> assignments = new ArrayList<Assignment>();
-//
-//            while (rs.next()) {
-//                Assignment assignment = getAssignmentFromResultSet(rs);
-//                assignments.add(assignment);
-//            }
-//
-//            return assignments;
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        } finally {
-//            dbCon.close();
-//        }
-//
-//        return null;
-//    }
+    public static ArrayList<Assignment> getAssignmentsForClass(int userId, int classId) throws Exception {
+        Connection dbCon = new DatabaseConnection().getConnection();
+        try {
+            Statement stmt = dbCon.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Assignments WHERE userId=" + userId + " AND classId=" + classId);
+
+            ArrayList<Assignment> assignments = new ArrayList<Assignment>();
+
+            while (rs.next()) {
+                Assignment assignment = getAssignmentFromResultSet(rs);
+                assignments.add(assignment);
+            }
+
+            return assignments;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            dbCon.close();
+        }
+
+        return null;
+    }
 }
