@@ -193,6 +193,7 @@ public class Login extends javax.swing.JFrame {
         } else {
             Login_s Info = new Login_s(user);
             Info.setVisible(true);
+            this.dispose();
         }
     }// GEN-LAST:event_jtbnSubmitActionPerformed
 
@@ -316,15 +317,15 @@ public class Login extends javax.swing.JFrame {
         // </editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
+       // java.awt.EventQueue.invokeLater(new Runnable() {
+            //public void run() {
                 try {
                     new Login().setVisible(true);
                 } catch (Exception ex) {
                     System.out.println("Login exception occurred" + ex);
                 }
-            }
-        });
+           // }
+       // });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

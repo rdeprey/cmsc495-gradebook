@@ -14,6 +14,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class Gradebook extends JFrame {
+    private static final Font f1 = new Font("Monospaced", Font.BOLD, 20);
+    private static final Font f2 = new Font("Monospaced", Font.BOLD, 16);
+
     //creates GUI
     public Gradebook(final User user) throws Exception {
         String userName = user.getUsername();
@@ -36,7 +39,6 @@ public class Gradebook extends JFrame {
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setBackground(new Color(0,122,204));
         JLabel title = new JLabel("GradeBook", SwingConstants.CENTER);
-        Font f1 = new Font(Font.MONOSPACED, Font.BOLD, 20);
         title.setFont(f1);
         title.setForeground(Color.WHITE);
         titlePanel.add(title, BorderLayout.CENTER);
@@ -54,7 +56,6 @@ public class Gradebook extends JFrame {
         //GreetingPanel
         c.gridy ++;
         c.gridwidth = 2;
-        Font f2 = new Font(Font.MONOSPACED, Font.BOLD, 16);
         JPanel greetingPanel = new JPanel(new GridLayout(0,1));
         greetingPanel.setBackground(new Color(102,194,255));
         JLabel greetingLabel = new JLabel(greetingMessage + ",", SwingConstants.CENTER);
@@ -66,22 +67,12 @@ public class Gradebook extends JFrame {
         //ProgressPanel
         c.gridy ++;
         c.gridwidth = 2;
-        JPanel progressPanel = new JPanel(new GridLayout(0,1,5,5));
+        final JPanel progressPanel = new JPanel(new GridLayout(0,1,5,5));
 
-        JPanel currentClassesPanel = new JPanel(new GridLayout(0,1,5,5));
-        currentClassesPanel.setBackground(new Color(179,224,255));
-        JLabel currentClassesLabel = new JLabel("Current Classes", SwingConstants.CENTER);
-        currentClassesLabel.setFont(f2);
-        currentClassesPanel.add(currentClassesLabel);
-        progressPanel.add(currentClassesPanel);
+        final JPanel currentClassesPanel = new JPanel(new GridLayout(0,1,5,5));
+        drawCurrentClassesPanel(currentClassesPanel, progressPanel, user); // dynamic progress panels
 
-        ArrayList<Class> currentClasses = Class.getCurrentClasses();
-        if (!currentClasses.isEmpty()) {
-            for (int i = 0; i < currentClasses.size(); i++) {
-                progressPanel.add(createClassProgressPanel(currentClasses.get(i).getClassName(), currentClasses.get(i).convertToLetterGrade(), 40, 100));
-            }
-        }
-
+        // Hard-coded progress panels
         progressPanel.add(createClassProgressPanel("Class A", "A", 40, 100));
         progressPanel.add(createClassProgressPanel("Class B", "A", 15, 80));
         progressPanel.add(createClassProgressPanel("Class C", "B", 10, 90));
@@ -98,13 +89,15 @@ public class Gradebook extends JFrame {
         compClassTitlePanel.add(compClassLabel);
         completedPanel.add(compClassTitlePanel);
 
-        ArrayList<Class> completedClasses = Class.getCompletedClasses();
+        ArrayList<Class> completedClasses = Class.getCompletedClasses(user.getUserId());
         if (!completedClasses.isEmpty()) {
             for (int i = 0; i < completedClasses.size(); i++) {
+                // Dynamic completed class panels
                 completedPanel.add(createCompClassPanel(completedClasses.get(i).getClassName(), completedClasses.get(i).convertToLetterGrade()));
             }
         }
 
+        // Hard-coded completed class panels
         completedPanel.add(createCompClassPanel("Class D", "A"));
         completedPanel.add(createCompClassPanel("Class E", "B"));
         contentPane.add(completedPanel, c);
@@ -117,6 +110,12 @@ public class Gradebook extends JFrame {
         // Create tabbed pane container
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setPreferredSize(new Dimension(600, 700));
+
+//        for (int i = 0; i < currentClasses.size(); i++) {
+//            JComponent classTemplatePanel = new JPanel(new GridLayout(0,1));
+//            tabbedPane.addTab(currentClasses.get(i).getClassName(), null, classTemplatePanel); // Add tab to tab container
+//            tabbedPane.setMnemonicAt(i, KeyEvent.VK_3); // keyboard event
+//        }
 
        //New Class
         JComponent newClassFormPanel = new JPanel(new GridBagLayout());
@@ -189,7 +188,14 @@ public class Gradebook extends JFrame {
                 c.add(Calendar.DATE, 90);
                 Class classX = new Class(user.getUserId(), className, assignmentsInt, new Date(), c.getTime());
                 try {
-                    Class.addClass(classX);
+                     boolean isSuccess = Class.addClass(classX);
+                     if (isSuccess) {
+                         // Redraw the progress panels when new classes are added
+                        drawCurrentClassesPanel(currentClassesPanel, progressPanel, user);
+                     } else {
+                         // Show error message
+
+                     }
                 } catch (Exception ex) {
                     // Show error in GUI if class isn't saved to database; don't allow user to continue in application
                     return;
@@ -212,7 +218,7 @@ public class Gradebook extends JFrame {
         newClassTemplatePanel.add(classTemplateLabel);
 
         JPanel assignmentsPanel = new JPanel(new GridLayout(0,3,5,5));
-        Font f3 = new Font(Font.MONOSPACED, Font.BOLD, 12);
+        Font f3 = new Font("Monospaced", Font.BOLD, 12);
 
         JLabel dueDateLabel = new JLabel("Due Date", SwingConstants.CENTER);
         dueDateLabel.setFont(f3);
@@ -269,6 +275,29 @@ public class Gradebook extends JFrame {
         }
 
         return greeting;
+    }
+
+    private static void drawCurrentClassesPanel(JPanel currentClassesPanel, JPanel progressPanel, User user) {
+        try {
+            ArrayList<Class> currentClasses = Class.getCurrentClasses(user.getUserId());
+            if (!currentClasses.isEmpty()) {
+                currentClassesPanel.removeAll();
+                progressPanel.removeAll();
+
+                currentClassesPanel.setBackground(new Color(179,224,255));
+                JLabel currentClassesLabel = new JLabel("Current Classes", SwingConstants.CENTER);
+                currentClassesLabel.setFont(f2);
+                currentClassesPanel.add(currentClassesLabel);
+                progressPanel.add(currentClassesPanel);
+
+                for (int i = 0; i < currentClasses.size(); i++) {
+                    progressPanel.add(createClassProgressPanel(currentClasses.get(i).getClassName(), currentClasses.get(i).convertToLetterGrade(), 40, 100));
+                }
+                currentClassesPanel.revalidate();
+            }
+        } catch (Exception ex) {
+            System.out.println("We're sorry, but we cannot access your classes at this time. Please try again later.");
+        }
     }
 
     protected static JPanel createClassProgressPanel(String className, String classGrade,

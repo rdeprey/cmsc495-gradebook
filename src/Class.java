@@ -132,11 +132,11 @@ public class Class {
         return false;
     }
 
-    public static ArrayList<Class> getCurrentClasses() throws Exception {
+    public static ArrayList<Class> getCurrentClasses(int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
             Statement stmt = dbCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Classes WHERE classEndDate >= GETDATE()");
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Classes WHERE classEndDate >= GETDATE() AND userId=" + userId);
 
             ArrayList<Class> classes = new ArrayList<Class>();
 
@@ -155,11 +155,11 @@ public class Class {
         return null;
     }
 
-    public static ArrayList<Class> getCompletedClasses() throws Exception {
+    public static ArrayList<Class> getCompletedClasses(int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
             Statement stmt = dbCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Classes WHERE classEndDate < GETDATE()");
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Classes WHERE classEndDate < GETDATE() AND userId=" + userId);
 
             ArrayList<Class> classes = new ArrayList<Class>();
 

@@ -69,6 +69,7 @@ public class Login_s extends javax.swing.JFrame {
     private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
         try {
             Gradebook gradebook = new Gradebook(user);
+            this.dispose();
         } catch (Exception ex) {
             System.out.println("Couldn't load the Gradebook GUI " + ex);
         }
