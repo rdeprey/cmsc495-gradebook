@@ -1,9 +1,4 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashSet;
-import java.util.Set;
+import java.sql.*;
 
 public class User {
     private int userId;
@@ -89,15 +84,14 @@ public class User {
         return null;
     }
 
-    public static User getUser(String emailAddress) throws Exception {
+    public static Integer getToken(int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
             Statement stmt = dbCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE emailAddress='" + emailAddress + "'");
+            ResultSet rs = stmt.executeQuery("SELECT resetToken FROM Users WHERE userId=" + userId);
 
             if (rs.next()) {
-                User user = getUserFromResultSet(rs);
-                return user;
+                return rs.getInt("resetToken");
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -108,72 +102,56 @@ public class User {
         return null;
     }
 
-    public static Set<User> getAllUsers() throws Exception {
+    // Deletes the reset token after the user resets his/her password
+    public static void deleteToken(int userId) throws Exception {
+        Connection dbCon = new DatabaseConnection().getConnection();
+        try {
+            PreparedStatement ps = dbCon.prepareStatement("UPDATE Users SET resetToken=NULL WHERE userId=?");
+            ps.setInt(1, userId);
+            int i = ps.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            dbCon.close();
+        }
+    }
+
+    // When the user asks to reset their password or get their username (i.e., enter email address step)
+    public static boolean forgotPasswordOrUsername(String emailAddress) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
             Statement stmt = dbCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM users");
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Users WHERE emailAddress='" + emailAddress + "'");
 
-            Set users = new HashSet();
-
-            while (rs.next()) {
-                User user = getUserFromResultSet(rs);
-                users.add(user);
+            if (rs.next()) {
+                return true;
             }
-
-            return users;
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
             dbCon.close();
         }
 
-        return null;
+        return false;
     }
 
-    // ONLY NEEDED ON LOGIN
-//    public User getUserByUsernameAndPassword(String username, String password) throws Exception {
-//        Connection dbCon = new DatabaseConnection().getConnection();
-//        try {
-//            Statement stmt = dbCon.createStatement();
-//            ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE username='" + username + "'AND password='" + password + "'");
-//
-//            if (rs.next()) {
-//                User user = getUserFromResultSet(rs);
-//                return user;
-//            }
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        } finally {
-//            dbCon.close();
-//        }
-//
-//        return null;
-//    }
-    // ONLY NEEDED ON LOGIN
-//    public boolean insertUser() {
-//
-//    }
-//    public boolean updateUser(int userId) throws Exception {
-//        Connection dbCon = new DatabaseConnection().getConnection();
-//        try {
-//            PreparedStatement ps = dbCon.prepareStatement("UPDATE user SET");
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        } finally {
-//            dbCon.close();
-//        }
-//
-//        return false;
-//    }
+    // When the user actually updates his/her password
+    public static boolean resetPassword(int userId, String password) throws Exception {
+        Connection dbCon = new DatabaseConnection().getConnection();
+        try {
+            PreparedStatement ps = dbCon.prepareStatement("UPDATE Users SET password=? WHERE userId=?");
+            ps.setString(1, password);
+            ps.setInt(2, userId);
+            int i = ps.executeUpdate();
 
-    // Get user from email address
-//    public User getUser(String emailAddress) {
-//        return User;
-//    }
-
-    // Get username
-//    public String getUsername(String emailAddress) {
-//        return username;
-//    }
+            if (i == 1) {
+                return true;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            dbCon.close();
+        }
+        return false;
+    }
 }

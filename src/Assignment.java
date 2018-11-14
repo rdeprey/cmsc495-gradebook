@@ -113,6 +113,25 @@ public class Assignment {
         return false;
     }
 
+    public static boolean updateAssignment(int assignmentId, float assignmentGrade) throws Exception {
+        Connection dbCon = new DatabaseConnection().getConnection();
+        try {
+            PreparedStatement ps = dbCon.prepareStatement("UPDATE Assignments SET assignmentGrade=? WHERE assignmentId=?");
+            ps.setFloat(1, assignmentGrade);
+            ps.setInt(2, assignmentId);
+            int i = ps.executeUpdate();
+
+            if (i == 1) {
+                return true;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            dbCon.close();
+        }
+        return false;
+    }
+
     public static ArrayList<Assignment> getAssignmentsForClass(int userId, int classId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
