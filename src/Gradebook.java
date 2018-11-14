@@ -83,15 +83,38 @@ public class Gradebook extends JFrame {
 
 
         //CompletedPanel
-        c.gridy ++;
+        c.gridy++;
         c.gridwidth = 2;
-        JPanel completedPanel = new JPanel(new GridLayout(0,1,5,5));
         JPanel compClassTitlePanel = new JPanel(new GridLayout(0,1,15,15));
         compClassTitlePanel.setBackground(new Color(179,224,255));
         JLabel compClassLabel = new JLabel("Completed Classes", SwingConstants.CENTER);
         compClassLabel.setFont(f2);
         compClassTitlePanel.add(compClassLabel);
-        completedPanel.add(compClassTitlePanel);
+        contentPane.add(compClassTitlePanel,c);
+
+        c.gridy++;
+        JPanel completedPanel = new JPanel(new GridLayout(0,1,5,5));
+        // Hard-coded completed class panels
+        completedPanel.add(createCompClassPanel("Class D", "A"));
+        completedPanel.add(createCompClassPanel("Class E", "B"));
+        completedPanel.add(createCompClassPanel("Class D", "A"));
+        completedPanel.add(createCompClassPanel("Class E", "B"));
+        completedPanel.add(createCompClassPanel("Class D", "A"));
+        completedPanel.add(createCompClassPanel("Class E", "B"));
+        completedPanel.add(createCompClassPanel("Class D", "A"));
+        completedPanel.add(createCompClassPanel("Class E", "B"));
+        completedPanel.add(createCompClassPanel("Class D", "A"));
+        completedPanel.add(createCompClassPanel("Class E", "B"));
+        completedPanel.add(createCompClassPanel("Class D", "A"));
+        completedPanel.add(createCompClassPanel("Class E", "B"));
+        completedPanel.add(createCompClassPanel("Class D", "A"));
+        completedPanel.add(createCompClassPanel("Class E", "B"));
+        JScrollPane completedClassScrollPane = new JScrollPane(completedPanel);
+        JPanel completedClassesPanel = new JPanel(new GridLayout(0,1,5,5));
+        completedClassesPanel.setPreferredSize(new Dimension(200,200));
+        completedClassesPanel.add(completedClassScrollPane);
+        contentPane.add(completedClassesPanel, c);
+
 
         ArrayList<Class> completedClasses = Class.getCompletedClasses(user.getUserId());
         if (!completedClasses.isEmpty()) {
@@ -101,10 +124,6 @@ public class Gradebook extends JFrame {
             }
         }
 
-        // Hard-coded completed class panels
-        completedPanel.add(createCompClassPanel("Class D", "A"));
-        completedPanel.add(createCompClassPanel("Class E", "B"));
-        contentPane.add(completedPanel, c);
 
         c.gridx = 3;
         c.gridy = 1;
