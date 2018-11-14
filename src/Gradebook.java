@@ -245,9 +245,45 @@ public class Gradebook extends JFrame {
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_2); // keyboard event
 
         //Actual Class
-        //Class Template Panel (moved to method, after values pulled from New Class & New Class Template)
-        JComponent classTemplatePanel = new JPanel(new GridLayout(0,1));
-        tabbedPane.addTab("Class X", null, classTemplatePanel); // Add tab to tab container
+        //Class Panel (moved to method, after values pulled from New Class & New Class Template)
+        JComponent classPanel = new JPanel(new BorderLayout());
+
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 150,0));
+
+        JPanel statusPanel = new JPanel(new GridLayout(0,1));
+        String className = "My Class";
+        JLabel classLabel = new JLabel( className, SwingConstants.LEADING);
+        classLabel.setFont(f1);
+        statusPanel.add(classLabel);
+        char currentGrade = 'A';
+        JLabel currentGradeLabel = new JLabel("Current Grade: " + currentGrade, SwingConstants.LEADING);
+        currentGradeLabel.setFont(f2);
+        statusPanel.add(currentGradeLabel);
+        headerPanel.add(statusPanel);
+
+        JPanel goalGradePanel = new JPanel(new GridLayout(0,1));
+        JRadioButton A = new JRadioButton("A (90-100)");
+        JRadioButton B = new JRadioButton("B (80-90)");
+        JRadioButton C = new JRadioButton("C (70-80)");
+        JRadioButton D = new JRadioButton("D (60-70");
+        goalGradePanel.add(new JLabel("Goal Grade     ", SwingConstants.RIGHT));
+        goalGradePanel.add(A);
+        goalGradePanel.add(B);
+        goalGradePanel.add(C);
+        goalGradePanel.add(D);
+        ButtonGroup goalGrade = new ButtonGroup();
+        goalGrade.add(A);
+        goalGrade.add(B);
+        goalGrade.add(C);
+        goalGrade.add(D);
+
+        headerPanel.add(goalGradePanel);
+        classPanel.add(headerPanel, BorderLayout.PAGE_START);
+
+
+
+
+        tabbedPane.addTab(className, null, classPanel); // Add tab to tab container
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_3); // keyboard event
 
         // Add the tabbed pane to contentPane
