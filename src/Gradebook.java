@@ -122,7 +122,7 @@ public class Gradebook extends JFrame {
 //        }
 
        //New Class
-        JPanel newClassPanel = new JPanel(new BorderLayout());
+        final JPanel newClassPanel = new JPanel(new BorderLayout());
 
         JLabel newClassLabel = new JLabel("Creating New Class", SwingConstants.CENTER);
         newClassLabel.setFont(f2);
@@ -174,9 +174,11 @@ public class Gradebook extends JFrame {
         e.gridwidth = 2;
         JButton createNewClassTemplate = new JButton("Create Class Template");
 
+
         // Create Class Template event handler
         createNewClassTemplate.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+
                 String className = nameTextField.getText();
                 String numOfAssignments = numOfAssignmentsTextField.getText();
 
@@ -229,32 +231,14 @@ public class Gradebook extends JFrame {
         tabbedPane.addTab("New Class", null, newClassPanel); // Add tab to tab container
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1); // keyboard event
 
-        //*********************************
 
        //New Class Template Panel (moved to method, after values pulled from New Class)
-        JComponent newClassTemplatePanel = new JPanel(new GridLayout(0,1));
-
-
+        JComponent newClassTemplatePanel = new JPanel(new BorderLayout());
         JLabel classTemplateLabel = new JLabel("Entering Assignments into Class", SwingConstants.CENTER);
         classTemplateLabel.setFont(f2);
-        newClassTemplatePanel.add(classTemplateLabel);
+        newClassTemplatePanel.add(classTemplateLabel, BorderLayout.PAGE_START);
 
-        JPanel assignmentsPanel = new JPanel(new GridLayout(0,3,5,5));
-        Font f3 = new Font("Monospaced", Font.BOLD, 12);
-
-        JLabel dueDateLabel = new JLabel("Due Date", SwingConstants.CENTER);
-        dueDateLabel.setFont(f3);
-        assignmentsPanel.add(dueDateLabel);
-
-        JLabel assignNameLabel = new JLabel("Assign. Name", SwingConstants.CENTER);
-        assignNameLabel.setFont(f3);
-        assignmentsPanel.add(assignNameLabel);
-
-        JLabel assignWeightLabel = new JLabel("Assign. Weight", SwingConstants.CENTER);
-        assignWeightLabel.setFont(f3);
-        assignmentsPanel.add(assignWeightLabel);
-        newClassTemplatePanel.add(assignmentsPanel);
-
+        //
         newClassTemplatePanel.add(createAssignmentForm(7));
 
         tabbedPane.addTab("New Class Template", null, newClassTemplatePanel); // Add tab to tab container
@@ -352,18 +336,61 @@ public class Gradebook extends JFrame {
     }
 
     protected static JPanel createAssignmentForm(int numOfAssignments){
+        Font f3 = new Font("Monospaced", Font.BOLD, 12);
+
         JPanel assignmentsFormPanel = new JPanel(new GridLayout(0,1));
 
+        JPanel assignmentsLabelPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints f = new GridBagConstraints();
+        f.gridx = 1;
+        f.gridy = 0;
+        JLabel dueDateLabel = new JLabel("Due Date");
+        dueDateLabel.setFont(f3);
+        assignmentsLabelPanel.add(dueDateLabel,f);
+
+        f.gridx = 2;
+        f.gridwidth = 2;
+        f.fill = GridBagConstraints.HORIZONTAL;
+        JLabel assignNameLabel = new JLabel("Assign. Name");
+        assignNameLabel.setFont(f3);
+        assignmentsLabelPanel.add(assignNameLabel,f);
+
+        f.gridx = 4;
+        f.gridwidth = 1;
+        JLabel assignWeightLabel = new JLabel("Assign. Weight");
+        assignWeightLabel.setFont(f3);
+        assignmentsLabelPanel.add(assignWeightLabel,f);
+
+        assignmentsFormPanel.add(assignmentsLabelPanel);
+
+        int assignNo = 1;
         //create each assignment's form
         for(int i = 0; i < numOfAssignments; i++){
-            //need to switch to gridBagLayout
-            JPanel anAssignmentPanel = new JPanel(new GridLayout(1,3,5,5));
-            JTextField dateTF = new JTextField(9);
-            JTextField assignNameTF = new JTextField(15);
-            JTextField assingWeightTF = new JTextField(5);
-            anAssignmentPanel.add(dateTF);
-            anAssignmentPanel.add(assignNameTF);
-            anAssignmentPanel.add(assingWeightTF);
+            //attempting to switch to gridBagLayout
+
+            JPanel anAssignmentPanel = new JPanel(new GridBagLayout());
+            GridBagConstraints g = new GridBagConstraints();
+            g.gridx = 0;
+            g.gridy = 0;
+            JLabel assignNumLabel = new JLabel("Assignment " + assignNo);
+            assignNo++;
+            anAssignmentPanel.add(assignNumLabel, g);
+
+            g.gridx = 1;
+            JTextField dateTF = new JTextField("--/--/----", 9);
+            anAssignmentPanel.add(dateTF, g);
+
+            g.gridx = 2;
+            g.gridwidth = 2;
+            g.fill = GridBagConstraints.HORIZONTAL;
+            JTextField assignNameTF = new JTextField("Assignment Name",15);
+            anAssignmentPanel.add(assignNameTF, g);
+
+            g.gridx = 4;
+            g.gridwidth =1;
+            JTextField assignWeightTextField = new JTextField("Weight",5);
+            anAssignmentPanel.add(assignWeightTextField, g);
+
             assignmentsFormPanel.add(anAssignmentPanel);
         }
       
