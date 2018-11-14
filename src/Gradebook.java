@@ -17,6 +17,7 @@ public class Gradebook extends JFrame {
     private static final Font f1 = new Font("Monospaced", Font.BOLD, 20);
     private static final Font f2 = new Font("Monospaced", Font.BOLD, 16);
 
+
     //creates GUI
     public Gradebook(final User user) throws Exception {
         String userName = user.getUsername();
@@ -60,8 +61,10 @@ public class Gradebook extends JFrame {
         greetingPanel.setBackground(new Color(102,194,255));
         JLabel greetingLabel = new JLabel(greetingMessage + ",", SwingConstants.CENTER);
         greetingLabel.setFont(f2);
+        greetingPanel.add(new JLabel());
         greetingPanel.add(greetingLabel);
         greetingPanel.add(new JLabel(userName, SwingConstants.CENTER));
+        greetingPanel.add(new JLabel());
         contentPane.add(greetingPanel, c);
 
         //ProgressPanel
@@ -77,6 +80,7 @@ public class Gradebook extends JFrame {
         progressPanel.add(createClassProgressPanel("Class B", "A", 15, 80));
         progressPanel.add(createClassProgressPanel("Class C", "B", 10, 90));
         contentPane.add(progressPanel, c);
+
 
         //CompletedPanel
         c.gridy ++;
@@ -118,36 +122,52 @@ public class Gradebook extends JFrame {
 //        }
 
        //New Class
-        JComponent newClassFormPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints e = new GridBagConstraints();
-        e.gridx = 0;
-        e.gridy = 0;
-        e.gridwidth = 2;
-        e.fill = GridBagConstraints.HORIZONTAL;
+        JPanel newClassPanel = new JPanel(new BorderLayout());
 
         JLabel newClassLabel = new JLabel("Creating New Class", SwingConstants.CENTER);
         newClassLabel.setFont(f2);
-        newClassFormPanel.add(newClassLabel, e);
+        newClassPanel.add(newClassLabel, BorderLayout.PAGE_START);
 
-        e.gridy++;
-        e.gridwidth = 1;
-        e.anchor = GridBagConstraints.LINE_END;
-        JLabel classNameLabel = new JLabel ("Class Name: ");
-        newClassFormPanel.add(classNameLabel,e);
 
-        e.gridy++;
-        final JLabel numberOfAssignmentsLabel = new JLabel("Number of Assignments: ");
-        newClassFormPanel.add(numberOfAssignmentsLabel, e);
 
-        e.gridx = 1;
-        e.gridy = 1;
-        e.anchor = GridBagConstraints.LINE_START;
+        JPanel newClassFormPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints e = new GridBagConstraints();
+        e.gridx = 0;
+        e.gridy = 0;
+        e.weighty = 1;
+        e.fill = GridBagConstraints.HORIZONTAL;
+        e.anchor = GridBagConstraints.FIRST_LINE_START;
+
+        JPanel classInfoPanel = new JPanel(new GridLayout(0,2));
+
+        classInfoPanel.add(new JLabel());
+        classInfoPanel.add(new JLabel());
+
+        final JLabel classNameLabel = new JLabel ("Class Name: ");
+        classInfoPanel.add(classNameLabel);
+
         final JTextField nameTextField = new JTextField(10);
-        newClassFormPanel.add(nameTextField, e);
+        classInfoPanel.add(nameTextField);
 
-        e.gridy++;
+        final JLabel classStartDateLabel = new JLabel("Class Start Date: ");
+        classInfoPanel.add(classStartDateLabel);
+
+        final JTextField classStartDateTextField = new JTextField(5);
+        classInfoPanel.add(classStartDateTextField);
+
+        final JLabel classEndDateLabel = new JLabel("Class End Date: ");
+        classInfoPanel.add(classEndDateLabel);
+
+        final JTextField classEndDateTextField = new JTextField(5);
+        classInfoPanel.add(classEndDateTextField);
+
+        final JLabel numberOfAssignmentsLabel = new JLabel("Number of Assignments: ");
+        classInfoPanel.add(numberOfAssignmentsLabel);
+
         final JTextField numOfAssignmentsTextField = new JTextField(5);
-        newClassFormPanel.add(numOfAssignmentsTextField, e);
+        classInfoPanel.add(numOfAssignmentsTextField);
+
+        newClassFormPanel.add(classInfoPanel, e);
 
         e.gridx = 0;
         e.gridy++;
@@ -204,10 +224,12 @@ public class Gradebook extends JFrame {
         });
 
         newClassFormPanel.add(createNewClassTemplate, e);
+        newClassPanel.add(newClassFormPanel, BorderLayout.CENTER);
 
-        tabbedPane.addTab("New Class", null, newClassFormPanel); // Add tab to tab container
+        tabbedPane.addTab("New Class", null, newClassPanel); // Add tab to tab container
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1); // keyboard event
 
+        //*********************************
 
        //New Class Template Panel (moved to method, after values pulled from New Class)
         JComponent newClassTemplatePanel = new JPanel(new GridLayout(0,1));
