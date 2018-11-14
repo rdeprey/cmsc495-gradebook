@@ -280,8 +280,40 @@ public class Gradebook extends JFrame {
         headerPanel.add(goalGradePanel);
         classPanel.add(headerPanel, BorderLayout.PAGE_START);
 
+        JPanel assignmentsPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints h = new GridBagConstraints();
 
+        h.gridx = 0;
+        h.gridy = 0;
+        h.gridwidth = 1;
+        h.fill = GridBagConstraints.HORIZONTAL;
+        JLabel dueDateLabel = new JLabel("Due Date");
+        assignmentsPanel.add(dueDateLabel, h);
 
+        h.gridx = 1;
+        h.gridwidth = 2;
+        JLabel assignmentName = new JLabel("Assignment Name");
+        assignmentsPanel.add(assignmentName,h);
+
+        h.gridx = 3;
+        h.gridwidth = 1;
+        JLabel assingmentWeight = new JLabel("Assignment Weight");
+        assignmentsPanel.add(assingmentWeight,h);
+
+        h.gridx = 4;
+        String earnedAssignmentWeightString = "0.0";
+        JLabel earnedAssignmentWeight = new JLabel(earnedAssignmentWeightString);
+        assignmentsPanel.add(earnedAssignmentWeight,h);
+
+        h.gridx++;
+        JTextField assignmentGradeTextField = new JTextField("Enter Grade %", 10);
+        assignmentsPanel.add(assignmentGradeTextField,h);
+
+        h.gridx++;
+        JButton submitButton = new JButton("Submit");
+        assignmentsPanel.add(submitButton,h);
+
+        classPanel.add(assignmentsPanel);
 
         tabbedPane.addTab(className, null, classPanel); // Add tab to tab container
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_3); // keyboard event
