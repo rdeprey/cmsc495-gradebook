@@ -358,13 +358,9 @@ public class Gradebook extends JFrame {
         else if(hour >=12 && hour<17) {
             //Good Afternoon 12 to 4pm
             greeting = "Good Afternoon";
-        }
-        else if(hour >=17 && hour<=20) {
-            //Good Evening 5pm to 8 pm
-            greeting = "Good Evening";
         } else {
             //Good Night 8 pm to 5am
-            greeting = "Good Night";
+            greeting = "Good Evening";
         }
 
         return greeting;
