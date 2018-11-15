@@ -282,9 +282,9 @@ public class Gradebook extends JFrame {
 
         JPanel goalGradePanel = new JPanel(new GridLayout(0,1));
         JRadioButton A = new JRadioButton("A (90-100)");
-        JRadioButton B = new JRadioButton("B (80-90)");
-        JRadioButton C = new JRadioButton("C (70-80)");
-        JRadioButton D = new JRadioButton("D (60-70");
+        JRadioButton B = new JRadioButton("B (80-89)");
+        JRadioButton C = new JRadioButton("C (70-79)");
+        JRadioButton D = new JRadioButton("D (60-69)");
         goalGradePanel.add(new JLabel("Goal Grade     ", SwingConstants.RIGHT));
         goalGradePanel.add(A);
         goalGradePanel.add(B);
