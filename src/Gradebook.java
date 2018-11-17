@@ -4,9 +4,7 @@
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,7 +14,6 @@ import java.util.Date;
 public class Gradebook extends JFrame {
     private static final Font f1 = new Font("Monospaced", Font.BOLD, 20);
     private static final Font f2 = new Font("Monospaced", Font.BOLD, 16);
-
 
     //creates GUI
     public Gradebook(final User user) throws Exception {
@@ -79,7 +76,15 @@ public class Gradebook extends JFrame {
         progressPanel.add(createClassProgressPanel("Class A", "A", 40, 100));
         progressPanel.add(createClassProgressPanel("Class B", "A", 15, 80));
         progressPanel.add(createClassProgressPanel("Class C", "B", 10, 90));
-        contentPane.add(progressPanel, c);
+        progressPanel.add(createClassProgressPanel("Class X", "B", 10, 90));
+        progressPanel.add(createClassProgressPanel("Class X", "B", 10, 90));
+        progressPanel.add(createClassProgressPanel("Class X", "B", 10, 90));
+        progressPanel.add(createClassProgressPanel("Class X", "B", 10, 90));
+        JScrollPane sp = new JScrollPane(progressPanel);
+        JPanel jp = new JPanel(new GridLayout(0,1,5,5));
+        jp.setPreferredSize(new Dimension(200,200));
+        jp.add(sp);
+        contentPane.add(jp, c);
 
 
         //CompletedPanel
@@ -325,7 +330,20 @@ public class Gradebook extends JFrame {
         assignmentsPanel.add(earnedAssignmentWeight,h);
 
         h.gridx++;
-        JTextField assignmentGradeTextField = new JTextField("Enter Grade %", 10);
+        final JTextField assignmentGradeTextField = new JTextField("Enter Grade %", 10);
+        assignmentGradeTextField.addFocusListener(new FocusListener() {
+            public void focusGained(FocusEvent e) {
+                assignmentGradeTextField.setText("");
+                assignmentGradeTextField.setForeground(new Color(50,50,50));
+            }
+
+            public void focusLost(FocusEvent e) {
+                if(assignmentGradeTextField.getText().length() == 0){
+                    assignmentGradeTextField.setText("Enter Grade %");
+                    assignmentGradeTextField.setForeground(new Color(150,150,150));
+                 }
+            }
+        });
         assignmentsPanel.add(assignmentGradeTextField,h);
 
         h.gridx++;
@@ -460,18 +478,57 @@ public class Gradebook extends JFrame {
             anAssignmentPanel.add(assignNumLabel, g);
 
             g.gridx = 1;
-            JTextField dateTF = new JTextField("--/--/----", 9);
+            final JTextField dateTF = new JTextField("--/--/----", 9);
+            dateTF.addFocusListener(new FocusListener() {
+                public void focusGained(FocusEvent e) {
+                    dateTF.setText("");
+                    dateTF.setForeground(new Color(50,50,50));
+                }
+
+                public void focusLost(FocusEvent e) {
+                    if(dateTF.getText().length() == 0){
+                        dateTF.setText("--/--/----");
+                        dateTF.setForeground(new Color(150,150,150));
+                    }
+                }
+            });
             anAssignmentPanel.add(dateTF, g);
 
             g.gridx = 2;
             g.gridwidth = 2;
             g.fill = GridBagConstraints.HORIZONTAL;
-            JTextField assignNameTF = new JTextField("Assignment Name",15);
+            final JTextField assignNameTF = new JTextField("Assignment Name",15);
+            assignNameTF.addFocusListener(new FocusListener() {
+                public void focusGained(FocusEvent e) {
+                    assignNameTF.setText("");
+                    assignNameTF.setForeground(new Color(50,50,50));
+                }
+
+                public void focusLost(FocusEvent e) {
+                    if(assignNameTF.getText().length() == 0){
+                        assignNameTF.setText("Assignment Name");
+                        assignNameTF.setForeground(new Color(150,150,150));
+                    }
+                }
+            });
             anAssignmentPanel.add(assignNameTF, g);
 
             g.gridx = 4;
             g.gridwidth =1;
-            JTextField assignWeightTextField = new JTextField("Weight",5);
+            final JTextField assignWeightTextField = new JTextField("Weight",5);
+            assignWeightTextField.addFocusListener(new FocusListener() {
+                public void focusGained(FocusEvent e) {
+                    assignWeightTextField.setText("");
+                    assignWeightTextField.setForeground(new Color(50,50,50));
+                }
+
+                public void focusLost(FocusEvent e) {
+                    if (assignWeightTextField.getText().length() == 0) {
+                        assignWeightTextField.setText("Weight");
+                        assignWeightTextField.setForeground(new Color(150, 150, 150));
+                    }
+                }
+            });
             anAssignmentPanel.add(assignWeightTextField, g);
 
             assignmentsFormPanel.add(anAssignmentPanel);
