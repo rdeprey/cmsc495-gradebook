@@ -14,9 +14,14 @@ import java.util.Date;
 public class Gradebook extends JFrame {
     private static final Font f1 = new Font("Monospaced", Font.BOLD, 20);
     private static final Font f2 = new Font("Monospaced", Font.BOLD, 16);
+    private static ArrayList<Class> currentClasses;
+    private static ArrayList<Class> completedClasses;
 
     //creates GUI
     public Gradebook(final User user) throws Exception {
+        currentClasses = Class.getCurrentClasses(user.getUserId());
+        completedClasses = Class.getCompletedClasses(user.getUserId());
+
         String userName = user.getUsername();
         String date = new SimpleDateFormat("EEEEE MMMMM d, yyyy").format(new Date());
         String greetingMessage = determineGreeting();
@@ -68,18 +73,8 @@ public class Gradebook extends JFrame {
         c.gridy++;
         c.gridwidth = 2;
         final JPanel progressPanel = new JPanel(new GridLayout(0, 1, 5, 5));
-
         final JPanel currentClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
         drawCurrentClassesPanel(currentClassesPanel, progressPanel, user); // dynamic progress panels
-
-        // Hard-coded progress panels
-        progressPanel.add(createClassProgressPanel("Class A", "A", 40, 100));
-        progressPanel.add(createClassProgressPanel("Class B", "A", 15, 80));
-        progressPanel.add(createClassProgressPanel("Class C", "B", 10, 90));
-        progressPanel.add(createClassProgressPanel("Class X", "B", 10, 90));
-        progressPanel.add(createClassProgressPanel("Class X", "B", 10, 90));
-        progressPanel.add(createClassProgressPanel("Class X", "B", 10, 90));
-        progressPanel.add(createClassProgressPanel("Class X", "B", 10, 90));
         JScrollPane sp = new JScrollPane(progressPanel);
         JPanel jp = new JPanel(new GridLayout(0, 1, 5, 5));
         jp.setPreferredSize(new Dimension(200, 200));
@@ -99,29 +94,12 @@ public class Gradebook extends JFrame {
 
         c.gridy++;
         JPanel completedPanel = new JPanel(new GridLayout(0, 1, 5, 5));
-        // Hard-coded completed class panels
-        completedPanel.add(createCompClassPanel("Class D", "A"));
-        completedPanel.add(createCompClassPanel("Class E", "B"));
-        completedPanel.add(createCompClassPanel("Class D", "A"));
-        completedPanel.add(createCompClassPanel("Class E", "B"));
-        completedPanel.add(createCompClassPanel("Class D", "A"));
-        completedPanel.add(createCompClassPanel("Class E", "B"));
-        completedPanel.add(createCompClassPanel("Class D", "A"));
-        completedPanel.add(createCompClassPanel("Class E", "B"));
-        completedPanel.add(createCompClassPanel("Class D", "A"));
-        completedPanel.add(createCompClassPanel("Class E", "B"));
-        completedPanel.add(createCompClassPanel("Class D", "A"));
-        completedPanel.add(createCompClassPanel("Class E", "B"));
-        completedPanel.add(createCompClassPanel("Class D", "A"));
-        completedPanel.add(createCompClassPanel("Class E", "B"));
         JScrollPane completedClassScrollPane = new JScrollPane(completedPanel);
         JPanel completedClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
         completedClassesPanel.setPreferredSize(new Dimension(200, 200));
         completedClassesPanel.add(completedClassScrollPane);
         contentPane.add(completedClassesPanel, c);
 
-
-        ArrayList<Class> completedClasses = Class.getCompletedClasses(user.getUserId());
         if (!completedClasses.isEmpty()) {
             for (int i = 0; i < completedClasses.size(); i++) {
                 // Dynamic completed class panels
@@ -139,15 +117,8 @@ public class Gradebook extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setPreferredSize(new Dimension(600, 700));
 
-//        for (int i = 0; i < currentClasses.size(); i++) {
-//            JComponent classTemplatePanel = new JPanel(new GridLayout(0,1));
-//            tabbedPane.addTab(currentClasses.get(i).getClassName(), null, classTemplatePanel); // Add tab to tab container
-//            tabbedPane.setMnemonicAt(i, KeyEvent.VK_3); // keyboard event
-//        }
-
         //New Class
         final JPanel newClassPanel = new JPanel(new BorderLayout());
-
         JLabel newClassLabel = new JLabel("Creating New Class", SwingConstants.CENTER);
         newClassLabel.setFont(f2);
         newClassPanel.add(newClassLabel, BorderLayout.PAGE_START);
@@ -352,102 +323,102 @@ public class Gradebook extends JFrame {
                 }
             }
         });
-
         newClassFormPanel.add(createNewClassTemplate, constraints);
         newClassPanel.add(newClassFormPanel, BorderLayout.CENTER);
-
         tabbedPane.addTab("New Class", null, newClassPanel); // Add tab to tab container
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1); // keyboard event
 
         //Actual Class
         //Class Panel (moved to method, after values pulled from New Class & New Class Template)
-        JComponent classPanel = new JPanel(new BorderLayout());
+        for (int i = 0; i < currentClasses.size(); i++) {
+            JComponent classPanel = new JPanel(new BorderLayout());
 
-        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 150, 0));
+            JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 150, 0));
 
-        JPanel statusPanel = new JPanel(new GridLayout(0, 1));
-        String className = "My Class";
-        JLabel classLabel = new JLabel(className, SwingConstants.LEADING);
-        classLabel.setFont(f1);
-        statusPanel.add(classLabel);
-        char currentGrade = 'A';
-        JLabel currentGradeLabel = new JLabel("Current Grade: " + currentGrade, SwingConstants.LEADING);
-        currentGradeLabel.setFont(f2);
-        statusPanel.add(currentGradeLabel);
-        headerPanel.add(statusPanel);
+            JPanel statusPanel = new JPanel(new GridLayout(0, 1));
+            String className = currentClasses.get(i).getClassName();
+            JLabel classLabel = new JLabel(className, SwingConstants.LEADING);
+            classLabel.setFont(f1);
+            statusPanel.add(classLabel);
+            char currentGrade = 'A';
+            JLabel currentGradeLabel = new JLabel("Current Grade: " + currentGrade, SwingConstants.LEADING);
+            currentGradeLabel.setFont(f2);
+            statusPanel.add(currentGradeLabel);
+            headerPanel.add(statusPanel);
 
-        JPanel goalGradePanel = new JPanel(new GridLayout(0, 1));
-        JRadioButton A = new JRadioButton("A (90-100)");
-        JRadioButton B = new JRadioButton("B (80-89)");
-        JRadioButton C = new JRadioButton("C (70-79)");
-        JRadioButton D = new JRadioButton("D (60-69)");
-        goalGradePanel.add(new JLabel("Goal Grade     ", SwingConstants.RIGHT));
-        goalGradePanel.add(A);
-        goalGradePanel.add(B);
-        goalGradePanel.add(C);
-        goalGradePanel.add(D);
-        ButtonGroup goalGrade = new ButtonGroup();
-        goalGrade.add(A);
-        goalGrade.add(B);
-        goalGrade.add(C);
-        goalGrade.add(D);
+            JPanel goalGradePanel = new JPanel(new GridLayout(0, 1));
+            JRadioButton A = new JRadioButton("A (90-100)");
+            JRadioButton B = new JRadioButton("B (80-89)");
+            JRadioButton C = new JRadioButton("C (70-79)");
+            JRadioButton D = new JRadioButton("D (60-69)");
+            goalGradePanel.add(new JLabel("Goal Grade     ", SwingConstants.RIGHT));
+            goalGradePanel.add(A);
+            goalGradePanel.add(B);
+            goalGradePanel.add(C);
+            goalGradePanel.add(D);
+            ButtonGroup goalGrade = new ButtonGroup();
+            goalGrade.add(A);
+            goalGrade.add(B);
+            goalGrade.add(C);
+            goalGrade.add(D);
 
-        headerPanel.add(goalGradePanel);
-        classPanel.add(headerPanel, BorderLayout.PAGE_START);
+            headerPanel.add(goalGradePanel);
+            classPanel.add(headerPanel, BorderLayout.PAGE_START);
 
-        JPanel assignmentsPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints h = new GridBagConstraints();
+            JPanel assignmentsPanel = new JPanel(new GridBagLayout());
+            GridBagConstraints h = new GridBagConstraints();
 
-        h.gridx = 0;
-        h.gridy = 0;
-        h.gridwidth = 1;
-        h.fill = GridBagConstraints.HORIZONTAL;
-        JLabel dueDateLabel = new JLabel("Due Date");
-        assignmentsPanel.add(dueDateLabel, h);
+            h.gridx = 0;
+            h.gridy = 0;
+            h.gridwidth = 1;
+            h.fill = GridBagConstraints.HORIZONTAL;
+            JLabel dueDateLabel = new JLabel("Due Date");
+            assignmentsPanel.add(dueDateLabel, h);
 
-        h.gridx = 1;
-        h.gridwidth = 2;
-        JLabel assignmentName = new JLabel("Assignment Name");
-        assignmentsPanel.add(assignmentName, h);
+            h.gridx = 1;
+            h.gridwidth = 2;
+            JLabel assignmentName = new JLabel("Assignment Name");
+            assignmentsPanel.add(assignmentName, h);
 
-        h.gridx = 3;
-        h.gridwidth = 1;
-        JLabel assingmentWeight = new JLabel("Assignment Weight");
-        assignmentsPanel.add(assingmentWeight, h);
+            h.gridx = 3;
+            h.gridwidth = 1;
+            JLabel assingmentWeight = new JLabel("Assignment Weight");
+            assignmentsPanel.add(assingmentWeight, h);
 
-        h.gridx = 4;
-        String earnedAssignmentWeightString = "0.0";
-        JLabel earnedAssignmentWeight = new JLabel(earnedAssignmentWeightString);
-        assignmentsPanel.add(earnedAssignmentWeight, h);
+            h.gridx = 4;
+            String earnedAssignmentWeightString = "0.0";
+            JLabel earnedAssignmentWeight = new JLabel(earnedAssignmentWeightString);
+            assignmentsPanel.add(earnedAssignmentWeight, h);
 
-        h.gridx++;
-        final JTextField assignmentGradeTextField = new JTextField("Enter Grade %", 10);
-        assignmentGradeTextField.addFocusListener(new FocusListener() {
-            public void focusGained(FocusEvent e) {
-                assignmentGradeTextField.setText("");
-                assignmentGradeTextField.setForeground(new Color(50, 50, 50));
-            }
-
-            public void focusLost(FocusEvent e) {
-                if (assignmentGradeTextField.getText().length() == 0) {
-                    assignmentGradeTextField.setText("Enter Grade %");
-                    assignmentGradeTextField.setForeground(new Color(150, 150, 150));
+            h.gridx++;
+            final JTextField assignmentGradeTextField = new JTextField("Enter Grade %", 10);
+            assignmentGradeTextField.addFocusListener(new FocusListener() {
+                public void focusGained(FocusEvent e) {
+                    assignmentGradeTextField.setText("");
+                    assignmentGradeTextField.setForeground(new Color(50, 50, 50));
                 }
-            }
-        });
-        assignmentsPanel.add(assignmentGradeTextField, h);
 
-        h.gridx++;
-        JButton submitButton = new JButton("Submit");
-        assignmentsPanel.add(submitButton, h);
+                public void focusLost(FocusEvent e) {
+                    if (assignmentGradeTextField.getText().length() == 0) {
+                        assignmentGradeTextField.setText("Enter Grade %");
+                        assignmentGradeTextField.setForeground(new Color(150, 150, 150));
+                    }
+                }
+            });
+            assignmentsPanel.add(assignmentGradeTextField, h);
 
-        classPanel.add(assignmentsPanel);
+            h.gridx++;
+            JButton submitButton = new JButton("Submit");
+            assignmentsPanel.add(submitButton, h);
 
-        tabbedPane.addTab(className, null, classPanel); // Add tab to tab container
-        tabbedPane.setMnemonicAt(0, KeyEvent.VK_3); // keyboard event
+            classPanel.add(assignmentsPanel);
 
-        // Add the tabbed pane to contentPane
-        contentPane.add(tabbedPane, c);
+            tabbedPane.addTab(className, null, classPanel); // Add tab to tab container
+            tabbedPane.setMnemonicAt(0, KeyEvent.VK_3); // keyboard event
+
+            // Add the tabbed pane to contentPane
+            contentPane.add(tabbedPane, c);
+        }
 
         frame.setSize(1000, 800);
         frame.setVisible(true);
@@ -476,7 +447,6 @@ public class Gradebook extends JFrame {
 
     private static void drawCurrentClassesPanel(JPanel currentClassesPanel, JPanel progressPanel, User user) {
         try {
-            ArrayList<Class> currentClasses = Class.getCurrentClasses(user.getUserId());
             if (!currentClasses.isEmpty()) {
                 currentClassesPanel.removeAll();
                 progressPanel.removeAll();
