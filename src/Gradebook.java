@@ -15,12 +15,9 @@ public class Gradebook extends JFrame {
     private static final Font f1 = new Font("Monospaced", Font.BOLD, 20);
     private static final Font f2 = new Font("Monospaced", Font.BOLD, 16);
     private static ArrayList<Class> currentClasses;
-    private static ArrayList<Class> completedClasses;
 
     //creates GUI
     public Gradebook(final User user) throws Exception {
-        completedClasses = Class.getCompletedClasses(user.getUserId());
-
         String userName = user.getUsername();
         String date = new SimpleDateFormat("EEEEE MMMMM d, yyyy").format(new Date());
         String greetingMessage = determineGreeting();
@@ -93,19 +90,13 @@ public class Gradebook extends JFrame {
 
         c.gridy++;
         JPanel completedPanel = new JPanel(new GridLayout(0, 1, 5, 5));
-        JScrollPane completedClassScrollPane = new JScrollPane(completedPanel);
         JPanel completedClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
-        completedClassesPanel.setPreferredSize(new Dimension(200, 200));
-        completedClassesPanel.add(completedClassScrollPane);
-        contentPane.add(completedClassesPanel, c);
-
-        if (!completedClasses.isEmpty()) {
-            for (int i = 0; i < completedClasses.size(); i++) {
-                // Dynamic completed class panels
-                completedPanel.add(createCompClassPanel(completedClasses.get(i).getClassName(), completedClasses.get(i).convertToLetterGrade()));
-            }
-        }
-
+        drawCompletedClassesPanel(completedClassesPanel, completedPanel, user);
+        JScrollPane completedClassScrollPane = new JScrollPane(completedPanel);
+        JPanel completedClassParentPane = new JPanel(new GridLayout(0, 1, 5, 5));
+        completedClassParentPane.setPreferredSize(new Dimension(200, 200));
+        completedClassParentPane.add(completedClassScrollPane);
+        contentPane.add(completedClassParentPane, c);
 
         c.gridx = 3;
         c.gridy = 1;
@@ -229,85 +220,83 @@ public class Gradebook extends JFrame {
 
                             JButton createClassWithAssignmentsBtn = new JButton("Save Class Information");
 
-                            createClassWithAssignmentsBtn.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent e) {
-                                // Create a class object
-                                for (Component b : newClassTemplatePanel.getComponents()) {
-                                    if (b instanceof JPanel) {
-                                        for (Component d : ((JPanel) b).getComponents()) {
-                                            if (d instanceof JPanel) {
-                                                int counter = 0;
-                                                String assignmentDate = null;
-                                                String assignmentName = null;
-                                                String assignmentWeight = null;
-                                                for (Component f : ((JPanel) d).getComponents()) {
-                                                    if (f instanceof JTextField) {
-                                                        switch (counter) {
-                                                            case 0:
-                                                                assignmentDate = ((JTextField) f).getText();
-                                                                break;
-                                                            case 1:
-                                                                assignmentName = ((JTextField) f).getText();
-                                                                break;
-                                                            case 2:
-                                                                assignmentWeight = ((JTextField) f).getText();
-                                                                break;
-                                                        }
-                                                        counter++;
+                            createClassWithAssignmentsBtn.addActionListener(e1 -> {
+                            // Create a class object
+                            for (Component b : newClassTemplatePanel.getComponents()) {
+                                if (b instanceof JPanel) {
+                                    for (Component d : ((JPanel) b).getComponents()) {
+                                        if (d instanceof JPanel) {
+                                            int counter = 0;
+                                            String assignmentDate = null;
+                                            String assignmentName = null;
+                                            String assignmentWeight = null;
+                                            for (Component f : ((JPanel) d).getComponents()) {
+                                                if (f instanceof JTextField) {
+                                                    switch (counter) {
+                                                        case 0:
+                                                            assignmentDate = ((JTextField) f).getText();
+                                                            break;
+                                                        case 1:
+                                                            assignmentName = ((JTextField) f).getText();
+                                                            break;
+                                                        case 2:
+                                                            assignmentWeight = ((JTextField) f).getText();
+                                                            break;
                                                     }
+                                                    counter++;
+                                                }
+                                            }
+
+                                            if (assignmentDate != null && assignmentName != null && assignmentWeight != null) {
+                                                // Make sure the assignmentDate is actually a valid date
+                                                Date assignmentDateVal = convertStringToDate(assignmentDate);
+
+                                                // Make sure that the assignment weight is a float
+                                                float assignmentWeightVal;
+                                                try {
+                                                    assignmentWeightVal = Float.parseFloat(assignmentWeight);
+                                                } catch (NumberFormatException ex) {
+                                                    // TODO: Add error message if the string isn't actually a float
+                                                    System.out.println("Assignment weight is not a float");
+                                                    return;
                                                 }
 
-                                                if (assignmentDate != null && assignmentName != null && assignmentWeight != null) {
-                                                    // Make sure the assignmentDate is actually a valid date
-                                                    Date assignmentDateVal = convertStringToDate(assignmentDate);
+                                                if (assignmentDateVal != null) {
+                                                    // Create an assignment object
+                                                    int classId = classX.getClassId();
+                                                    Assignment assignment = new Assignment(user.getUserId(), classId, assignmentName, assignmentDateVal, assignmentWeightVal);
 
-                                                    // Make sure that the assignment weight is a float
-                                                    float assignmentWeightVal;
+                                                    // Try to add the assignment object to the database
                                                     try {
-                                                        assignmentWeightVal = Float.parseFloat(assignmentWeight);
-                                                    } catch (NumberFormatException ex) {
-                                                        // TODO: Add error message if the string isn't actually a float
-                                                        System.out.println("Assignment weight is not a float");
-                                                        return;
+                                                        Assignment.addAssignment(assignment);
+
+                                                    } catch (Exception ex) {
+                                                        // TODO: Show error message if assignment can't be added to the database
+                                                        System.out.println("Failed to add assignment to the database");
                                                     }
-
-                                                    if (assignmentDateVal != null) {
-                                                        // Create an assignment object
-                                                        int classId = classX.getClassId();
-                                                        System.out.println(classId);
-                                                        Assignment assignment = new Assignment(user.getUserId(), classId, assignmentName, assignmentDateVal, assignmentWeightVal);
-
-                                                        // Try to add the assignment object to the database
-                                                        try {
-                                                            Assignment.addAssignment(assignment);
-
-                                                        } catch (Exception ex) {
-                                                            // TODO: Show error message if assignment can't be added to the database
-                                                            System.out.println("Failed to add assignment to the database");
-                                                        }
-                                                    }
-
-                                                    assignmentDate = null;
-                                                    assignmentName = null;
-                                                    assignmentWeight = null;
-                                                } else {
-                                                    // TODO: Show error message if any of the fields are empty for a row
                                                 }
+
+                                                assignmentDate = null;
+                                                assignmentName = null;
+                                                assignmentWeight = null;
+                                            } else {
+                                                // TODO: Show error message if any of the fields are empty for a row
                                             }
                                         }
                                     }
                                 }
+                            }
 
-                                // Redraw the progress panels when new classes are added
-                                drawCurrentClassesPanel(currentClassesPanel, progressPanel, user);
+                            // Redraw the progress panels when new classes are added
+                            drawCurrentClassesPanel(currentClassesPanel, progressPanel, user);
+                            drawCompletedClassesPanel(completedClassesPanel, completedPanel, user);
 
-                                // Restore the add class tab to its original state
-                                newClassPanel.removeAll();
-                                newClassPanel.revalidate();
-                                newClassPanel.repaint();
-                                newClassFormPanel.add(createNewClassTemplate, constraints);
-                                newClassPanel.add(newClassFormPanel, BorderLayout.CENTER);
-                                }
+                            // Restore the add class tab to its original state
+                            newClassPanel.removeAll();
+                            newClassPanel.revalidate();
+                            newClassPanel.repaint();
+                            newClassFormPanel.add(createNewClassTemplate, constraints);
+                            newClassPanel.add(newClassFormPanel, BorderLayout.CENTER);
                             });
                             newClassTemplatePanel.add(createClassWithAssignmentsBtn, BorderLayout.PAGE_END);
                             newClassPanel.add(newClassTemplatePanel, BorderLayout.PAGE_START);
@@ -317,7 +306,6 @@ public class Gradebook extends JFrame {
                         }
                     } catch (Exception ex) {
                         // Show error in GUI if class isn't saved to database; don't allow user to continue in application
-                        return;
                     }
                 }
             }
@@ -381,8 +369,8 @@ public class Gradebook extends JFrame {
 
             h.gridx = 3;
             h.gridwidth = 1;
-            JLabel assingmentWeight = new JLabel("Assignment Weight");
-            assignmentsPanel.add(assingmentWeight, h);
+            JLabel assignmentWeight = new JLabel("Assignment Weight");
+            assignmentsPanel.add(assignmentWeight, h);
 
             h.gridx = 4;
             String earnedAssignmentWeightString = "0.0";
@@ -447,7 +435,7 @@ public class Gradebook extends JFrame {
     private static void drawCurrentClassesPanel(JPanel currentClassesPanel, JPanel progressPanel, User user) {
         try {
             currentClasses = Class.getCurrentClasses(user.getUserId());
-            if (!currentClasses.isEmpty()) {
+            if (currentClasses.size() > 0) {
                 currentClassesPanel.removeAll();
                 progressPanel.removeAll();
 
@@ -458,9 +446,27 @@ public class Gradebook extends JFrame {
                 progressPanel.add(currentClassesPanel);
 
                 for (int i = 0; i < currentClasses.size(); i++) {
-                    progressPanel.add(createClassProgressPanel(currentClasses.get(i).getClassName(), currentClasses.get(i).convertToLetterGrade(), 40, 100));
+                    progressPanel.add(createClassProgressPanel(currentClasses.get(i).getClassName(), currentClasses.get(i).convertToLetterGrade(), 0, 100));
                 }
                 currentClassesPanel.revalidate();
+            }
+        } catch (Exception ex) {
+            System.out.println("We're sorry, but we cannot access your classes at this time. Please try again later.");
+        }
+    }
+
+    private static void drawCompletedClassesPanel(JPanel completedClassesPanel, JPanel completedPanel, User user) {
+        try {
+            ArrayList<Class> completedClasses = Class.getCompletedClasses(user.getUserId());
+            if (completedClasses.size() > 0) {
+                completedClassesPanel.removeAll();
+                completedPanel.removeAll();
+
+                for (int i = 0; i < completedClasses.size(); i++) {
+                    // Dynamic completed class panels
+                    completedPanel.add(createCompClassPanel(completedClasses.get(i).getClassName(), completedClasses.get(i).convertToLetterGrade()));
+                }
+                completedClassesPanel.revalidate();
             }
         } catch (Exception ex) {
             System.out.println("We're sorry, but we cannot access your classes at this time. Please try again later.");
