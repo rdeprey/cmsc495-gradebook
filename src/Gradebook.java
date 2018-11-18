@@ -186,15 +186,19 @@ public class Gradebook extends JFrame {
                                 switch (counter) {
                                     case 0:
                                         className = ((JTextField) d).getText();
+                                        ((JTextField) d).setText(""); // Reset text field for later use after getting value
                                         break;
                                     case 1:
                                         classStartDate = ((JTextField) d).getText();
+                                        ((JTextField) d).setText("");
                                         break;
                                     case 2:
                                         classEndDate = ((JTextField) d).getText();
+                                        ((JTextField) d).setText("");
                                         break;
                                     case 3:
                                         numOfAssignments = ((JTextField) d).getText();
+                                        ((JTextField) d).setText("");
                                         break;
                                 }
                                 counter++;
@@ -254,7 +258,6 @@ public class Gradebook extends JFrame {
                             newClassTemplatePanel.add(createAssignmentForm(assignmentsInt));
 
                             JButton createClassWithAssignmentsBtn = new JButton("Save Class Information");
-                            newClassTemplatePanel.add(createClassWithAssignmentsBtn, BorderLayout.PAGE_END);
 
                             createClassWithAssignmentsBtn.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent e) {
@@ -300,7 +303,9 @@ public class Gradebook extends JFrame {
 
                                                     if (assignmentDateVal != null) {
                                                         // Create an assignment object
-                                                        Assignment assignment = new Assignment(user.getUserId(), classX.getClassId(), assignmentName, assignmentDateVal, assignmentWeightVal);
+                                                        int classId = classX.getClassId();
+                                                        System.out.println(classId);
+                                                        Assignment assignment = new Assignment(user.getUserId(), classId, assignmentName, assignmentDateVal, assignmentWeightVal);
 
                                                         // Try to add the assignment object to the database
                                                         try {
@@ -327,13 +332,15 @@ public class Gradebook extends JFrame {
                                 drawCurrentClassesPanel(currentClassesPanel, progressPanel, user);
 
                                 // Restore the add class tab to its original state
-                                newClassPanel.add(newClassTemplatePanel, BorderLayout.PAGE_START);
                                 newClassPanel.removeAll();
                                 newClassPanel.revalidate();
                                 newClassPanel.repaint();
-                                newClassFormPanel.add(classInfoPanel, constraints);
+                                newClassFormPanel.add(createNewClassTemplate, constraints);
+                                newClassPanel.add(newClassFormPanel, BorderLayout.CENTER);
                                 }
                             });
+                            newClassTemplatePanel.add(createClassWithAssignmentsBtn, BorderLayout.PAGE_END);
+                            newClassPanel.add(newClassTemplatePanel, BorderLayout.PAGE_START);
                         } else {
                             // Show error message
 
