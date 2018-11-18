@@ -234,6 +234,14 @@ public class Login extends Application {
         Scene scene = new Scene(grid, 500, 400);
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        reset.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                userTextField.setText("");
+                pwBox.setText("");
+            }
+        });
     }
 
     /**
