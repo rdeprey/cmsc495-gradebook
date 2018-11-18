@@ -34,8 +34,7 @@ public class DatabaseConnection {
         String jdbcUrl = host + ":1433;DatabaseName=gradebookdb";
 
         try {
-            Connection con = DriverManager.getConnection(jdbcUrl, username, password);
-            return con;
+            return DriverManager.getConnection(jdbcUrl, username, password);
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             throw new RuntimeException("Error connecting to the database", ex);

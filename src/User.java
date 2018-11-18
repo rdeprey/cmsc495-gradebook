@@ -72,8 +72,25 @@ public class User {
             ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE username='" + username + "' AND password='" + password + "'");
 
             if (rs.next()) {
-                User user = getUserFromResultSet(rs);
-                return user;
+                return getUserFromResultSet(rs);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            dbCon.close();
+        }
+
+        return null;
+    }
+
+    public static User getUser(String emailAddress) throws Exception {
+        Connection dbCon = new DatabaseConnection().getConnection();
+        try {
+            Statement stmt = dbCon.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE emailAddress='" + emailAddress + "'");
+
+            if (rs.next()) {
+                return getUserFromResultSet(rs);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

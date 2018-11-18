@@ -171,5 +171,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" exported="" name="javafx" level="project" />
+    <orderEntry type="library" exported="" name="javax.mail" level="project" />
+    <orderEntry type="library" exported="" name="activation" level="project" />
   </component>
 </module>
