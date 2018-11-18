@@ -1,346 +1,422 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
-import javax.swing.*;
-import java.awt.event.WindowEvent;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.Properties;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class Login extends javax.swing.JFrame {
 
-    private static final int MAX_ATTEMPTS = 3;
-    private int attempts;
+public class Login extends Application {
 
-    private String timestamp;
-    private User user;
+    private Object httpSession;
 
-    /**
-     * Creates new form Login
-     */
-    public Login() throws Exception {
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("GradeBook Login");
+        // Grid Pane divides your window into grids
+        final GridPane grid = new GridPane();
+        // Align to Center
+        // Note Position is geometric object for alignment
+        grid.setAlignment(Pos.CENTER);
+        // Set gap between the components
+        // Larger numbers mean bigger spaces
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        // Create some text to place in the scene
+        Text scenetitle = new Text("Please, login to continue.");
+        // Add text to grid 0,0 span 2 columns, 1 row
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        // Create Label
+        Label userName = new Label("User Name:");
+        // Add label to grid 0,1
+        grid.add(userName, 0, 1);
+
+        // Create Textfield
+        final TextField userTextField = new TextField();
+        // Add textfield to grid 1,1
+        grid.add(userTextField, 1, 1);
+
+        // Create Label
+        Label pw = new Label("Password:");
+        // Add label to grid 0,2
+        grid.add(pw, 0, 2);
+
+        // Create Passwordfield
+        final PasswordField pwBox = new PasswordField();
+        // Add Password field to grid 1,2
+        grid.add(pwBox, 1, 2);
+
+        // Create Login Button
+        Button btn = new Button("Login");
+        // Add button to grid 1,4
+        grid.add(btn, 1, 4);
+
+        // Create Reset Button
+        Button reset = new Button("Reset");
+        // Add button to grid 2,4
+        grid.add(reset, 0, 4);
+
+
+        // Create Forgot Button for Username/Password
+        CheckBox forgotButton = new CheckBox("Forgot Username/Password");
+        grid.add(forgotButton, 0,5,2,2);
+        forgotButton.setSelected(false);
+
+
+
+
+        //Create Warning Disclaimer
+        Text warning = new Text ("Privacy Disclaimer:\n" +
+                "This system is for the use of authorized students only. \n" +
+                "Individuals using this system without authority, or in excess of their authority, are subject\n" +
+                "to having all of their activities on this system monitored and recorded by system personnel.");
+        warning.setStyle("-fx-font: 10 arial;");
+        grid.add(warning, 0, 8, 3, 2);
+
+        final Text actiontarget = new Text();
+        grid.add(actiontarget, 1, 10);
+
+
+
+        // Set the Action when button is clicked
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent e) {
+                // Authenticate the user
+                boolean isValid = authenticate(userTextField.getText(), pwBox.getText());
+                int counter = counter();
+                int maxAttempts = 2;
+                // If valid clear the grid and Welcome the user
+                if (counter == maxAttempts) {
+                    grid.setVisible(false);
+                    GridPane grid2 = new GridPane();
+                    // Align to Center
+                    // Note Position is geometric object for alignment
+                    grid2.setAlignment(Pos.CENTER);
+                    // Set gap between the components
+                    // Larger numbers mean bigger spaces
+                    grid2.setHgap(10);
+                    grid2.setVgap(10);
+                    Text scenetitle = new Text("ACCESS DENIED!\n" +
+                            "You have had mutiple failed Login Attempts.\n" +
+                            "Please contact Help Desk for further assistance.");
+                    scenetitle.setFill(Color.FIREBRICK);
+                    // Add text to grid 0,0 span 2 columns, 1 row
+                    grid2.add(scenetitle, 0, 0, 2, 2);
+                    Scene scene = new Scene(grid2, 500, 400);
+                    primaryStage.setScene(scene);
+                    primaryStage.show();
+
+                    // If Invalid Ask user to try again                   
+                } else if(isValid != true && counter < maxAttempts){
+
+                    final Text actiontarget = new Text();
+                    grid.add(actiontarget, 1, 10);
+                    actiontarget.setFill(Color.FIREBRICK);
+                    actiontarget.setText("Please try again.");
+                    System.out.println(counter);
                 }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
+                else {
+                    javamail(userTextField.getText());
+                    grid.setVisible(false);
+                    GridPane grid3 = new GridPane();
+                    // Align to Center
+                    // Note Position is geometric object for alignment
+                    grid3.setAlignment(Pos.CENTER);
+                    // Set gap between the components
+                    // Larger numbers mean bigger spaces
+                    grid3.setHgap(10);
+                    grid3.setVgap(10);
+                    Text scenetitle = new Text("Please check your email " + userTextField.getText()
+                            + "\nand input your given security code to continue.");
+                    // Add text to grid 0,0 span 2 columns, 1 row
+                    grid3.add(scenetitle, 0, 0, 2, 1);
+                    // Create Label for security Code
+                    Label securecode = new Label("Security Code: ");
+                    // Add label to grid 0,1
+                    grid3.add(securecode, 0, 1);
+                    // Create Textfield for code input
+                    TextField emailcode = new TextField();
+                    // Add textfield to grid 1,1
+                    grid3.add(emailcode, 0, 2);
+                    // Create Login Button
+                    Button secbtn = new Button("Confirm");
+                    // Add button to grid 1,4
+                    grid3.add(secbtn, 0, 4, 2, 1);
+                    Scene scene = new Scene(grid3, 500, 400);
+                    primaryStage.setScene(scene);
+                    primaryStage.show();
 
-        initComponents();
-    }
+                    secbtn.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent e) {
+                            try {
+                                secure();
+                            } catch (Exception ex) {
+                                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            boolean authen = confirmation(userTextField.getText(), emailcode.getText());
+                            if(authen == false){
+                                grid.setVisible(false);
+                                GridPane grid4 = new GridPane();
+                                // Align to Center
+                                // Note Position is geometric object for alignment
+                                grid4.setAlignment(Pos.CENTER);
+                                // Set gap between the components
+                                // Larger numbers mean bigger spaces
+                                grid4.setHgap(10);
+                                grid4.setVgap(10);
+                                Text scenetitle = new Text("ACCESS DENIED!\n" +
+                                        "You've failed to enter the correct security code.\n" +
+                                        "Your information will be reviewed by our system's personnel.\n" +
+                                        " If you think an error has been made please contact our\n" +
+                                        "Help Desk immediately.");
+                                scenetitle.setFill(Color.FIREBRICK);
+                                // Add text to grid 0,0 span 2 columns, 1 row
+                                grid4.add(scenetitle, 0, 0, 2, 2);
+                                Scene scene = new Scene(grid4, 500, 400);
+                                primaryStage.setScene(scene);
+                                primaryStage.show();
+                            }
+                            else {
+                                grid.setVisible(false);
+                                GridPane grid5 = new GridPane();
+                                // Align to Center
+                                // Note Position is geometric object for alignment
+                                grid5.setAlignment(Pos.CENTER);
+                                // Set gap between the components
+                                // Larger numbers mean bigger spaces
+                                grid5.setHgap(10);
+                                grid5.setVgap(10);
+                                Text scenetitle = new Text("Welcome " + userTextField.getText() + "!\n"
+                                        + "Thank you for your identity confirmation!");
+                                // Add text to grid 0,0 span 2 columns, 1 row
+                                grid5.add(scenetitle, 0, 0, 2, 1);
+                                Scene scene = new Scene(grid5, 500, 400);
+                                primaryStage.setScene(scene);
+                                primaryStage.show();
+                            }
+                        }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() throws Exception {
-
-        jPasswordField1 = new javax.swing.JPasswordField();
-        jPassword = new javax.swing.JPasswordField();
-        jtxtUserName = new javax.swing.JTextField();
-        label1 = new java.awt.Label();
-        label2 = new java.awt.Label();
-        jtbnReset = new java.awt.Button();
-        jtbnSubmit = new java.awt.Button();
-        jtbnExit = new java.awt.Button();
-        label3 = new java.awt.Label();
-
-        jPasswordField1.setText("jPasswordField1");
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jPassword.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jPasswordActionPerformed(evt);
+                    });
+                }
             }
         });
-
-        label1.setText("Username:");
-
-        label2.setText("Password:");
-
-        jtbnReset.setLabel("Reset");
-        jtbnReset.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtbnResetActionPerformed(evt);
-            }
-        });
-
-        jtbnSubmit.setLabel("Submit");
-        jtbnSubmit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                try {
-                    jtbnSubmitActionPerformed(evt);
-                } catch (Exception ex) {
-                    System.out.println("Submit exception occurred " + ex);
-                }
-            }
-        });
-
-        jtbnExit.setLabel("Exit ");
-        jtbnExit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtbnExitActionPerformed(evt);
-            }
-        });
-
-        label3.setFont(new java.awt.Font("Lucida Grande", 3, 24)); // NOI18N
-        label3.setText("Gradebook: User Login ");
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(46, 46, 46)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jtbnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(label2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(52, 52, 52)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jtxtUserName, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
-                                .addComponent(jPassword))
-                            .addComponent(jtbnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jtbnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(22, 22, 22))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(label3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(42, 42, 42)
-                .addComponent(label3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jtxtUserName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(label1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(label2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(27, 27, 27)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jtbnReset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jtbnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jtbnExit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(64, 64, 64))
-        );
-
-        label3.getAccessibleContext().setAccessibleName(" User Login ");
-
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
-
-    private void jtbnExitActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jtbnExitActionPerformed
-        // Exit Button
-
-        System.exit(0);
-    }// GEN-LAST:event_jtbnExitActionPerformed
-
-    private void jtbnResetActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jtbnResetActionPerformed
-
-        jPassword.setText(null);
-        jtxtUserName.setText(null);
-
-    }// GEN-LAST:event_jtbnResetActionPerformed
-
-    private void jPasswordActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jPasswordActionPerformed
-        // TODO add your handling code here:
-    }// GEN-LAST:event_jPasswordActionPerformed
-
-    private void jtbnSubmitActionPerformed(java.awt.event.ActionEvent evt) throws Exception  {// GEN-FIRST:event_jtbnSubmitActionPerformed
-
-        String password = String.valueOf(jPassword.getPassword());
-        String username = jtxtUserName.getText();
-
-        if (!login(username, password)) {
-            if (attempts == MAX_ATTEMPTS) {
-                JOptionPane.showMessageDialog(null, " Max Login Attempts, GoodBye!", "Login Error",
-                        JOptionPane.ERROR_MESSAGE);
-                System.exit(0);
-            }
-            JOptionPane.showMessageDialog(null, "Invalid UserName or Password", "Login Error",
-                    JOptionPane.ERROR_MESSAGE);
-            jPassword.setText(null);
-            jtxtUserName.setText(null);
-        } else {
-            Login_s Info = new Login_s(user);
-            Info.setVisible(true);
-            this.dispose();
-        }
-    }// GEN-LAST:event_jtbnSubmitActionPerformed
-
-    public int getAttempts() {
-        return attempts;
-    }
-
-    public boolean login(String username, String password) throws Exception  {
-        String timestamp = new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss").format(new Date());
-        if (attempts == MAX_ATTEMPTS) {
-            String log = "Username:" + username + "Max Login Attempts, Timestamp at: " + timestamp + "\n";
-            BufferedWriter writer = null;
-
-            try {
-                writer = new BufferedWriter(new FileWriter("log.txt", true));
-                writer.write(log);
-            } // print error message if there is one
-            catch (IOException io) {
-                System.out.println("File IO Exception" + io.getMessage());
-            } // close the file
-            finally {
-                try {
-                    if (writer != null) {
-                        writer.close();
-                    }
-                } // print error message if there is one
-                catch (IOException io) {
-                    System.out.println("Issue closing the file." + io.getMessage());
-                }
-
-            } // close the file
-            return false;
-        }
-
-        user = User.getUser(username, password);
-
-        if (user != null) {
-            jtxtUserName.setText(null);
-            jPassword.setText(null);
-            systemExit();
-
-            String log = "Username:" + username + "  Successful Login, Timestamp at: " + timestamp + "\n";
-            BufferedWriter writer = null;
-
-            try {
-                writer = new BufferedWriter(new FileWriter("log2.txt", true));
-                writer.write(log);
-            } // print error message if there is one
-            catch (IOException io) {
-                System.out.println("File IO Exception" + io.getMessage());
-            } // close the file
-            finally {
-                try {
-                    if (writer != null) {
-                        writer.close();
-                    }
-                } // print error message if there is one
-                catch (IOException io) {
-                    System.out.println("Issue closing the file." + io.getMessage());
-                }
-
-            }
-            return true;
-        } else {
-
-            String log = "Username:" + username + "  Unsuccessful Login, Timestamp at: " + timestamp + "\n";
-            BufferedWriter writer = null;
-
-            try {
-                writer = new BufferedWriter(new FileWriter("log3.txt", true));
-                writer.write(log);
-            } // print error message if there is one
-            catch (IOException io) {
-                System.out.println("File IO Exception" + io.getMessage());
-            } // close the file
-            finally {
-                try {
-                    if (writer != null) {
-                        writer.close();
-                    }
-                } // print error message if there is one
-                catch (IOException io) {
-                    System.out.println("Issue closing the file." + io.getMessage());
-                }
-
-            } // close the file
-            attempts++;
-            return false;
-        }
+        // Set the size of Scene
+        Scene scene = new Scene(grid, 500, 400);
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) throws Exception {
-        /* Set the Nimbus look and feel */
-        // <editor-fold defaultstate="collapsed" desc=" Look and feel setting
-        // code (optional) ">
-        /*
-		 * If Nimbus (introduced in Java SE 6) is not available, stay with the
-		 * default look and feel. For details see
-		 * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.
-		 * html
-         */
+    public static void main(String[] args) {
+        launch(args);
+
+    }
+    String filename = "Logins.txt";
+    String line;
+    final boolean append = true;
+    BufferedWriter writer = null;
+
+    Date date = new Date();
+    private int count = 0;
+    public int attempts;
+
+    Random rand = new Random();
+    int  n = rand.nextInt(9999) + 1;
+    String code = Integer.toString(n);
+
+    //Create a function that is able to encrypt the audit records
+    //encrypt each line
+    public void secure() throws Exception{
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+            SecretKey key = KeyGenerator.getInstance("AES").generateKey();
+            AESEncrypter encrypter = new AESEncrypter(key);
+            BufferedReader br = new BufferedReader(new FileReader(filename));
+            while((line = br.readLine()) != null) {
+                encrypter.encrypt(line);
+
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        // </editor-fold>
+        catch (NoSuchAlgorithmException e) {
+            System.err.println("No such algorithm exists.");
+        }
+        catch(FileNotFoundException ex) {
+            System.out.println(
+                    "Unable to open file '" +
+                            filename + "'");
+        }
+        catch(IOException ex) {
+            System.out.println(
+                    "Error reading file '"
+                            + filename + "'");
+        }
+    }
+    /**
+     * @param user the username entered
+     * @param pword the password entered
+     * @return isValid true for authenticated
+     */
+    public boolean authenticate(String user, String pword) {
 
-        /* Create and display the form */
-       // java.awt.EventQueue.invokeLater(new Runnable() {
-            //public void run() {
-                try {
-                    new Login().setVisible(true);
-                } catch (Exception ex) {
-                    System.out.println("Login exception occurred" + ex);
-                }
-           // }
-       // });
+        boolean isValid = false;
+        if (user.equalsIgnoreCase("test")
+                && pword.equals("test")) {
+            isValid = true;
+            try {
+                writer = new BufferedWriter(new FileWriter(filename,append));
+                writer.newLine();
+                writer.append("Successful Login on " + date + " in which the following username: " + user);
+                writer.newLine();
+                writer.append("and password: " + pword + " were entered correctly by the user to access their account.");
+                writer.newLine();
+                writer.append("It took the user " + (attempts + 1) + " attempts to access their account successfully.");
+                writer.newLine();
+            }
+            // print error message if there is one
+            catch (IOException io) {
+                System.out.println("File IO Exception" + io.getMessage());
+            }
+        }
+        else{
+            try {
+                writer = new BufferedWriter(new FileWriter(filename, append));
+                writer.newLine();
+                writer.append("Error: Invalid Login Credentials on " + date + " in which the");
+                writer.newLine();
+                writer.append("following username: " + user + " and password: " + pword + " were entered by a user");
+                writer.newLine();
+                writer.append("in the attempt to access an account. This is users " + (attempts + 1)
+                        + " attempt to login into this system");
+                writer.newLine();
+                writer.append("unsuccessfully. This should be reviewed by a systems administrator for further action.");
+                writer.newLine();
+            }
+            // print error message if there is one
+            catch (IOException io) {
+                System.out.println("File IO Exception" + io.getMessage());
+            }
+        }
+        try {
+            if (writer != null) {
+                writer.close();
+            }
+        }
+        //print error message if there is one
+        catch (IOException io) {
+            System.out.println("Issue closing the File." + io.getMessage());
+        }
+        return isValid;
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPasswordField jPassword;
-    private javax.swing.JPasswordField jPasswordField1;
-    private java.awt.Button jtbnExit;
-    private java.awt.Button jtbnReset;
-    private java.awt.Button jtbnSubmit;
-    private javax.swing.JTextField jtxtUserName;
-    private java.awt.Label label1;
-    private java.awt.Label label2;
-    private java.awt.Label label3;
-    // End of variables declaration//GEN-END:variables
-
-    private void systemExit() {
-        WindowEvent winClosing = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
+    public int counter(){
+        int oneUp = count++;
+        attempts = oneUp + 1;
+        return oneUp;
     }
+
+
+    public boolean confirmation(String user, String secureNum) {
+        boolean authen = false;
+        if (secureNum.equalsIgnoreCase(code)) {
+            authen = true;
+            try {
+                writer = new BufferedWriter(new FileWriter(filename,append));
+                writer.newLine();
+                writer.append("Successful Email Authentication on " + date + " in which the following");
+                writer.newLine();
+                writer.append("username:" + user + " entered the correct security code that was emailed.");
+                writer.newLine();
+            }
+            // print error message if there is one
+            catch (IOException io) {
+                System.out.println("File IO Exception" + io.getMessage());
+            }
+        }
+        else{
+            try {
+                writer = new BufferedWriter(new FileWriter(filename, append));
+                writer.newLine();
+                writer.append("Error: Invalid Security Code Credentials on " + date + " in which the");
+                writer.newLine();
+                writer.append("following username: " + user + " entered the incorrect emailed security code.");
+                writer.newLine();
+            }
+
+            // print error message if there is one
+            catch (IOException io) {
+                System.out.println("File IO Exception" + io.getMessage());
+            }
+        }
+        try {
+            if (writer != null) {
+                writer.close();
+            }
+        }
+        //print error message if there is one
+        catch (IOException io) {
+            System.out.println("Issue closing the File." + io.getMessage());
+        }
+        return authen;
+    }
+    public void javamail(String user){
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.class",
+                "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.port", "465");
+
+        Session session = Session.getDefaultInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication("cmsc495gradebook","1234test%");
+                    }
+                });
+
+        try {
+
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("cmsc495gradebook@gmail.com"));
+            message.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse("hgiles27@yahoo.com"));
+            message.setSubject("Login Security Code");
+            message.setText("Dear " + user + "," +
+                    "\n\n Thank you for attempting to login to GradeBook"
+                    + " To confirm your identity please now type in" +
+                    " Security Code below into the application and click" +
+                    " 'Confirm' button to continue." +
+                    "\n\nThe Security Code is: " + "\n" + code);
+
+            Transport.send(message);
+
+
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

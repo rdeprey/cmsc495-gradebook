@@ -26,8 +26,18 @@ public class Class {
     }
 
     // Getters
-    public int getClassId() {
-        return this.classId;
+    public Integer getClassId() {
+        if (this.classId != 0) {
+            return this.classId;
+        } else {
+            try {
+                return getClassId(this.className, this.userId);
+            } catch (Exception ex) {
+                // TODO: Handle exception if you can't get the class ID
+            }
+        }
+
+        return null;
     }
 
     public int getUserId() {
@@ -169,6 +179,24 @@ public class Class {
             }
 
             return classes;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            dbCon.close();
+        }
+
+        return null;
+    }
+
+    public static Integer getClassId(String className, int userId) throws Exception {
+        Connection dbCon = new DatabaseConnection().getConnection();
+        try {
+            Statement stmt = dbCon.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT classId FROM Classes WHERE className='" + className + "' AND userId=" + userId);
+
+            while (rs.next()) {
+                return rs.getInt("classId");
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
