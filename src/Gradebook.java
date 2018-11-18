@@ -15,11 +15,11 @@ public class Gradebook extends JFrame {
     private static final Font f1 = new Font("Monospaced", Font.BOLD, 20);
     private static final Font f2 = new Font("Monospaced", Font.BOLD, 16);
     private static ArrayList<Class> currentClasses;
+    private static ArrayList<Class> completedClasses;
 
     //creates GUI
     public Gradebook(final User user) throws Exception {
-        currentClasses = Class.getCurrentClasses(user.getUserId());
-        ArrayList<Class> completedClasses = Class.getCompletedClasses(user.getUserId());
+        completedClasses = Class.getCompletedClasses(user.getUserId());
 
         String userName = user.getUsername();
         String date = new SimpleDateFormat("EEEEE MMMMM d, yyyy").format(new Date());
@@ -446,6 +446,7 @@ public class Gradebook extends JFrame {
 
     private static void drawCurrentClassesPanel(JPanel currentClassesPanel, JPanel progressPanel, User user) {
         try {
+            currentClasses = Class.getCurrentClasses(user.getUserId());
             if (!currentClasses.isEmpty()) {
                 currentClassesPanel.removeAll();
                 progressPanel.removeAll();
