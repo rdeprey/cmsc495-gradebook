@@ -124,7 +124,7 @@ public class Login extends Application {
                                 // Larger numbers mean bigger spaces
                                 grid3.setHgap(10);
                                 grid3.setVgap(10);
-                                Text scenetitle = new Text("Please check your email " + userTextField.getText()
+                                Text scenetitle = new Text("Your username is " + user.getUsername() + ".\n\nPlease check your email " + userTextField.getText()
                                         + "\nand input your given security code to continue.");
                                 // Add text to grid 0,0 span 2 columns, 1 row
                                 grid3.add(scenetitle, 0, 0, 2, 1);
@@ -212,11 +212,15 @@ public class Login extends Application {
                                     }
                                 });
                             } else {
-                                System.out.println("Unable to access the database");
+                                System.out.println("Email wasn't found in the database.");
                             }
                         } catch (Exception ex) {
                             // TODO: Show error if the email can't be found?
-                            System.out.println("Email wasn't found in database.");
+                            System.out.println("Unable to access the database");
+                            final Text actiontarget = new Text();
+                            grid.add(actiontarget, 1, 10);
+                            actiontarget.setFill(Color.FIREBRICK);
+                            actiontarget.setText("Please try again.");
                         }
                     }
                 });

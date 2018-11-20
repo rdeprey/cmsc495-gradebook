@@ -133,25 +133,6 @@ public class User {
         }
     }
 
-    // When the user asks to reset their password or get their username (i.e., enter email address step)
-    public static boolean forgotPasswordOrUsername(String emailAddress) throws Exception {
-        Connection dbCon = new DatabaseConnection().getConnection();
-        try {
-            Statement stmt = dbCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Users WHERE emailAddress='" + emailAddress + "'");
-
-            if (rs.next()) {
-                return true;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        } finally {
-            dbCon.close();
-        }
-
-        return false;
-    }
-
     // When the user actually updates his/her password
     public static boolean resetPassword(int userId, String password) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();

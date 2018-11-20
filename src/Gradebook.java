@@ -527,13 +527,39 @@ public class Gradebook extends JFrame {
         final JLabel classStartDateLabel = new JLabel("Class Start Date: ");
         classInfoPanel.add(classStartDateLabel);
 
-        final JTextField classStartDateTextField = new JTextField(5);
+        final JTextField classStartDateTextField = new JTextField("--/--/----", 9);
+        classStartDateTextField.addFocusListener(new FocusListener() {
+            public void focusGained(FocusEvent e) {
+                classStartDateTextField.setText("");
+                classStartDateTextField.setForeground(new Color(50, 50, 50));
+            }
+
+            public void focusLost(FocusEvent e) {
+                if (classStartDateTextField.getText().length() == 0) {
+                    classStartDateTextField.setText("--/--/----");
+                    classStartDateTextField.setForeground(new Color(150, 150, 150));
+                }
+            }
+        });
         classInfoPanel.add(classStartDateTextField);
 
         final JLabel classEndDateLabel = new JLabel("Class End Date: ");
         classInfoPanel.add(classEndDateLabel);
 
-        final JTextField classEndDateTextField = new JTextField(5);
+        final JTextField classEndDateTextField = new JTextField("--/--/----", 9);
+        classEndDateTextField.addFocusListener(new FocusListener() {
+            public void focusGained(FocusEvent e) {
+                classEndDateTextField.setText("");
+                classEndDateTextField.setForeground(new Color(50, 50, 50));
+            }
+
+            public void focusLost(FocusEvent e) {
+                if (classEndDateTextField.getText().length() == 0) {
+                    classEndDateTextField.setText("--/--/----");
+                    classEndDateTextField.setForeground(new Color(150, 150, 150));
+                }
+            }
+        });
         classInfoPanel.add(classEndDateTextField);
 
         final JLabel numberOfAssignmentsLabel = new JLabel("Number of Assignments: ");
