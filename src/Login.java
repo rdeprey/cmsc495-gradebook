@@ -1,6 +1,4 @@
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -83,153 +81,140 @@ public class Login extends Application {
         forgotButton.setSelected(false);
 
         // Create forgot button action
-        forgotButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                // Update the view to panel that asks user for their email address
-                GridPane grid6 = new GridPane();
-                // Align to Center
-                // Note Position is geometric object for alignment
-                grid6.setAlignment(Pos.CENTER);
-                // Set gap between the components
-                // Larger numbers mean bigger spaces
-                grid6.setHgap(10);
-                grid6.setVgap(10);
-                Text enterEmailTitle = new Text("Please enter the email address associated with your account.");
-                grid6.add(enterEmailTitle, 0, 0, 2, 1);
-                Label emailAddressLbl = new Label("Email Address: ");
-                grid6.add(emailAddressLbl, 0, 1);
-                TextField emailAddressTxt = new TextField();
-                grid6.add(emailAddressTxt, 0, 2);
-                Button submitEmailBtn = new Button("Submit");
+        forgotButton.setOnAction(actionEvent -> {
+            // Update the view to panel that asks user for their email address
+            GridPane grid6 = new GridPane();
+            // Align to Center
+            // Note Position is geometric object for alignment
+            grid6.setAlignment(Pos.CENTER);
+            // Set gap between the components
+            // Larger numbers mean bigger spaces
+            grid6.setHgap(10);
+            grid6.setVgap(10);
+            Text enterEmailTitle = new Text("Please enter the email address associated with your account.");
+            grid6.add(enterEmailTitle, 0, 0, 2, 1);
+            Label emailAddressLbl = new Label("Email Address: ");
+            grid6.add(emailAddressLbl, 0, 1);
+            TextField emailAddressTxt = new TextField();
+            grid6.add(emailAddressTxt, 0, 2);
+            Button submitEmailBtn = new Button("Submit");
 
-                // Check the database for the user's email address when the submit button is clicked
-                submitEmailBtn.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent actionEvent) {
-                        try {
-                            // Check if email exists in database
-                            User user = User.getUser(emailAddressTxt.getText());
+            // Check the database for the user's email address when the submit button is clicked
+            submitEmailBtn.setOnAction(actionEvent12 -> {
+                try {
+                    // Check if email exists in database
+                    User user = User.getUser(emailAddressTxt.getText());
 
-                            // If the email does exist, send an email to the user and prompt him/her to enter the security
-                            // token from the email
-                            if (user != null) {
-                                javamail(user);
+                    // If the email does exist, send an email to the user and prompt him/her to enter the security
+                    // token from the email
+                    if (user != null) {
+                        javamail(user);
+                        grid.setVisible(false);
+                        GridPane grid3 = new GridPane();
+                        // Align to Center
+                        // Note Position is geometric object for alignment
+                        grid3.setAlignment(Pos.CENTER);
+                        // Set gap between the components
+                        // Larger numbers mean bigger spaces
+                        grid3.setHgap(10);
+                        grid3.setVgap(10);
+                        Text scenetitle13 = new Text("Your username is " + user.getUsername() + ".\n\nPlease check your email " + userTextField.getText()
+                                + "\nand input your given security code to continue.");
+                        // Add text to grid 0,0 span 2 columns, 1 row
+                        grid3.add(scenetitle13, 0, 0, 2, 1);
+                        // Create Label for security Code
+                        Label securecode = new Label("Security Code: ");
+                        // Add label to grid 0,1
+                        grid3.add(securecode, 0, 1);
+                        // Create Textfield for code input
+                        TextField emailcode = new TextField();
+                        // Add textfield to grid 1,1
+                        grid3.add(emailcode, 0, 2);
+                        // Create Login Button
+                        Button secbtn = new Button("Confirm");
+                        // Add button to grid 1,4
+                        grid3.add(secbtn, 0, 4, 2, 1);
+                        Scene scene = new Scene(grid3, 500, 400);
+                        primaryStage.setScene(scene);
+                        primaryStage.show();
+
+                        secbtn.setOnAction(e -> {
+                            try {
+                                secure();
+                            } catch (Exception ex) {
+                                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            boolean authen = confirmation(userTextField.getText(), emailcode.getText());
+                            if (!authen) {
                                 grid.setVisible(false);
-                                GridPane grid3 = new GridPane();
+                                GridPane grid4 = new GridPane();
                                 // Align to Center
                                 // Note Position is geometric object for alignment
-                                grid3.setAlignment(Pos.CENTER);
+                                grid4.setAlignment(Pos.CENTER);
                                 // Set gap between the components
                                 // Larger numbers mean bigger spaces
-                                grid3.setHgap(10);
-                                grid3.setVgap(10);
-                                Text scenetitle = new Text("Your username is " + user.getUsername() + ".\n\nPlease check your email " + userTextField.getText()
-                                        + "\nand input your given security code to continue.");
+                                grid4.setHgap(10);
+                                grid4.setVgap(10);
+                                Text scenetitle12 = new Text("ACCESS DENIED!\n" +
+                                        "You've failed to enter the correct security code.\n" +
+                                        "Your information will be reviewed by our system's personnel.\n" +
+                                        " If you think an error has been made please contact our\n" +
+                                        "Help Desk immediately.");
+                                scenetitle12.setFill(Color.FIREBRICK);
                                 // Add text to grid 0,0 span 2 columns, 1 row
-                                grid3.add(scenetitle, 0, 0, 2, 1);
-                                // Create Label for security Code
-                                Label securecode = new Label("Security Code: ");
-                                // Add label to grid 0,1
-                                grid3.add(securecode, 0, 1);
-                                // Create Textfield for code input
-                                TextField emailcode = new TextField();
-                                // Add textfield to grid 1,1
-                                grid3.add(emailcode, 0, 2);
-                                // Create Login Button
-                                Button secbtn = new Button("Confirm");
-                                // Add button to grid 1,4
-                                grid3.add(secbtn, 0, 4, 2, 1);
-                                Scene scene = new Scene(grid3, 500, 400);
-                                primaryStage.setScene(scene);
+                                grid4.add(scenetitle12, 0, 0, 2, 2);
+                                Scene scene1 = new Scene(grid4, 500, 400);
+                                primaryStage.setScene(scene1);
                                 primaryStage.show();
+                            } else {
+                                grid.setVisible(false);
+                                GridPane grid5 = new GridPane();
+                                // Align to Center
+                                // Note Position is geometric object for alignment
+                                grid5.setAlignment(Pos.CENTER);
+                                // Set gap between the components
+                                // Larger numbers mean bigger spaces
+                                grid5.setHgap(10);
+                                grid5.setVgap(10);
+                                Text scenetitle12 = new Text("Welcome " + userTextField.getText() + "!\n"
+                                        + "Thank you for your identity confirmation!");
+                                // Add text to grid 0,0 span 2 columns, 1 row
+                                grid5.add(scenetitle12, 0, 0, 2, 1);
+                                // Add a button to open the Gradebook
+                                Button openGradebookBtn = new Button("Open Gradebook");
 
-                                secbtn.setOnAction(new EventHandler<ActionEvent>() {
-                                    @Override
-                                    public void handle(ActionEvent e) {
-                                        try {
-                                            secure();
-                                        } catch (Exception ex) {
-                                            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-                                        }
-                                        boolean authen = confirmation(userTextField.getText(), emailcode.getText());
-                                        if(authen == false){
-                                            grid.setVisible(false);
-                                            GridPane grid4 = new GridPane();
-                                            // Align to Center
-                                            // Note Position is geometric object for alignment
-                                            grid4.setAlignment(Pos.CENTER);
-                                            // Set gap between the components
-                                            // Larger numbers mean bigger spaces
-                                            grid4.setHgap(10);
-                                            grid4.setVgap(10);
-                                            Text scenetitle = new Text("ACCESS DENIED!\n" +
-                                                    "You've failed to enter the correct security code.\n" +
-                                                    "Your information will be reviewed by our system's personnel.\n" +
-                                                    " If you think an error has been made please contact our\n" +
-                                                    "Help Desk immediately.");
-                                            scenetitle.setFill(Color.FIREBRICK);
-                                            // Add text to grid 0,0 span 2 columns, 1 row
-                                            grid4.add(scenetitle, 0, 0, 2, 2);
-                                            Scene scene = new Scene(grid4, 500, 400);
-                                            primaryStage.setScene(scene);
-                                            primaryStage.show();
-                                        }
-                                        else {
-                                            grid.setVisible(false);
-                                            GridPane grid5 = new GridPane();
-                                            // Align to Center
-                                            // Note Position is geometric object for alignment
-                                            grid5.setAlignment(Pos.CENTER);
-                                            // Set gap between the components
-                                            // Larger numbers mean bigger spaces
-                                            grid5.setHgap(10);
-                                            grid5.setVgap(10);
-                                            Text scenetitle = new Text("Welcome " + userTextField.getText() + "!\n"
-                                                    + "Thank you for your identity confirmation!");
-                                            // Add text to grid 0,0 span 2 columns, 1 row
-                                            grid5.add(scenetitle, 0, 0, 2, 1);
-                                            // Add a button to open the Gradebook
-                                            Button openGradebookBtn = new Button("Open Gradebook");
+                                // Add a button handler for the click event
+                                openGradebookBtn.setOnAction(actionEvent1 -> {
+                                    try {
+                                        new Gradebook(user);
+                                    } catch (Exception ex) {
 
-                                            // Add a button handler for the click event
-                                            openGradebookBtn.setOnAction(new EventHandler<ActionEvent>() {
-                                                @Override
-                                                public void handle(ActionEvent actionEvent) {
-                                                    try {
-                                                        new Gradebook(user);
-                                                    } catch (Exception ex) {
-
-                                                    }
-                                                }
-                                            });
-
-                                            grid5.add(openGradebookBtn, 0, 2, 2, 1);
-                                            Scene scene = new Scene(grid5, 500, 400);
-                                            primaryStage.setScene(scene);
-                                            primaryStage.show();
-                                        }
                                     }
                                 });
-                            } else {
-                                System.out.println("Email wasn't found in the database.");
-                            }
-                        } catch (Exception ex) {
-                            // TODO: Show error if the email can't be found?
-                            System.out.println("Unable to access the database");
-                            final Text actiontarget = new Text();
-                            grid.add(actiontarget, 1, 10);
-                            actiontarget.setFill(Color.FIREBRICK);
-                            actiontarget.setText("Please try again.");
-                        }
-                    }
-                });
 
-                grid6.add(submitEmailBtn, 0, 4,2,1);
-                Scene enterEmailScene = new Scene(grid6, 500, 400);
-                primaryStage.setScene(enterEmailScene);
-                primaryStage.show();
-            }
+                                grid5.add(openGradebookBtn, 0, 2, 2, 1);
+                                Scene scene1 = new Scene(grid5, 500, 400);
+                                primaryStage.setScene(scene1);
+                                primaryStage.show();
+                            }
+                        });
+                    } else {
+                        System.out.println("Email wasn't found in the database.");
+                    }
+                } catch (Exception ex) {
+                    // TODO: Show error if the email can't be found?
+                    System.out.println("Unable to access the database");
+                    final Text actiontarget = new Text();
+                    grid.add(actiontarget, 1, 10);
+                    actiontarget.setFill(Color.FIREBRICK);
+                    actiontarget.setText("Please try again.");
+                }
+            });
+
+            grid6.add(submitEmailBtn, 0, 4, 2, 1);
+            Scene enterEmailScene = new Scene(grid6, 500, 400);
+            primaryStage.setScene(enterEmailScene);
+            primaryStage.show();
         });
 
 
@@ -247,50 +232,47 @@ public class Login extends Application {
 
 
         // Set the Action when button is clicked
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                try {
-                    // Authenticate the user
-                    boolean isValid = authenticate(userTextField.getText(), pwBox.getText());
+        btn.setOnAction(e -> {
+            try {
+                // Authenticate the user
+                boolean isValid = authenticate(userTextField.getText(), pwBox.getText());
 
-                    int counter = counter();
-                    int maxAttempts = 2;
-                    // If valid clear the grid and Welcome the user
-                    if (isValid) {
-                        new Gradebook(currentUser);
-                    } else if (counter == maxAttempts) {
-                        grid.setVisible(false);
-                        GridPane grid2 = new GridPane();
-                        // Align to Center
-                        // Note Position is geometric object for alignment
-                        grid2.setAlignment(Pos.CENTER);
-                        // Set gap between the components
-                        // Larger numbers mean bigger spaces
-                        grid2.setHgap(10);
-                        grid2.setVgap(10);
-                        Text scenetitle = new Text("ACCESS DENIED!\n" +
-                                "You have had mutiple failed Login Attempts.\n" +
-                                "Please contact Help Desk for further assistance.");
-                        scenetitle.setFill(Color.FIREBRICK);
-                        // Add text to grid 0,0 span 2 columns, 1 row
-                        grid2.add(scenetitle, 0, 0, 2, 2);
-                        Scene scene = new Scene(grid2, 500, 400);
-                        primaryStage.setScene(scene);
-                        primaryStage.show();
+                int counter = counter();
+                int maxAttempts = 2;
+                // If valid clear the grid and Welcome the user
+                if (isValid) {
+                    new Gradebook(currentUser);
+                } else if (counter == maxAttempts) {
+                    grid.setVisible(false);
+                    GridPane grid2 = new GridPane();
+                    // Align to Center
+                    // Note Position is geometric object for alignment
+                    grid2.setAlignment(Pos.CENTER);
+                    // Set gap between the components
+                    // Larger numbers mean bigger spaces
+                    grid2.setHgap(10);
+                    grid2.setVgap(10);
+                    Text scenetitle1 = new Text("ACCESS DENIED!\n" +
+                            "You have had mutiple failed Login Attempts.\n" +
+                            "Please contact Help Desk for further assistance.");
+                    scenetitle1.setFill(Color.FIREBRICK);
+                    // Add text to grid 0,0 span 2 columns, 1 row
+                    grid2.add(scenetitle1, 0, 0, 2, 2);
+                    Scene scene = new Scene(grid2, 500, 400);
+                    primaryStage.setScene(scene);
+                    primaryStage.show();
 
-                        // If Invalid Ask user to try again
-                    } else if(counter < maxAttempts){
+                    // If Invalid Ask user to try again
+                } else if (counter < maxAttempts) {
 
-                        final Text actiontarget = new Text();
-                        grid.add(actiontarget, 1, 10);
-                        actiontarget.setFill(Color.FIREBRICK);
-                        actiontarget.setText("Please try again.");
-                        System.out.println(counter);
-                    }
-                } catch (Exception ex) {
-                    System.out.println("Unable to access the database");
+                    final Text actiontarget1 = new Text();
+                    grid.add(actiontarget1, 1, 10);
+                    actiontarget1.setFill(Color.FIREBRICK);
+                    actiontarget1.setText("Please try again.");
+                    System.out.println(counter);
                 }
+            } catch (Exception ex) {
+                System.out.println("Unable to access the database");
             }
         });
         // Set the size of Scene
@@ -299,12 +281,9 @@ public class Login extends Application {
         primaryStage.show();
 
         // Set the reset button click event handler
-        reset.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                userTextField.setText("");
-                pwBox.setText("");
-            }
+        reset.setOnAction(actionEvent -> {
+            userTextField.setText("");
+            pwBox.setText("");
         });
     }
 
@@ -315,22 +294,22 @@ public class Login extends Application {
         launch(args);
 
     }
-    String filename = "Logins.txt";
-    String line;
-    final boolean append = true;
-    BufferedWriter writer = null;
+    private final String filename = "Logins.txt";
+    private String line;
+    private final boolean append = true;
+    private BufferedWriter writer = null;
 
-    Date date = new Date();
+    private final Date date = new Date();
     private int count = 0;
-    public int attempts;
+    private int attempts;
 
-    Random rand = new Random();
-    int  n = rand.nextInt(9999) + 1;
-    String code = Integer.toString(n);
+    private final Random rand = new Random();
+    private final int  n = rand.nextInt(9999) + 1;
+    private final String code = Integer.toString(n);
 
     //Create a function that is able to encrypt the audit records
     //encrypt each line
-    public void secure() throws Exception{
+    private void secure() throws Exception{
         try {
             SecretKey key = KeyGenerator.getInstance("AES").generateKey();
             AESEncrypter encrypter = new AESEncrypter(key);
@@ -359,7 +338,7 @@ public class Login extends Application {
      * @param pword the password entered
      * @return isValid true for authenticated
      */
-    public boolean authenticate(String user, String pword) throws Exception {
+    private boolean authenticate(String user, String pword) throws Exception {
 
         boolean isValid = false;
         currentUser = User.getUser(user, pword);
@@ -368,11 +347,11 @@ public class Login extends Application {
             try {
                 writer = new BufferedWriter(new FileWriter(filename,append));
                 writer.newLine();
-                writer.append("Successful Login on " + date + " in which the following username: " + user);
+                writer.append("Successful Login on ").append(String.valueOf(date)).append(" in which the following username: ").append(user);
                 writer.newLine();
-                writer.append("and password: " + pword + " were entered correctly by the user to access their account.");
+                writer.append("and password: ").append(pword).append(" were entered correctly by the user to access their account.");
                 writer.newLine();
-                writer.append("It took the user " + (attempts + 1) + " attempts to access their account successfully.");
+                writer.append("It took the user ").append(String.valueOf(attempts + 1)).append(" attempts to access their account successfully.");
                 writer.newLine();
             }
             // print error message if there is one
@@ -384,12 +363,11 @@ public class Login extends Application {
             try {
                 writer = new BufferedWriter(new FileWriter(filename, append));
                 writer.newLine();
-                writer.append("Error: Invalid Login Credentials on " + date + " in which the");
+                writer.append("Error: Invalid Login Credentials on ").append(String.valueOf(date)).append(" in which the");
                 writer.newLine();
-                writer.append("following username: " + user + " and password: " + pword + " were entered by a user");
+                writer.append("following username: ").append(user).append(" and password: ").append(pword).append(" were entered by a user");
                 writer.newLine();
-                writer.append("in the attempt to access an account. This is users " + (attempts + 1)
-                        + " attempt to login into this system");
+                writer.append("in the attempt to access an account. This is users ").append(String.valueOf(attempts + 1)).append(" attempt to login into this system");
                 writer.newLine();
                 writer.append("unsuccessfully. This should be reviewed by a systems administrator for further action.");
                 writer.newLine();
@@ -411,23 +389,23 @@ public class Login extends Application {
         return isValid;
     }
 
-    public int counter(){
+    private int counter(){
         int oneUp = count++;
         attempts = oneUp + 1;
         return oneUp;
     }
 
 
-    public boolean confirmation(String user, String secureNum) {
+    private boolean confirmation(String user, String secureNum) {
         boolean authen = false;
         if (secureNum.equalsIgnoreCase(code)) {
             authen = true;
             try {
                 writer = new BufferedWriter(new FileWriter(filename,append));
                 writer.newLine();
-                writer.append("Successful Email Authentication on " + date + " in which the following");
+                writer.append("Successful Email Authentication on ").append(String.valueOf(date)).append(" in which the following");
                 writer.newLine();
-                writer.append("username:" + user + " entered the correct security code that was emailed.");
+                writer.append("username:").append(user).append(" entered the correct security code that was emailed.");
                 writer.newLine();
             }
             // print error message if there is one
@@ -439,9 +417,9 @@ public class Login extends Application {
             try {
                 writer = new BufferedWriter(new FileWriter(filename, append));
                 writer.newLine();
-                writer.append("Error: Invalid Security Code Credentials on " + date + " in which the");
+                writer.append("Error: Invalid Security Code Credentials on ").append(String.valueOf(date)).append(" in which the");
                 writer.newLine();
-                writer.append("following username: " + user + " entered the incorrect emailed security code.");
+                writer.append("following username: ").append(user).append(" entered the incorrect emailed security code.");
                 writer.newLine();
             }
 
@@ -461,7 +439,7 @@ public class Login extends Application {
         }
         return authen;
     }
-    public void javamail(User user){
+    private void javamail(User user){
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.socketFactory.port", "465");
