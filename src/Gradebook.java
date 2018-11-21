@@ -513,23 +513,63 @@ public class Gradebook extends JFrame {
     }
 
     private static JPanel createAddClassPanel() {
-        final JPanel classInfoPanel = new JPanel(new GridLayout(0, 2));
+        final JPanel classInfoPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints g = new GridBagConstraints();
+        g.fill = GridBagConstraints.BOTH;
 
-        classInfoPanel.add(new JLabel());
-        classInfoPanel.add(new JLabel());
+        g.gridwidth = 2;
+        g.weightx = 1.0;
+        g.ipady = 2;
+        g.gridx = 0;
+        g.gridy = 0;
+        classInfoPanel.add(new JLabel(), g);
 
+        g.gridx = 0;
+        g.gridy = 1;
         final JLabel classNameLabel = new JLabel("Class Name: ");
-        classInfoPanel.add(classNameLabel);
+        classInfoPanel.add(classNameLabel, g);
+        final JLabel classNameError = new JLabel();
+        classNameError.setForeground(Color.red);
+        classNameError.setVisible(false);
 
+        g.gridx = 3;
+        g.gridy = 1;
         final JTextField nameTextField = new JTextField(10);
-        classInfoPanel.add(nameTextField);
+        nameTextField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                classNameError.setVisible(false);
+            }
 
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (nameTextField.getText().isEmpty()) {
+                    classNameError.setText("You must enter a class name.");
+                    classNameError.setVisible(true);
+                }
+            }
+        });
+        classInfoPanel.add(nameTextField, g);
+
+        g.gridx = 0;
+        g.gridy = 2;
+        classInfoPanel.add(classNameError, g);
+
+        g.gridx = 0;
+        g.gridy = 3;
         final JLabel classStartDateLabel = new JLabel("Class Start Date: ");
-        classInfoPanel.add(classStartDateLabel);
+        classInfoPanel.add(classStartDateLabel, g);
+        final JLabel classStartDateError = new JLabel();
+        classStartDateError.setVisible(false);
+        classStartDateError.setForeground(Color.RED);
 
+        g.gridx = 3;
+        g.gridy = 3;
         final JTextField classStartDateTextField = new JTextField("--/--/----", 9);
+        Date classStartDateVal;
         classStartDateTextField.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
+                classStartDateError.setVisible(false);
                 classStartDateTextField.setText("");
                 classStartDateTextField.setForeground(new Color(50, 50, 50));
             }
@@ -539,16 +579,35 @@ public class Gradebook extends JFrame {
                     classStartDateTextField.setText("--/--/----");
                     classStartDateTextField.setForeground(new Color(150, 150, 150));
                 }
+
+                Date classStartDateVal = convertStringToDate(classStartDateTextField.getText());
+                System.out.println(classStartDateVal);
+                if (classStartDateVal == null) {
+                    classStartDateError.setText("You must enter a valid date.");
+                    classStartDateError.setVisible(true);
+                }
             }
         });
-        classInfoPanel.add(classStartDateTextField);
+        classInfoPanel.add(classStartDateTextField, g);
 
+        g.gridx = 0;
+        g.gridy = 4;
+        classInfoPanel.add(classStartDateError, g);
+
+        g.gridx = 0;
+        g.gridy = 5;
         final JLabel classEndDateLabel = new JLabel("Class End Date: ");
-        classInfoPanel.add(classEndDateLabel);
+        classInfoPanel.add(classEndDateLabel, g);
+        final JLabel classEndDateError = new JLabel();
+        classEndDateError.setVisible(false);
+        classEndDateError.setForeground(Color.RED);
 
+        g.gridx = 3;
+        g.gridy = 5;
         final JTextField classEndDateTextField = new JTextField("--/--/----", 9);
         classEndDateTextField.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
+                classEndDateError.setVisible(false);
                 classEndDateTextField.setText("");
                 classEndDateTextField.setForeground(new Color(50, 50, 50));
             }
@@ -558,15 +617,66 @@ public class Gradebook extends JFrame {
                     classEndDateTextField.setText("--/--/----");
                     classEndDateTextField.setForeground(new Color(150, 150, 150));
                 }
+
+                Date classEndDateVal = convertStringToDate(classEndDateTextField.getText());
+                if (classEndDateVal == null) {
+                    classEndDateError.setText("You must enter a valid date.");
+                    classEndDateError.setVisible(true);
+                } else if (classEndDateVal.before(convertStringToDate(classStartDateTextField.getText()))) {
+                    classEndDateError.setText("The class end date must be later than the class start date.");
+                    classEndDateError.setVisible(true);
+                }
             }
         });
-        classInfoPanel.add(classEndDateTextField);
+        classInfoPanel.add(classEndDateTextField, g);
 
+        g.gridx = 0;
+        g.gridy = 6;
+        classInfoPanel.add(classEndDateError, g);
+
+        g.gridx = 0;
+        g.gridy = 7;
+        g.insets = new Insets(5,0,5,5);
         final JLabel numberOfAssignmentsLabel = new JLabel("Number of Assignments: ");
-        classInfoPanel.add(numberOfAssignmentsLabel);
+        classInfoPanel.add(numberOfAssignmentsLabel, g);
+        final JLabel numberOfAssignmentsError = new JLabel();
+        numberOfAssignmentsError.setVisible(false);
+        numberOfAssignmentsError.setForeground(Color.RED);
 
+        g.gridx = 3;
+        g.gridy = 7;
         final JTextField numOfAssignmentsTextField = new JTextField(5);
-        classInfoPanel.add(numOfAssignmentsTextField);
+
+        numOfAssignmentsTextField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                numberOfAssignmentsError.setVisible(false);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                // Verify that the number of assignments is actually an integer value
+                for (int i = 0; i < numOfAssignmentsTextField.getText().length(); i++) {
+                    if (i == 0 && numOfAssignmentsTextField.getText().charAt(i) == '-') {
+                        if (numOfAssignmentsTextField.getText().length() == 1) {
+                            numberOfAssignmentsError.setText("Please enter an integer value for the number of assignments");
+                            numberOfAssignmentsError.setVisible(true);
+                        }
+                        continue;
+                    }
+                    if (Character.digit(numOfAssignmentsTextField.getText().charAt(i), 10) < 0) {
+                        numberOfAssignmentsError.setText("Please enter an integer value for the number of assignments");
+                        numberOfAssignmentsError.setVisible(true);
+                    }
+                }
+            }
+        });
+        classInfoPanel.add(numOfAssignmentsTextField, g);
+
+        g.gridwidth = 4;
+        g.gridx = 0;
+        g.gridy = 8;
+        classInfoPanel.add(numberOfAssignmentsError, g);
 
         return classInfoPanel;
     }
