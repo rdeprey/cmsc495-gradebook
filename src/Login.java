@@ -100,7 +100,6 @@ public class Login extends Application {
             Text actiontarget1 = new Text();
             actiontarget1.setFill(Color.FIREBRICK);
             grid6.add(actiontarget1, 1, 5);
-            actiontarget1.setText("Please enter a valid email address.");
             actiontarget1.setVisible(false);
             Text enterEmailTitle = new Text("Please enter the email address associated with your account.");
             grid6.add(enterEmailTitle, 0, 0, 2, 1);
@@ -114,7 +113,6 @@ public class Login extends Application {
                     // Remove email address validation when email textbox is in focus
                     if (t1) {
                         actiontarget1.setVisible(false);
-                        System.out.println("textfield in focus");
                     }
                 }
             });
@@ -130,6 +128,7 @@ public class Login extends Application {
 
                     Matcher emailMatcher = VALID_EMAILADDRESS_REGEX.matcher(emailAddress);
                     if (!emailMatcher.find()) {
+                        actiontarget1.setText("Please enter a valid email address.");
                         actiontarget1.setVisible(true);
                     } else {
                         // Check if email exists in database
@@ -230,13 +229,14 @@ public class Login extends Application {
                             });
                         } else {
                             System.out.println("Email wasn't found in the database.");
+                            actiontarget1.setText("Invalid email.");
+                            actiontarget1.setVisible(true);
                         }
                     }
                 } catch (Exception ex) {
-                    // TODO: Show error if the email can't be found?
                     System.out.println("Unable to access the database");
                     final Text actiontarget = new Text();
-                    grid.add(actiontarget, 1, 10);
+                    grid6.add(actiontarget, 1, 10);
                     actiontarget.setFill(Color.FIREBRICK);
                     actiontarget.setText("Please try again.");
                 }
