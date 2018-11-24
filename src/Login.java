@@ -29,7 +29,7 @@ public class Login extends Application {
 
     private Object httpSession;
     private User currentUser;
-    public static final Pattern VALID_EMAILADDRESS_REGEX =
+    private static final Pattern VALID_EMAILADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
     @Override
@@ -46,7 +46,7 @@ public class Login extends Application {
         grid.setVgap(10);
 
         // Create some text to place in the scene
-        Text scenetitle = new Text("Please, login to continue.");
+        Text scenetitle = new Text("Please login to continue.");
         // Add text to grid 0,0 span 2 columns, 1 row
         grid.add(scenetitle, 0, 0, 2, 1);
 

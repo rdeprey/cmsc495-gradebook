@@ -2,7 +2,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Class {
+class Class {
     private int classId;
     private int userId;
     private String className;
@@ -12,7 +12,7 @@ public class Class {
     private float classGrade;
 
     // Default constructor
-    public Class() {
+    private Class() {
 
     }
 
@@ -65,27 +65,27 @@ public class Class {
     }
 
     // Setters
-    public void setClassId(int classId) {
+    private void setClassId(int classId) {
         this.classId = classId;
     }
 
-    public void setUserId(int userId) {
+    private void setUserId(int userId) {
         this.userId = userId;
     }
 
-    public void setClassName(String className) {
+    private void setClassName(String className) {
         this.className = className;
     }
 
-    public void setNumberOfAssignments(int numberOfAssignments) {
+    private void setNumberOfAssignments(int numberOfAssignments) {
         this.numberOfAssignments = numberOfAssignments;
     }
 
-    public void setClassStartDate(Date classStartDate) {
+    private void setClassStartDate(Date classStartDate) {
         this.classStartDate = classStartDate;
     }
 
-    public void setClassEndDate(Date classEndDate) {
+    private void setClassEndDate(Date classEndDate) {
         this.classEndDate = classEndDate;
     }
 
@@ -188,7 +188,7 @@ public class Class {
         return null;
     }
 
-    public static Integer getClassId(String className, int userId) throws Exception {
+    private static Integer getClassId(String className, int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
             Statement stmt = dbCon.createStatement();

@@ -2,7 +2,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Assignment {
+class Assignment {
     private int assignmentId;
     private int userId;
     private int classId;
@@ -12,7 +12,7 @@ public class Assignment {
     private float assignmentGrade;
 
     // Default constructor
-    public Assignment() {
+    private Assignment() {
 
     }
 
@@ -55,42 +55,45 @@ public class Assignment {
     }
 
     // Setters
-    public void setUserId(int userId) {
+    private void setAssignmentId(int assignmentId) { this.assignmentId = assignmentId; }
+    private void setUserId(int userId) {
         this.userId = userId;
     }
 
-    public void setClassId(int classId) {
+    private void setClassId(int classId) {
         this.classId = classId;
     }
 
-    public void setAssignmentName(String assignmentName) {
+    private void setAssignmentName(String assignmentName) {
         this.assignmentName = assignmentName;
     }
 
-    public void setAssignmentDueDate(Date assignmentDueDate) {
+    private void setAssignmentDueDate(Date assignmentDueDate) {
         this.assignmentDueDate = assignmentDueDate;
     }
 
-    public void setAssignmentWeight(float assignmentWeight) {
+    private void setAssignmentWeight(float assignmentWeight) {
         this.assignmentWeight = assignmentWeight;
     }
 
-    public void setAssignmentGrade(float assignmentGrade) {
+    private void setAssignmentGrade(float assignmentGrade) {
         this.assignmentGrade = assignmentGrade;
     }
 
     // Methods needed to retrieve assignment data from the database
     private static Assignment getAssignmentFromResultSet(ResultSet rs) throws SQLException {
         Assignment assignment = new Assignment();
+        assignment.setAssignmentId(rs.getInt("assignmentId"));
         assignment.setUserId(rs.getInt("userId"));
         assignment.setClassId(rs.getInt("classId"));
         assignment.setAssignmentName(rs.getString("assignmentName"));
         assignment.setAssignmentDueDate(rs.getDate("assignmentDueDate"));
         assignment.setAssignmentWeight(rs.getFloat("assignmentWeight"));
+        assignment.setAssignmentGrade(rs.getFloat("assignmentGrade"));
         return assignment;
     }
 
-    public static boolean addAssignment(Assignment assignment) throws Exception {
+    public static void addAssignment(Assignment assignment) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
             PreparedStatement ps = dbCon.prepareStatement("INSERT INTO Assignments (userId, classId, assignmentName, assignmentDueDate, assignmentWeight, assignmentGrade) VALUES (?,?,?,?,?,NULL)");
@@ -102,7 +105,6 @@ public class Assignment {
             int i = ps.executeUpdate();
 
             if (i == 1) {
-                return true;
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -110,10 +112,9 @@ public class Assignment {
             dbCon.close();
         }
 
-        return false;
     }
 
-    public static boolean updateAssignment(int assignmentId, float assignmentGrade) throws Exception {
+    public static void updateAssignment(int assignmentId, float assignmentGrade) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
             PreparedStatement ps = dbCon.prepareStatement("UPDATE Assignments SET assignmentGrade=? WHERE assignmentId=?");
@@ -122,14 +123,12 @@ public class Assignment {
             int i = ps.executeUpdate();
 
             if (i == 1) {
-                return true;
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
             dbCon.close();
         }
-        return false;
     }
 
     public static ArrayList<Assignment> getAssignmentsForClass(int userId, int classId) throws Exception {

@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,20 +14,22 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Gradebook extends JFrame {
+class Gradebook extends JFrame {
     private static User user;
     private static final Font f1 = new Font("Monospaced", Font.BOLD, 20);
     private static final Font f2 = new Font("Monospaced", Font.BOLD, 16);
+    private static final Font tableHeadFont = new Font("Monospaced", Font.BOLD, 13);
     private static ArrayList<Class> currentClasses;
     private static final JPanel progressPanel = new JPanel(new GridLayout(0, 1, 5, 5));
     private static final JPanel currentClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
-    private static JPanel completedPanel = new JPanel(new GridLayout(0, 1, 5, 5));
-    private static JPanel completedClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
+    private static final JPanel completedPanel = new JPanel(new GridLayout(0, 1, 5, 5));
+    private static final JPanel completedClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
     private static final JPanel classInfoPanel = createAddClassPanel();
+    private static final JTabbedPane tabbedPane = new JTabbedPane();
 
     //creates GUI
     public Gradebook(final User user) throws Exception {
-        this.user = user;
+        Gradebook.user = user;
         String userName = user.getUsername();
         String date = new SimpleDateFormat("EEEEE MMMMM d, yyyy").format(new Date());
         String greetingMessage = determineGreeting();
@@ -111,7 +114,6 @@ public class Gradebook extends JFrame {
         c.gridheight = 20;
 
         // Create tabbed pane container
-        JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setPreferredSize(new Dimension(1100, 700));
 
         //New Class
@@ -129,91 +131,11 @@ public class Gradebook extends JFrame {
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1); // keyboard event
 
         //Actual Class
-        //Class Panel (moved to method, after values pulled from New Class & New Class Template)
+        //Class Panel
         for (int i = 0; i < currentClasses.size(); i++) {
-            JComponent classPanel = new JPanel(new BorderLayout());
-
-            JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 150, 0));
-
-            JPanel statusPanel = new JPanel(new GridLayout(0, 1));
             String className = currentClasses.get(i).getClassName();
-            JLabel classLabel = new JLabel(className, SwingConstants.LEADING);
-            classLabel.setFont(f1);
-            statusPanel.add(classLabel);
-            char currentGrade = 'A';
-            JLabel currentGradeLabel = new JLabel("Current Grade: " + currentGrade, SwingConstants.LEADING);
-            currentGradeLabel.setFont(f2);
-            statusPanel.add(currentGradeLabel);
-            headerPanel.add(statusPanel);
-
-            JPanel goalGradePanel = new JPanel(new GridLayout(0, 1));
-            JRadioButton A = new JRadioButton("A (90-100)");
-            JRadioButton B = new JRadioButton("B (80-89)");
-            JRadioButton C = new JRadioButton("C (70-79)");
-            JRadioButton D = new JRadioButton("D (60-69)");
-            goalGradePanel.add(new JLabel("Goal Grade     ", SwingConstants.RIGHT));
-            goalGradePanel.add(A);
-            goalGradePanel.add(B);
-            goalGradePanel.add(C);
-            goalGradePanel.add(D);
-            ButtonGroup goalGrade = new ButtonGroup();
-            goalGrade.add(A);
-            goalGrade.add(B);
-            goalGrade.add(C);
-            goalGrade.add(D);
-
-            headerPanel.add(goalGradePanel);
-            classPanel.add(headerPanel, BorderLayout.PAGE_START);
-
-            JPanel assignmentsPanel = new JPanel(new GridBagLayout());
-            GridBagConstraints h = new GridBagConstraints();
-
-            h.gridx = 0;
-            h.gridy = 0;
-            h.gridwidth = 1;
-            h.fill = GridBagConstraints.HORIZONTAL;
-            JLabel dueDateLabel = new JLabel("Due Date");
-            assignmentsPanel.add(dueDateLabel, h);
-
-            h.gridx = 1;
-            h.gridwidth = 2;
-            JLabel assignmentName = new JLabel("Assignment Name");
-            assignmentsPanel.add(assignmentName, h);
-
-            h.gridx = 3;
-            h.gridwidth = 1;
-            JLabel assignmentWeight = new JLabel("Assignment Weight");
-            assignmentsPanel.add(assignmentWeight, h);
-
-            h.gridx = 4;
-            String earnedAssignmentWeightString = "0.0";
-            JLabel earnedAssignmentWeight = new JLabel(earnedAssignmentWeightString);
-            assignmentsPanel.add(earnedAssignmentWeight, h);
-
-            h.gridx++;
-            final JTextField assignmentGradeTextField = new JTextField("Enter Grade %", 10);
-            assignmentGradeTextField.addFocusListener(new FocusListener() {
-                public void focusGained(FocusEvent e) {
-                    assignmentGradeTextField.setText("");
-                    assignmentGradeTextField.setForeground(new Color(50, 50, 50));
-                }
-
-                public void focusLost(FocusEvent e) {
-                    if (assignmentGradeTextField.getText().length() == 0) {
-                        assignmentGradeTextField.setText("Enter Grade %");
-                        assignmentGradeTextField.setForeground(new Color(150, 150, 150));
-                    }
-                }
-            });
-            assignmentsPanel.add(assignmentGradeTextField, h);
-
-            h.gridx++;
-            JButton submitButton = new JButton("Submit");
-            assignmentsPanel.add(submitButton, h);
-
-            classPanel.add(assignmentsPanel);
-
-            tabbedPane.addTab(className, null, classPanel); // Add tab to tab container
+            JComponent parentPanel = createCurrentClassTab(className, currentClasses.get(i).getClassId());
+            tabbedPane.addTab(className, null, parentPanel); // Add tab to tab container
             tabbedPane.setMnemonicAt(0, KeyEvent.VK_3); // keyboard event
 
             // Add the tabbed pane to contentPane
@@ -556,6 +478,8 @@ public class Gradebook extends JFrame {
                         JButton createClassWithAssignmentsBtn = new JButton("Save Class Information");
 
                         createClassWithAssignmentsBtn.addActionListener(e1 -> {
+                            int classId = classX.getClassId();
+
                             // Create a class object
                             for (Component b : newClassTemplatePanel.getComponents()) {
                                 if (b instanceof JPanel) {
@@ -578,34 +502,37 @@ public class Gradebook extends JFrame {
                                                             assignmentWeight = ((JTextField) k).getText();
                                                             break;
                                                     }
-                                                    counter++;
+
+                                                    if (counter == 2) {
+                                                        counter = 0;
+                                                        // Create an assignment object
+                                                        Assignment assignment = new Assignment(user.getUserId(), classId, assignmentName, convertStringToDate(assignmentDate), Float.parseFloat(assignmentWeight));
+                                                        assignmentDate = null;
+                                                        assignmentName = null;
+                                                        assignmentWeight = null;
+
+                                                        // Try to add the assignment object to the database
+                                                        try {
+                                                            Assignment.addAssignment(assignment);
+                                                            counter = 0;
+                                                        } catch (Exception ex) {
+                                                            // TODO: Show error message if assignment can't be added to the database
+                                                            System.out.println("Failed to add assignment to the database");
+                                                        }
+                                                    } else {
+                                                        counter++;
+                                                    }
                                                 }
                                             }
                                         }
                                     }
-
-                                    // Create an assignment object
-                                    int classId = classX.getClassId();
-                                    Assignment assignment = new Assignment(user.getUserId(), classId, assignmentName, convertStringToDate(assignmentDate), Float.parseFloat(assignmentWeight));
-
-                                    // Try to add the assignment object to the database
-                                    try {
-                                        Assignment.addAssignment(assignment);
-
-                                    } catch (Exception ex) {
-                                        // TODO: Show error message if assignment can't be added to the database
-                                        System.out.println("Failed to add assignment to the database");
-                                    }
-
-                                    assignmentDate = null;
-                                    assignmentName = null;
-                                    assignmentWeight = null;
                                 }
                             }
 
                             // Redraw the progress panels when new classes are added
                             drawCurrentClassesPanel(user);
                             drawCompletedClassesPanel(user);
+                            tabbedPane.addTab(className, null, createCurrentClassTab(className, classId));
 
                             // Restore the add class tab to its original state
                             classInfoPanel.removeAll();
@@ -797,5 +724,304 @@ public class Gradebook extends JFrame {
         }
 
         return assignmentsFormPanel;
+    }
+
+    private static JPanel classAssignmentPanel(int assignmentId, Date dueDate, String assignmentName, float assignmentWeight, float grade) {
+        Dimension labelDimensions = new Dimension(183, 25);
+        JPanel assignmentPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints h = new GridBagConstraints();
+
+        h.weightx = 1;
+        h.weighty = 1;
+        h.gridx = 0;
+        h.gridy = 0;
+        h.gridwidth = 1;
+        h.insets = new Insets(10, 10, 0, 10);
+        h.fill = GridBagConstraints.HORIZONTAL;
+        h.anchor = GridBagConstraints.NORTHWEST;
+        JLabel dueDateLabel = new JLabel(new SimpleDateFormat("MM/dd/yyyy").format(dueDate));
+        dueDateLabel.setPreferredSize(labelDimensions);
+        dueDateLabel.setMaximumSize(labelDimensions);
+        dueDateLabel.setMinimumSize(labelDimensions);
+        assignmentPanel.add(dueDateLabel, h);
+
+        h.gridx = 1;
+        JLabel assignmentNameLabel = new JLabel(assignmentName);
+        assignmentNameLabel.setPreferredSize(labelDimensions);
+        assignmentNameLabel.setMaximumSize(labelDimensions);
+        assignmentNameLabel.setMinimumSize(labelDimensions);
+        assignmentPanel.add(assignmentNameLabel, h);
+
+        h.gridx = 2;
+        JLabel assingmentWeight = new JLabel(new DecimalFormat("#.#").format(assignmentWeight));
+        assingmentWeight.setPreferredSize(labelDimensions);
+        assingmentWeight.setMaximumSize(labelDimensions);
+        assingmentWeight.setMinimumSize(labelDimensions);
+        assignmentPanel.add(assingmentWeight, h);
+
+        if (grade != 0.0) {
+            float earnedAssignmentWeight = assignmentWeight * (grade / 100);
+
+            h.gridx = 3;
+            JLabel earnedAssignmentWeightLabel = new JLabel(new DecimalFormat("#.#").format(earnedAssignmentWeight));
+            earnedAssignmentWeightLabel.setPreferredSize(labelDimensions);
+            earnedAssignmentWeightLabel.setMaximumSize(labelDimensions);
+            earnedAssignmentWeightLabel.setMinimumSize(labelDimensions);
+            assignmentPanel.add(earnedAssignmentWeightLabel, h);
+
+            h.gridx = 4;
+            JLabel gradeEarnedLabel = new JLabel(new DecimalFormat("#.#").format(grade));
+            gradeEarnedLabel.setPreferredSize(labelDimensions);
+            gradeEarnedLabel.setMaximumSize(labelDimensions);
+            gradeEarnedLabel.setMinimumSize(labelDimensions);
+            assignmentPanel.add(gradeEarnedLabel, h);
+
+            h.gridx = 5;
+            JLabel spacer = new JLabel(" ");
+            spacer.setPreferredSize(labelDimensions);
+            spacer.setMaximumSize(labelDimensions);
+            spacer.setMinimumSize(labelDimensions);
+            assignmentPanel.add(spacer, h);
+        } else {
+            h.gridx = 3;
+            JLabel earnedAssignmentWeightSpacer = new JLabel(" ");
+            earnedAssignmentWeightSpacer.setPreferredSize(labelDimensions);
+            earnedAssignmentWeightSpacer.setMaximumSize(labelDimensions);
+            earnedAssignmentWeightSpacer.setMinimumSize(labelDimensions);
+            assignmentPanel.add(earnedAssignmentWeightSpacer, h);
+
+            JLabel gradeError = new JLabel("Please enter grade as a float.");
+            gradeError.setPreferredSize(labelDimensions);
+            gradeError.setForeground(Color.RED);
+            gradeError.setVisible(false);
+
+            h.gridx = 4;
+//            h.anchor = GridBagConstraints.LINE_END;
+            JTextField assignmentGradeTextField = new JTextField();
+            assignmentGradeTextField.setPreferredSize(labelDimensions);
+            assignmentGradeTextField.setMaximumSize(labelDimensions);
+            assignmentGradeTextField.setMinimumSize(labelDimensions);
+            assignmentGradeTextField.addFocusListener(new FocusListener() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    assignmentGradeTextField.setText("");
+                    gradeError.setVisible(false);
+                }
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    if (assignmentGradeTextField.getText().length() == 0) {
+                        assignmentGradeTextField.setText("Enter grade %");
+
+                        gradeError.setVisible(true);
+                    } else {
+                        try {
+                            Float.parseFloat(assignmentGradeTextField.getText());
+                        } catch (NumberFormatException ex) {
+                            gradeError.setVisible(true);
+                        }
+                    }
+                }
+            });
+            assignmentPanel.add(assignmentGradeTextField, h);
+
+            h.gridx = 5;
+            h.fill = GridBagConstraints.NONE;
+            JButton submitButton = new JButton("Submit");
+            submitButton.setPreferredSize(labelDimensions);
+            submitButton.setMinimumSize(labelDimensions);
+            submitButton.setMaximumSize(labelDimensions);
+            //submitButton.setPreferredSize(new Dimension(100, 25));
+            submitButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        gradeError.setVisible(false);
+
+                        float gradeVal = Float.parseFloat(assignmentGradeTextField.getText());
+                        Assignment.updateAssignment(assignmentId, gradeVal);
+
+                        assignmentPanel.remove(earnedAssignmentWeightSpacer);
+                        assignmentPanel.remove(assignmentGradeTextField);
+                        assignmentPanel.remove(submitButton);
+
+                        h.gridx = 3;
+                        h.gridy = 0;
+                        h.gridwidth = 1;
+                        h.fill = GridBagConstraints.HORIZONTAL;
+                        float earnedAssignmentWeight = assignmentWeight * (gradeVal / 100);
+                        JLabel earnedAssignmentWeightLabel = new JLabel(new DecimalFormat("#.#").format(earnedAssignmentWeight));
+                        earnedAssignmentWeightLabel.setPreferredSize(labelDimensions);
+                        earnedAssignmentWeightLabel.setMaximumSize(labelDimensions);
+                        earnedAssignmentWeightLabel.setMinimumSize(labelDimensions);
+                        assignmentPanel.add(earnedAssignmentWeightLabel, h);
+
+                        h.gridx = 4;
+                        JLabel gradeEarnedLabel = new JLabel(new DecimalFormat("#.#").format(gradeVal));
+                        gradeEarnedLabel.setPreferredSize(labelDimensions);
+                        gradeEarnedLabel.setMaximumSize(labelDimensions);
+                        gradeEarnedLabel.setMinimumSize(labelDimensions);
+                        assignmentPanel.add(gradeEarnedLabel, h);
+
+                        h.gridx = 5;
+                        JLabel spacer = new JLabel(" ");
+                        spacer.setPreferredSize(labelDimensions);
+                        spacer.setMaximumSize(labelDimensions);
+                        spacer.setMinimumSize(labelDimensions);
+                        assignmentPanel.add(spacer, h);
+
+                        assignmentPanel.revalidate();
+                        assignmentPanel.repaint();
+                    } catch (NumberFormatException ex) {
+                        gradeError.setVisible(true);
+                    } catch (Exception ex) {
+                        gradeError.setText("Cannot connect to the database. Try again later.");
+                        gradeError.setVisible(true);
+                    }
+                }
+            });
+            assignmentPanel.add(submitButton, h);
+
+            h.gridy = 1;
+            h.gridx = 4;
+            h.gridwidth = 2;
+            assignmentPanel.add(gradeError, h);
+        }
+
+        return assignmentPanel;
+    }
+
+    private static JComponent createCurrentClassTab(String classNameVal, int classIdVal) {
+        Dimension assignmentLabelDimesions = new Dimension(183, 25);
+        JComponent parentPanel = new JPanel(new BorderLayout());
+        JComponent classPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints classPanelConstraints = new GridBagConstraints();
+        classPanelConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        classPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
+        classPanelConstraints.weightx = 1;
+
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 150, 0));
+
+        JPanel statusPanel = new JPanel(new GridLayout(0, 1));
+        String className = classNameVal;
+        JLabel classLabel = new JLabel(className, SwingConstants.LEADING);
+        classLabel.setFont(f1);
+        statusPanel.add(classLabel);
+        char currentGrade = 'A';
+        JLabel currentGradeLabel = new JLabel("Current Grade: " + currentGrade, SwingConstants.LEADING);
+        currentGradeLabel.setFont(f2);
+        statusPanel.add(currentGradeLabel);
+        headerPanel.add(statusPanel);
+
+        JPanel goalGradePanel = new JPanel(new GridLayout(0, 1));
+        JRadioButton A = new JRadioButton("A (90-100)");
+        JRadioButton B = new JRadioButton("B (80-89)");
+        JRadioButton C = new JRadioButton("C (70-79)");
+        JRadioButton D = new JRadioButton("D (60-69)");
+        goalGradePanel.add(new JLabel("Goal Grade     ", SwingConstants.RIGHT));
+        goalGradePanel.add(A);
+        goalGradePanel.add(B);
+        goalGradePanel.add(C);
+        goalGradePanel.add(D);
+        ButtonGroup goalGrade = new ButtonGroup();
+        goalGrade.add(A);
+        goalGrade.add(B);
+        goalGrade.add(C);
+        goalGrade.add(D);
+
+        headerPanel.add(goalGradePanel);
+        classPanelConstraints.gridx = 0;
+        classPanelConstraints.gridy = 0;
+        classPanel.add(headerPanel, classPanelConstraints);
+
+        JPanel assignLabelPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints h = new GridBagConstraints();
+        h.weightx = 1;
+        h.weighty = 1;
+        h.gridx = 0;
+        h.gridy = 0;
+        h.gridwidth = 1;
+        h.insets = new Insets(10,10,0,10);
+        h.fill = GridBagConstraints.HORIZONTAL;
+        h.anchor = GridBagConstraints.NORTHWEST;
+        JLabel headline = new JLabel("Assignments");
+        headline.setFont(f2);
+        assignLabelPanel.add(headline, h);
+
+        h.gridx = 0;
+        h.gridy = 1;
+        JLabel dueDateLabel = new JLabel("Due Date");
+        dueDateLabel.setPreferredSize(assignmentLabelDimesions);
+        dueDateLabel.setMaximumSize(assignmentLabelDimesions);
+        dueDateLabel.setMinimumSize(assignmentLabelDimesions);
+        dueDateLabel.setFont(tableHeadFont);
+        assignLabelPanel.add(dueDateLabel, h);
+
+        h.gridx = 1;
+        JLabel assignmentName = new JLabel("Name");
+        assignmentName.setPreferredSize(assignmentLabelDimesions);
+        assignmentName.setMaximumSize(assignmentLabelDimesions);
+        assignmentName.setMinimumSize(assignmentLabelDimesions);
+        assignmentName.setFont(tableHeadFont);
+        assignLabelPanel.add(assignmentName, h);
+
+        h.gridx = 2;
+        JLabel assignmentWeight = new JLabel("Weight");
+        assignmentWeight.setPreferredSize(assignmentLabelDimesions);
+        assignmentWeight.setMaximumSize(assignmentLabelDimesions);
+        assignmentWeight.setMinimumSize(assignmentLabelDimesions);
+        assignmentWeight.setFont(tableHeadFont);
+        assignLabelPanel.add(assignmentWeight, h);
+
+        h.gridx = 3;
+        JLabel earnedWeight = new JLabel("Earned Weight");
+        earnedWeight.setPreferredSize(assignmentLabelDimesions);
+        earnedWeight.setMaximumSize(assignmentLabelDimesions);
+        earnedWeight.setMinimumSize(assignmentLabelDimesions);
+        earnedWeight.setFont(tableHeadFont);
+        assignLabelPanel.add(earnedWeight, h);
+
+        h.gridx = 4;
+        JLabel grade = new JLabel("Grade");
+        grade.setPreferredSize(assignmentLabelDimesions);
+        grade.setMaximumSize(assignmentLabelDimesions);
+        grade.setMinimumSize(assignmentLabelDimesions);
+        grade.setFont(tableHeadFont);
+        assignLabelPanel.add(grade, h);
+
+        h.gridx = 5;
+        JLabel headerSpacer = new JLabel(" ");
+        headerSpacer.setPreferredSize(assignmentLabelDimesions);
+        headerSpacer.setMaximumSize(assignmentLabelDimesions);
+        headerSpacer.setMinimumSize(assignmentLabelDimesions);
+        assignLabelPanel.add(headerSpacer, h);
+
+        classPanelConstraints.gridy = 1;
+        classPanel.add(assignLabelPanel, classPanelConstraints);
+
+        try {
+            ArrayList<Assignment> assignmentsForClass = Assignment.getAssignmentsForClass(user.getUserId(), classIdVal);
+            if (assignmentsForClass != null) {
+                JPanel assignmentsPanel = new JPanel(new GridLayout(assignmentsForClass.size(), 1, 0, 0));
+                GridBagConstraints aConstraints = new GridBagConstraints();
+                aConstraints.anchor = GridBagConstraints.NORTHWEST;
+                aConstraints.gridx = 0;
+                aConstraints.weighty = 1;
+
+                for (int j = 0; j < assignmentsForClass.size(); j++) {
+                    aConstraints.gridy = j;
+                    assignmentsPanel.add(classAssignmentPanel(assignmentsForClass.get(j).getAssignmentId(), assignmentsForClass.get(j).getAssignmentDueDate(), assignmentsForClass.get(j).getAssignmentName(), assignmentsForClass.get(j).getAssignmentWeight(), assignmentsForClass.get(j).getAssignmentGrade()), aConstraints);
+                }
+
+                classPanelConstraints.gridy = 2;
+                classPanel.add(assignmentsPanel, classPanelConstraints);
+            }
+
+            parentPanel.add(classPanel, BorderLayout.NORTH);
+        } catch (Exception ex) {
+            System.out.println("Unable to connect to the database.");
+        }
+
+        return parentPanel;
     }
 }

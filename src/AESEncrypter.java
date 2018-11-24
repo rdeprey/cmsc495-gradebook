@@ -14,8 +14,8 @@ class AESEncrypter {
         dcipher.init(Cipher.DECRYPT_MODE, key);
     }
 
-    public String encrypt(String str) throws Exception {
-        return Base64.getEncoder().encodeToString(ecipher.doFinal(str.getBytes(StandardCharsets.UTF_8)));
+    public void encrypt(String str) throws Exception {
+        Base64.getEncoder().encodeToString(ecipher.doFinal(str.getBytes(StandardCharsets.UTF_8)));
     }
 
     public String decrypt(String str) throws Exception {

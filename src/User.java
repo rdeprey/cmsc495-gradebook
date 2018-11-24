@@ -35,19 +35,19 @@ public class User {
     }
 
     // Setters
-    public void setUserId(int userId) {
+    private void setUserId(int userId) {
         this.userId = userId;
     }
 
-    public void setEmailAddress(String emailAddress) {
+    private void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
     }
 
-    public void setUsername(String username) {
+    private void setUsername(String username) {
         this.username = username;
     }
 
-    public void setPassword(String password) {
+    private void setPassword(String password) {
         this.password = password;
     }
 
