@@ -1,6 +1,21 @@
-/* Connecting to the database: https://www.homeandlearn.co.uk/java/connect_to_a_database_using_java_code.html */
-/* JTabbedPane starter code from: https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial/uiswing/examples/components/TabbedPaneDemoProject/src/components/TabbedPaneDemo.java */
-/* Verify string is integer from: https://stackoverflow.com/questions/5439529/determine-if-a-string-is-an-integer-in-java */
+/*********************************************************************************************************
+ * File name: Gradebook.java
+ * Date: November 2018
+ * Author: Haemee Nabors, Rebecca Deprey, Devon Artist, Harry Giles, Brittany White, Ryan Haas
+ * Purpose: This class extends the JFrame class to create a JFrame window for the GradeBook GUI. It has
+ * methods to allow students to add classes and assignments; add grades for assignments; view their
+ * progress in current classes; and review their grades from completed classes.
+ *
+ * The GUI uses Java Swing components.
+ *
+ * References:
+ * 1. Java Tutorials Code Sample – getCodeSampleUrl(); document.write(codeSampleName);. (n.d.). Retrieved
+ * from https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial
+ * /uiswing/examples/components/TabbedPaneDemoProject/src/components/TabbedPaneDemo.java
+ *
+ * 2. Determine if a String is an Integer in Java. (n.d.). Retrieved from https://stackoverflow.com/questions
+ * /5439529/determine-if-a-string-is-an-integer-in-java
+ *********************************************************************************************************/
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,3 +1,15 @@
+/*********************************************************************************************************
+ * File name: DatabaseConnection.java
+ * Date: November 2018
+ * Author: Haemee Nabors, Rebecca Deprey, Devon Artist, Harry Giles, Brittany White, Ryan Haas
+ * Purpose: This class uses the Java Database Connectivity (JDBC) library to connect to a Microsoft SQL
+ * database hosted on the Amazon Web Services Relational Database Services platform. It reads the database
+ * connection data from a .txt file and uses it to connect to the database.
+ *
+ * References:
+ * 1. Connect to a Database Using Java Code. (n.d.). Retrieved from https://www.homeandlearn.co.uk/java/connect_to_a_database_using_java_code.html
+ *********************************************************************************************************/
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;

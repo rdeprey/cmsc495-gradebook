@@ -1,3 +1,11 @@
+/*********************************************************************************************************
+ * File name: AESEncrypter.java
+ * Date: November 2018
+ * Author: Haemee Nabors, Rebecca Deprey, Devon Artist, Harry Giles, Brittany White, Ryan Haas
+ * Purpose: This class encrypts and decrypts the log files uses to store data on attempts to log into the
+ * application.
+ *********************************************************************************************************/
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;

@@ -1,3 +1,18 @@
+/*********************************************************************************************************
+ * File name: Assignment.java
+ * Date: November 2018
+ * Author: Haemee Nabors, Rebecca Deprey, Devon Artist, Harry Giles, Brittany White, Ryan Haas
+ * Purpose: This class serves as a data transfer object for the Assignment table in the Microsoft SQL
+ * database. It maps each field in the database table to private fields for the Assignment objects used
+ * in the program. It also has methods that get, set, and update data in the database based on changes in
+ * the application GUI as well as getter and setter methods used throughout the application.
+ *
+ * References:
+ * 1. Java Tutorials Code Sample – getCodeSampleUrl(); document.write(codeSampleName);. (n.d.). Retrieved
+ * from https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial
+ * /uiswing/examples/components/TabbedPaneDemoProject/src/components/TabbedPaneDemo.java
+ *********************************************************************************************************/
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;

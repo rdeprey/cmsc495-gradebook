@@ -1,3 +1,15 @@
+/*********************************************************************************************************
+ * File name: Login.java
+ * Date: November 2018
+ * Author: Haemee Nabors, Rebecca Deprey, Devon Artist, Harry Giles, Brittany White, Ryan Haas
+ * Purpose: This class serves as the entry point to the GradeBook application. It authenticates users
+ * based on a username and password stored in the User table in the Microsoft SQL database. If a student
+ * attempts to login with invalid credentials more than three times, then he/she is locked out. There
+ * are also methods used to remind students of their username and send them password reset tokens.
+ *
+ * The GUI uses the JavaFX library.
+ *********************************************************************************************************/
+
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
