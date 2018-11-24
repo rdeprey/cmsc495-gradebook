@@ -10,23 +10,34 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Gradebook extends JFrame {
+    private static User user;
     private static final Font f1 = new Font("Monospaced", Font.BOLD, 20);
     private static final Font f2 = new Font("Monospaced", Font.BOLD, 16);
     private static ArrayList<Class> currentClasses;
+    private static final JPanel progressPanel = new JPanel(new GridLayout(0, 1, 5, 5));
+    private static final JPanel currentClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
+    private static JPanel completedPanel = new JPanel(new GridLayout(0, 1, 5, 5));
+    private static JPanel completedClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
+    private static final JPanel classInfoPanel = createAddClassPanel();
 
     //creates GUI
     public Gradebook(final User user) throws Exception {
+        this.user = user;
         String userName = user.getUsername();
         String date = new SimpleDateFormat("EEEEE MMMMM d, yyyy").format(new Date());
         String greetingMessage = determineGreeting();
 
         JFrame frame = new JFrame("Gradebook");
+        frame.setSize(1500, 1000);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel contentPane = new JPanel(new GridBagLayout());
         frame.setContentPane(contentPane);
+        frame.setMinimumSize(new Dimension(1500, 600));
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -68,9 +79,7 @@ public class Gradebook extends JFrame {
         //ProgressPanel
         c.gridy++;
         c.gridwidth = 2;
-        final JPanel progressPanel = new JPanel(new GridLayout(0, 1, 5, 5));
-        final JPanel currentClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
-        drawCurrentClassesPanel(currentClassesPanel, progressPanel, user); // dynamic progress panels
+        drawCurrentClassesPanel(user); // dynamic progress panels
         JScrollPane sp = new JScrollPane(progressPanel);
         JPanel jp = new JPanel(new GridLayout(0, 1, 5, 5));
         jp.setPreferredSize(new Dimension(200, 200));
@@ -89,9 +98,7 @@ public class Gradebook extends JFrame {
         contentPane.add(compClassTitlePanel, c);
 
         c.gridy++;
-        JPanel completedPanel = new JPanel(new GridLayout(0, 1, 5, 5));
-        JPanel completedClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
-        drawCompletedClassesPanel(completedClassesPanel, completedPanel, user);
+        drawCompletedClassesPanel(user);
         JScrollPane completedClassScrollPane = new JScrollPane(completedPanel);
         JPanel completedClassParentPane = new JPanel(new GridLayout(0, 1, 5, 5));
         completedClassParentPane.setPreferredSize(new Dimension(200, 200));
@@ -105,212 +112,18 @@ public class Gradebook extends JFrame {
 
         // Create tabbed pane container
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setPreferredSize(new Dimension(600, 700));
+        tabbedPane.setPreferredSize(new Dimension(1100, 700));
 
         //New Class
         final JPanel newClassPanel = new JPanel(new BorderLayout());
-        JLabel newClassLabel = new JLabel("Creating New Class", SwingConstants.CENTER);
-        newClassLabel.setFont(f2);
-        newClassPanel.add(newClassLabel, BorderLayout.PAGE_START);
-
-
         final JPanel newClassFormPanel = new JPanel(new GridBagLayout());
         final GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.weighty = 1;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.FIRST_LINE_START;
-
-        final JPanel classInfoPanel = createAddClassPanel();
+        constraints.anchor = GridBagConstraints.PAGE_START;
         newClassFormPanel.add(classInfoPanel, constraints);
-
-        constraints.gridx = 0;
-        constraints.gridy++;
-        constraints.gridwidth = 2;
-        JButton createNewClassTemplate = new JButton("Add Assignments");
-
-
-        // Create Class Template event handler
-        createNewClassTemplate.addActionListener(new ActionListener() {
-            String className = null;
-            String classStartDate = null;
-            String classEndDate = null;
-            String numOfAssignments = null;
-
-            public void actionPerformed(ActionEvent e) {
-                for (Component c : newClassFormPanel.getComponents()) {
-                    if (c instanceof JPanel) {
-                        int counter = 0;
-                        for (Component d : classInfoPanel.getComponents()) {
-                            if (d instanceof JTextField) {
-                                switch (counter) {
-                                    case 0:
-                                        className = ((JTextField) d).getText();
-                                        ((JTextField) d).setText(""); // Reset text field for later use after getting value
-                                        break;
-                                    case 1:
-                                        classStartDate = ((JTextField) d).getText();
-                                        ((JTextField) d).setText("");
-                                        break;
-                                    case 2:
-                                        classEndDate = ((JTextField) d).getText();
-                                        ((JTextField) d).setText("");
-                                        break;
-                                    case 3:
-                                        numOfAssignments = ((JTextField) d).getText();
-                                        ((JTextField) d).setText("");
-                                        break;
-                                }
-                                counter++;
-                            }
-                        }
-                    }
-                }
-
-
-                if (className == null || classStartDate == null || classEndDate == null || numOfAssignments == null) {
-                    // TODO: Show an error message
-                    return;
-                }
-
-                // Verify that the number of assignments is actually an integer value
-                for (int i = 0; i < numOfAssignments.length(); i++) {
-                    if (i == 0 && numOfAssignments.charAt(i) == '-') {
-                        if (numOfAssignments.length() == 1) {
-                            // TODO: Show error message - not an integer
-                            return;
-                        }
-                        continue;
-                    }
-                    if (Character.digit(numOfAssignments.charAt(i), 10) < 0) {
-                        // TODO: Show error message - not an integer
-                        return;
-                    }
-                }
-
-                // This means it's an integer
-                final int assignmentsInt = Integer.parseInt(numOfAssignments);
-
-                // Verify that dates are valid
-                final Date classStartDateVal = convertStringToDate(classStartDate);
-                final Date classEndDateVal = convertStringToDate(classEndDate);
-
-                if (classStartDateVal != null && classEndDateVal != null) {
-                    // Create a class object
-                    final Class classX = new Class(user.getUserId(), className, assignmentsInt, classStartDateVal, classEndDateVal);
-
-                    // Try to save the class object to the database
-                    try {
-                        boolean classIsSuccess = Class.addClass(classX);
-
-                        // If the class is saved successfully, let the user continue to the add assignments view
-                        if (classIsSuccess) {
-                            // If the user input is valid, show the assignment panel
-                            newClassPanel.removeAll();
-                            newClassPanel.revalidate();
-                            newClassPanel.repaint();
-                            final JComponent newClassTemplatePanel = new JPanel(new BorderLayout());
-                            JLabel classTemplateLabel = new JLabel("Entering Assignments into Class", SwingConstants.CENTER);
-                            classTemplateLabel.setFont(f2);
-                            newClassTemplatePanel.add(classTemplateLabel, BorderLayout.PAGE_START);
-
-                            // Generate the number of assignment fields specified by the user
-                            newClassTemplatePanel.add(createAssignmentForm(assignmentsInt));
-
-                            JButton createClassWithAssignmentsBtn = new JButton("Save Class Information");
-
-                            createClassWithAssignmentsBtn.addActionListener(e1 -> {
-                            // Create a class object
-                            for (Component b : newClassTemplatePanel.getComponents()) {
-                                if (b instanceof JPanel) {
-                                    for (Component d : ((JPanel) b).getComponents()) {
-                                        if (d instanceof JPanel) {
-                                            int counter = 0;
-                                            String assignmentDate = null;
-                                            String assignmentName = null;
-                                            String assignmentWeight = null;
-                                            for (Component f : ((JPanel) d).getComponents()) {
-                                                if (f instanceof JTextField) {
-                                                    switch (counter) {
-                                                        case 0:
-                                                            assignmentDate = ((JTextField) f).getText();
-                                                            break;
-                                                        case 1:
-                                                            assignmentName = ((JTextField) f).getText();
-                                                            break;
-                                                        case 2:
-                                                            assignmentWeight = ((JTextField) f).getText();
-                                                            break;
-                                                    }
-                                                    counter++;
-                                                }
-                                            }
-
-                                            if (assignmentDate != null && assignmentName != null && assignmentWeight != null) {
-                                                // Make sure the assignmentDate is actually a valid date
-                                                Date assignmentDateVal = convertStringToDate(assignmentDate);
-
-                                                // Make sure that the assignment weight is a float
-                                                float assignmentWeightVal;
-                                                try {
-                                                    assignmentWeightVal = Float.parseFloat(assignmentWeight);
-                                                } catch (NumberFormatException ex) {
-                                                    // TODO: Add error message if the string isn't actually a float
-                                                    System.out.println("Assignment weight is not a float");
-                                                    return;
-                                                }
-
-                                                if (assignmentDateVal != null) {
-                                                    // Create an assignment object
-                                                    int classId = classX.getClassId();
-                                                    Assignment assignment = new Assignment(user.getUserId(), classId, assignmentName, assignmentDateVal, assignmentWeightVal);
-
-                                                    // Try to add the assignment object to the database
-                                                    try {
-                                                        Assignment.addAssignment(assignment);
-
-                                                    } catch (Exception ex) {
-                                                        // TODO: Show error message if assignment can't be added to the database
-                                                        System.out.println("Failed to add assignment to the database");
-                                                    }
-                                                }
-
-                                                assignmentDate = null;
-                                                assignmentName = null;
-                                                assignmentWeight = null;
-                                            } else {
-                                                // TODO: Show error message if any of the fields are empty for a row
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Redraw the progress panels when new classes are added
-                            drawCurrentClassesPanel(currentClassesPanel, progressPanel, user);
-                            drawCompletedClassesPanel(completedClassesPanel, completedPanel, user);
-
-                            // Restore the add class tab to its original state
-                            newClassPanel.removeAll();
-                            newClassPanel.revalidate();
-                            newClassPanel.repaint();
-                            newClassFormPanel.add(createNewClassTemplate, constraints);
-                            newClassPanel.add(newClassFormPanel, BorderLayout.CENTER);
-                            });
-                            newClassTemplatePanel.add(createClassWithAssignmentsBtn, BorderLayout.PAGE_END);
-                            newClassPanel.add(newClassTemplatePanel, BorderLayout.PAGE_START);
-                        } else {
-                            // Show error message
-
-                        }
-                    } catch (Exception ex) {
-                        // Show error in GUI if class isn't saved to database; don't allow user to continue in application
-                    }
-                }
-            }
-        });
-        newClassFormPanel.add(createNewClassTemplate, constraints);
         newClassPanel.add(newClassFormPanel, BorderLayout.CENTER);
         tabbedPane.addTab("New Class", null, newClassPanel); // Add tab to tab container
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1); // keyboard event
@@ -432,7 +245,7 @@ public class Gradebook extends JFrame {
         return greeting;
     }
 
-    private static void drawCurrentClassesPanel(JPanel currentClassesPanel, JPanel progressPanel, User user) {
+    private static void drawCurrentClassesPanel(User user) {
         try {
             currentClasses = Class.getCurrentClasses(user.getUserId());
             if (currentClasses.size() > 0) {
@@ -455,7 +268,7 @@ public class Gradebook extends JFrame {
         }
     }
 
-    private static void drawCompletedClassesPanel(JPanel completedClassesPanel, JPanel completedPanel, User user) {
+    private static void drawCompletedClassesPanel(User user) {
         try {
             ArrayList<Class> completedClasses = Class.getCompletedClasses(user.getUserId());
             if (completedClasses.size() > 0) {
@@ -474,7 +287,7 @@ public class Gradebook extends JFrame {
     }
 
     private static JPanel createClassProgressPanel(String className, String classGrade,
-                                                     int completedWeight, int totalWeight) {
+                                                   int completedWeight, int totalWeight) {
         JPanel classProgressPanel = new JPanel(new GridLayout(0, 1));
 
         //Class Name and Grade
@@ -506,34 +319,64 @@ public class Gradebook extends JFrame {
         try {
             return new SimpleDateFormat("MM/dd/yyyy").parse(date.trim());
         } catch (ParseException ex) {
-            // TODO: Add error message if the string isn't actually a date
-            System.out.println("Not a date");
             return null;
         }
     }
 
-    private static JPanel createAddClassPanel() {
-        final JPanel classInfoPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints g = new GridBagConstraints();
-        g.fill = GridBagConstraints.BOTH;
+    private static boolean isInteger(String value) {
+        for (int i = 0; i < value.length(); i++) {
+            if (i == 0 && value.charAt(i) == '-') {
+                if (value.length() == 1) {
+                    return false;
+                }
+                continue;
+            }
+            if (Character.digit(value.charAt(i), 10) < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-        g.gridwidth = 2;
+    private static JPanel createAddClassPanel() {
+        Map<String, Boolean> isValid = new HashMap<>();
+        isValid.put("className", false);
+        isValid.put("startDate", false);
+        isValid.put("endDate", false);
+        isValid.put("numberOfAssignments", false);
+
+        final JPanel classInfoPanel = new JPanel(new GridBagLayout());
+        classInfoPanel.setSize(new Dimension(1100, 700));
+        GridBagConstraints g = new GridBagConstraints();
+        g.fill = GridBagConstraints.HORIZONTAL;
+        g.anchor = GridBagConstraints.PAGE_START;
+
+        g.gridwidth = 5;
         g.weightx = 1.0;
-        g.ipady = 2;
-        g.gridx = 0;
+        g.gridx = 2;
         g.gridy = 0;
-        classInfoPanel.add(new JLabel(), g);
+        JPanel newClassLabelPanel = new JPanel(new BorderLayout());
+        JLabel newClassLabel = new JLabel("Creating New Class");
+        newClassLabel.setHorizontalAlignment(JLabel.CENTER);
+        newClassLabel.setFont(f2);
+        newClassLabelPanel.add(newClassLabel, BorderLayout.CENTER);
+        classInfoPanel.add(newClassLabelPanel, g);
 
         g.gridx = 0;
         g.gridy = 1;
+        g.insets = new Insets(0, 0, 0, 100);
+        classInfoPanel.add(new JLabel(), g);
+
+        g.gridx = 0;
+        g.gridy = 2;
         final JLabel classNameLabel = new JLabel("Class Name: ");
         classInfoPanel.add(classNameLabel, g);
         final JLabel classNameError = new JLabel();
         classNameError.setForeground(Color.red);
         classNameError.setVisible(false);
 
-        g.gridx = 3;
-        g.gridy = 1;
+        g.gridx = 6;
+        g.gridy = 2;
         final JTextField nameTextField = new JTextField(10);
         nameTextField.addFocusListener(new FocusListener() {
             @Override
@@ -546,27 +389,29 @@ public class Gradebook extends JFrame {
                 if (nameTextField.getText().isEmpty()) {
                     classNameError.setText("You must enter a class name.");
                     classNameError.setVisible(true);
+                    isValid.put("className", false);
+                } else {
+                    isValid.put("className", true);
                 }
             }
         });
         classInfoPanel.add(nameTextField, g);
 
         g.gridx = 0;
-        g.gridy = 2;
+        g.gridy = 3;
         classInfoPanel.add(classNameError, g);
 
         g.gridx = 0;
-        g.gridy = 3;
+        g.gridy = 4;
         final JLabel classStartDateLabel = new JLabel("Class Start Date: ");
         classInfoPanel.add(classStartDateLabel, g);
         final JLabel classStartDateError = new JLabel();
         classStartDateError.setVisible(false);
         classStartDateError.setForeground(Color.RED);
 
-        g.gridx = 3;
-        g.gridy = 3;
+        g.gridx = 6;
+        g.gridy = 4;
         final JTextField classStartDateTextField = new JTextField("--/--/----", 9);
-        Date classStartDateVal;
         classStartDateTextField.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
                 classStartDateError.setVisible(false);
@@ -581,29 +426,31 @@ public class Gradebook extends JFrame {
                 }
 
                 Date classStartDateVal = convertStringToDate(classStartDateTextField.getText());
-                System.out.println(classStartDateVal);
                 if (classStartDateVal == null) {
                     classStartDateError.setText("You must enter a valid date.");
                     classStartDateError.setVisible(true);
+                    isValid.put("startDate", false);
+                } else {
+                    isValid.put("startDate", true);
                 }
             }
         });
         classInfoPanel.add(classStartDateTextField, g);
 
         g.gridx = 0;
-        g.gridy = 4;
+        g.gridy = 5;
         classInfoPanel.add(classStartDateError, g);
 
         g.gridx = 0;
-        g.gridy = 5;
+        g.gridy = 6;
         final JLabel classEndDateLabel = new JLabel("Class End Date: ");
         classInfoPanel.add(classEndDateLabel, g);
         final JLabel classEndDateError = new JLabel();
         classEndDateError.setVisible(false);
         classEndDateError.setForeground(Color.RED);
 
-        g.gridx = 3;
-        g.gridy = 5;
+        g.gridx = 6;
+        g.gridy = 6;
         final JTextField classEndDateTextField = new JTextField("--/--/----", 9);
         classEndDateTextField.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
@@ -622,31 +469,33 @@ public class Gradebook extends JFrame {
                 if (classEndDateVal == null) {
                     classEndDateError.setText("You must enter a valid date.");
                     classEndDateError.setVisible(true);
+                    isValid.put("endDate", false);
                 } else if (classEndDateVal.before(convertStringToDate(classStartDateTextField.getText()))) {
                     classEndDateError.setText("The class end date must be later than the class start date.");
                     classEndDateError.setVisible(true);
+                    isValid.put("endDate", false);
+                } else {
+                    isValid.put("endDate", true);
                 }
             }
         });
         classInfoPanel.add(classEndDateTextField, g);
 
         g.gridx = 0;
-        g.gridy = 6;
+        g.gridy = 7;
         classInfoPanel.add(classEndDateError, g);
 
         g.gridx = 0;
-        g.gridy = 7;
-        g.insets = new Insets(5,0,5,5);
+        g.gridy = 8;
         final JLabel numberOfAssignmentsLabel = new JLabel("Number of Assignments: ");
         classInfoPanel.add(numberOfAssignmentsLabel, g);
         final JLabel numberOfAssignmentsError = new JLabel();
         numberOfAssignmentsError.setVisible(false);
         numberOfAssignmentsError.setForeground(Color.RED);
 
-        g.gridx = 3;
-        g.gridy = 7;
+        g.gridx = 6;
+        g.gridy = 8;
         final JTextField numOfAssignmentsTextField = new JTextField(5);
-
         numOfAssignmentsTextField.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -656,27 +505,133 @@ public class Gradebook extends JFrame {
             @Override
             public void focusLost(FocusEvent e) {
                 // Verify that the number of assignments is actually an integer value
-                for (int i = 0; i < numOfAssignmentsTextField.getText().length(); i++) {
-                    if (i == 0 && numOfAssignmentsTextField.getText().charAt(i) == '-') {
-                        if (numOfAssignmentsTextField.getText().length() == 1) {
-                            numberOfAssignmentsError.setText("Please enter an integer value for the number of assignments");
-                            numberOfAssignmentsError.setVisible(true);
-                        }
-                        continue;
-                    }
-                    if (Character.digit(numOfAssignmentsTextField.getText().charAt(i), 10) < 0) {
-                        numberOfAssignmentsError.setText("Please enter an integer value for the number of assignments");
-                        numberOfAssignmentsError.setVisible(true);
-                    }
+                boolean numAssignmentsIsInteger = isInteger(numOfAssignmentsTextField.getText());
+                if (!numAssignmentsIsInteger) {
+                    numberOfAssignmentsError.setText("Please enter an integer value for the number of assignments");
+                    numberOfAssignmentsError.setVisible(true);
+                    isValid.put("numberOfAssignments", false);
+                } else {
+                    isValid.put("numberOfAssignments", true);
                 }
             }
         });
         classInfoPanel.add(numOfAssignmentsTextField, g);
 
-        g.gridwidth = 4;
         g.gridx = 0;
-        g.gridy = 8;
+        g.gridy = 9;
         classInfoPanel.add(numberOfAssignmentsError, g);
+
+        g.gridwidth = 10;
+        g.gridx = 0;
+        g.gridy = 10;
+        JButton createNewClassBtn = new JButton("Add Assignments");
+        createNewClassBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String className = nameTextField.getText();
+                Date classStartDate = convertStringToDate(classStartDateTextField.getText());
+                Date classEndDate = convertStringToDate(classEndDateTextField.getText());
+                int numOfAssignments = Integer.parseInt(numOfAssignmentsTextField.getText());
+
+                // Create a class object
+                final Class classX = new Class(user.getUserId(), className, numOfAssignments, classStartDate, classEndDate);
+
+                // Try to save the class object to the database
+                try {
+                    boolean classIsSuccess = Class.addClass(classX);
+
+                    // If the class is saved successfully, let the user continue to the add assignments view
+                    if (classIsSuccess) {
+                        // If the user input is valid, show the assignment panel
+                        classInfoPanel.removeAll();
+                        classInfoPanel.revalidate();
+                        classInfoPanel.repaint();
+                        final JComponent newClassTemplatePanel = new JPanel(new BorderLayout());
+                        JLabel classTemplateLabel = new JLabel("Entering Assignments into Class", SwingConstants.CENTER);
+                        classTemplateLabel.setFont(f2);
+                        newClassTemplatePanel.add(classTemplateLabel, BorderLayout.PAGE_START);
+
+                        // Generate the number of assignment fields specified by the user
+                        newClassTemplatePanel.add(createAssignmentForm(numOfAssignments));
+
+                        JButton createClassWithAssignmentsBtn = new JButton("Save Class Information");
+
+                        createClassWithAssignmentsBtn.addActionListener(e1 -> {
+                            // Create a class object
+                            for (Component b : newClassTemplatePanel.getComponents()) {
+                                if (b instanceof JPanel) {
+                                    int counter = 0;
+                                    String assignmentDate = null;
+                                    String assignmentName = null;
+                                    String assignmentWeight = null;
+                                    for (Component f : ((JPanel) b).getComponents()) {
+                                        if (f instanceof JPanel) {
+                                            for (Component k : ((JPanel) f).getComponents()) {
+                                                if (k instanceof JTextField) {
+                                                    switch (counter) {
+                                                        case 0:
+                                                            assignmentDate = ((JTextField) k).getText();
+                                                            break;
+                                                        case 1:
+                                                            assignmentName = ((JTextField) k).getText();
+                                                            break;
+                                                        case 2:
+                                                            assignmentWeight = ((JTextField) k).getText();
+                                                            break;
+                                                    }
+                                                    counter++;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Create an assignment object
+                                    int classId = classX.getClassId();
+                                    Assignment assignment = new Assignment(user.getUserId(), classId, assignmentName, convertStringToDate(assignmentDate), Float.parseFloat(assignmentWeight));
+
+                                    // Try to add the assignment object to the database
+                                    try {
+                                        Assignment.addAssignment(assignment);
+
+                                    } catch (Exception ex) {
+                                        // TODO: Show error message if assignment can't be added to the database
+                                        System.out.println("Failed to add assignment to the database");
+                                    }
+
+                                    assignmentDate = null;
+                                    assignmentName = null;
+                                    assignmentWeight = null;
+                                }
+                            }
+
+                            // Redraw the progress panels when new classes are added
+                            drawCurrentClassesPanel(user);
+                            drawCompletedClassesPanel(user);
+
+                            // Restore the add class tab to its original state
+                            classInfoPanel.removeAll();
+                            classInfoPanel.revalidate();
+                            classInfoPanel.repaint();
+                            classInfoPanel.add(createAddClassPanel());
+                        });
+                        newClassTemplatePanel.add(createClassWithAssignmentsBtn, BorderLayout.PAGE_END);
+                        classInfoPanel.add(newClassTemplatePanel, BorderLayout.PAGE_START);
+                    } else {
+                        // Show error message
+
+                    }
+                } catch (Exception ex) {
+                    // Show error in GUI if class isn't saved to database; don't allow user to continue in application
+                }
+            }
+        });
+
+        classInfoPanel.add(createNewClassBtn, g);
+
+//        if (isValid.containsValue(false)) {
+//            createNewClassBtn.setEnabled(false);
+//        } else {
+//            createNewClassBtn.setEnabled(true);
+//        }
 
         return classInfoPanel;
     }
@@ -684,26 +639,37 @@ public class Gradebook extends JFrame {
     private static JPanel createAssignmentForm(int numOfAssignments) {
         Font f3 = new Font("Monospaced", Font.BOLD, 12);
 
-        JPanel assignmentsFormPanel = new JPanel(new GridLayout(0, 1));
+        JPanel assignmentsFormPanel = new JPanel(new GridLayout(1 + numOfAssignments, 1));
+        assignmentsFormPanel.setSize(new Dimension(1100, 700));
 
         JPanel assignmentsLabelPanel = new JPanel(new GridBagLayout());
         GridBagConstraints f = new GridBagConstraints();
-        f.gridx = 1;
+        f.fill = GridBagConstraints.HORIZONTAL;
+        f.anchor = GridBagConstraints.PAGE_START;
+
+        f.gridx = 0;
+        f.gridy = 0;
+        JLabel spaceLabel = new JLabel("");
+        spaceLabel.setPreferredSize(new Dimension(100, 20));
+        assignmentsLabelPanel.add(spaceLabel, f);
+
+        f.gridx = 2;
         f.gridy = 0;
         JLabel dueDateLabel = new JLabel("Due Date");
+        dueDateLabel.setPreferredSize(new Dimension(220, 20));
         dueDateLabel.setFont(f3);
         assignmentsLabelPanel.add(dueDateLabel, f);
 
-        f.gridx = 2;
+        f.gridx = 4;
         f.gridwidth = 2;
-        f.fill = GridBagConstraints.HORIZONTAL;
-        JLabel assignNameLabel = new JLabel("Assign. Name");
+        JLabel assignNameLabel = new JLabel("Assignment Name");
+        assignNameLabel.setPreferredSize(new Dimension(260, 20));
         assignNameLabel.setFont(f3);
         assignmentsLabelPanel.add(assignNameLabel, f);
 
-        f.gridx = 4;
+        f.gridx = 8;
         f.gridwidth = 1;
-        JLabel assignWeightLabel = new JLabel("Assign. Weight");
+        JLabel assignWeightLabel = new JLabel("Assignment Weight");
         assignWeightLabel.setFont(f3);
         assignmentsLabelPanel.add(assignWeightLabel, f);
 
@@ -712,65 +678,116 @@ public class Gradebook extends JFrame {
         int assignNo = 1;
         //create each assignment's form
         for (int i = 0; i < numOfAssignments; i++) {
-            //attempting to switch to gridBagLayout
-
             JPanel anAssignmentPanel = new JPanel(new GridBagLayout());
+            anAssignmentPanel.setSize(new Dimension(1100, 700));
             GridBagConstraints g = new GridBagConstraints();
+            g.fill = GridBagConstraints.HORIZONTAL;
+            g.anchor = GridBagConstraints.PAGE_START;
+            g.insets = new Insets(0, 0, 0, 50);
+
+            JLabel assignmentDateError = new JLabel();
+            assignmentDateError.setForeground(Color.RED);
+            assignmentDateError.setVisible(false);
+            g.gridx = 2;
+            g.gridy = i + 1;
+            anAssignmentPanel.add(assignmentDateError, g);
+
             g.gridx = 0;
-            g.gridy = 0;
+            g.gridy = i;
             JLabel assignNumLabel = new JLabel("Assignment " + assignNo);
             assignNo++;
             anAssignmentPanel.add(assignNumLabel, g);
 
-            g.gridx = 1;
-            final JTextField dateTF = new JTextField("--/--/----", 9);
+            g.gridx = 2;
+            g.gridy = i;
+            final JTextField dateTF = new JTextField("--/--/----");
+            dateTF.setPreferredSize(new Dimension(200, 25));
             dateTF.addFocusListener(new FocusListener() {
                 public void focusGained(FocusEvent e) {
                     dateTF.setText("");
                     dateTF.setForeground(new Color(50, 50, 50));
+                    assignmentDateError.setVisible(false);
                 }
 
                 public void focusLost(FocusEvent e) {
                     if (dateTF.getText().length() == 0) {
                         dateTF.setText("--/--/----");
                         dateTF.setForeground(new Color(150, 150, 150));
+
+                        Date assignmentDate = convertStringToDate(dateTF.getText());
+                        if (dateTF.getText().length() == 0 || assignmentDate == null) {
+                            assignmentDateError.setText("You must enter a valid date.");
+                            assignmentDateError.setVisible(true);
+                        }
                     }
                 }
             });
             anAssignmentPanel.add(dateTF, g);
 
-            g.gridx = 2;
-            g.gridwidth = 2;
-            g.fill = GridBagConstraints.HORIZONTAL;
-            final JTextField assignNameTF = new JTextField("Assignment Name", 15);
+            JLabel assignmentNameError = new JLabel();
+            assignmentNameError.setForeground(Color.RED);
+            assignmentNameError.setVisible(false);
+            g.gridx = 4;
+            g.gridy = i + 1;
+            anAssignmentPanel.add(assignmentNameError, g);
+
+            g.gridx = 4;
+            g.gridy = i;
+            final JTextField assignNameTF = new JTextField("Assignment Name");
+            assignNameTF.setPreferredSize(new Dimension(240, 25));
             assignNameTF.addFocusListener(new FocusListener() {
                 public void focusGained(FocusEvent e) {
                     assignNameTF.setText("");
                     assignNameTF.setForeground(new Color(50, 50, 50));
+                    assignmentNameError.setVisible(false);
                 }
 
                 public void focusLost(FocusEvent e) {
                     if (assignNameTF.getText().length() == 0) {
                         assignNameTF.setText("Assignment Name");
                         assignNameTF.setForeground(new Color(150, 150, 150));
+
+                        assignmentNameError.setText("You must enter an assignment name.");
+                        assignmentNameError.setVisible(true);
                     }
                 }
             });
             anAssignmentPanel.add(assignNameTF, g);
 
-            g.gridx = 4;
-            g.gridwidth = 1;
-            final JTextField assignWeightTextField = new JTextField("Weight", 5);
+            JLabel assignmentWeightError = new JLabel();
+            assignmentWeightError.setForeground(Color.RED);
+            assignmentWeightError.setVisible(false);
+            g.gridx = 8;
+            g.gridy = i + 1;
+            anAssignmentPanel.add(assignmentWeightError, g);
+
+            g.gridx = 8;
+            g.gridy = i;
+            final JTextField assignWeightTextField = new JTextField("Weight");
+            assignWeightTextField.setPreferredSize(new Dimension(200, 25));
             assignWeightTextField.addFocusListener(new FocusListener() {
                 public void focusGained(FocusEvent e) {
                     assignWeightTextField.setText("");
                     assignWeightTextField.setForeground(new Color(50, 50, 50));
+                    assignmentWeightError.setVisible(false);
                 }
 
                 public void focusLost(FocusEvent e) {
                     if (assignWeightTextField.getText().length() == 0) {
                         assignWeightTextField.setText("Weight");
                         assignWeightTextField.setForeground(new Color(150, 150, 150));
+                    }
+
+                    try {
+                        if (assignWeightTextField.getText() != null) {
+                            Float.parseFloat(assignWeightTextField.getText());
+                        } else {
+                            assignmentWeightError.setText("You must enter a valid weight");
+                            assignmentWeightError.setVisible(true);
+                        }
+                    } catch (NumberFormatException ex) {
+                        assignmentWeightError.setText("You must enter a valid weight");
+                        assignmentWeightError.setVisible(true);
                     }
                 }
             });
