@@ -216,7 +216,10 @@ class Gradebook extends JFrame {
                             currentGrade += (currentWeight * (assignments.get(j).getAssignmentGrade() / 100));
                         }
                     }
-                    progressPanel.add(createClassProgressPanel(currentClasses.get(i).getClassName(), Class.convertToLetterGrade((currentGrade / completedAssignmentWeight) * 100), completedAssignmentWeight, 100));
+
+                    String letterGrade = (completedAssignmentWeight == 0) ? null : Class.convertToLetterGrade((currentGrade / completedAssignmentWeight) * 100);
+
+                    progressPanel.add(createClassProgressPanel(currentClasses.get(i).getClassName(), letterGrade, completedAssignmentWeight, 100));
                 }
                 currentClassesPanel.revalidate();
             }
