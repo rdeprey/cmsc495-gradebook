@@ -109,13 +109,17 @@ class Class {
     }
 
     public String convertToLetterGrade() {
-        if (this.classGrade >= 90.0 && this.classGrade <= 100.0) {
+        return convertToLetterGrade(this.classGrade);
+    }
+
+    public static String convertToLetterGrade(float grade) {
+        if (grade >= 90.0 && grade <= 100.0) {
             return "A";
-        } else if (this.classGrade >= 80.0 && this.classGrade <= 89.0) {
+        } else if (grade >= 80.0 && grade <= 89.0) {
             return "B";
-        } else if (this.classGrade >= 70.0 && this.classGrade <= 79.0) {
+        } else if (grade >= 70.0 && grade <= 79.0) {
             return "C";
-        } else if (this.classGrade >= 60.0 && this.classGrade <= 69.0) {
+        } else if (grade >= 60.0 && grade <= 69.0) {
             return "D";
         } else {
             return "F";

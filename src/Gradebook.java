@@ -49,7 +49,7 @@ class Gradebook extends JFrame {
         String date = new SimpleDateFormat("EEEEE MMMMM d, yyyy").format(new Date());
         String greetingMessage = determineGreeting();
 
-        JFrame frame = new JFrame("Gradebook");
+        JFrame frame = new JFrame("GradeBook");
         frame.setSize(1500, 1000);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -152,10 +152,10 @@ class Gradebook extends JFrame {
             JComponent parentPanel = createCurrentClassTab(className, currentClasses.get(i).getClassId());
             tabbedPane.addTab(className, null, parentPanel); // Add tab to tab container
             tabbedPane.setMnemonicAt(0, KeyEvent.VK_3); // keyboard event
-
-            // Add the tabbed pane to contentPane
-            contentPane.add(tabbedPane, c);
         }
+
+        // Add the tabbed pane to contentPane
+        contentPane.add(tabbedPane, c);
 
         frame.setSize(1000, 800);
         frame.setVisible(true);
@@ -196,7 +196,18 @@ class Gradebook extends JFrame {
                 progressPanel.add(currentClassesPanel);
 
                 for (int i = 0; i < currentClasses.size(); i++) {
-                    progressPanel.add(createClassProgressPanel(currentClasses.get(i).getClassName(), currentClasses.get(i).convertToLetterGrade(), 0, 100));
+                    ArrayList<Assignment> assignments = Assignment.getAssignmentsForClass(user.getUserId(), currentClasses.get(i).getClassId());
+                    float completedAssignmentWeight = 0;
+                    float currentGrade = 0;
+
+                    for (int j = 0; j < assignments.size(); j++) {
+                        if (assignments.get(j).getAssignmentGrade() != 0.0) {
+                            float currentWeight = assignments.get(j).getAssignmentWeight();
+                            completedAssignmentWeight += currentWeight;
+                            currentGrade += (currentWeight * (assignments.get(j).getAssignmentGrade() / 100));
+                        }
+                    }
+                    progressPanel.add(createClassProgressPanel(currentClasses.get(i).getClassName(), Class.convertToLetterGrade((currentGrade / completedAssignmentWeight) * 100), completedAssignmentWeight, 100));
                 }
                 currentClassesPanel.revalidate();
             }
@@ -224,7 +235,7 @@ class Gradebook extends JFrame {
     }
 
     private static JPanel createClassProgressPanel(String className, String classGrade,
-                                                   int completedWeight, int totalWeight) {
+                                                   float completedWeight, int totalWeight) {
         JPanel classProgressPanel = new JPanel(new GridLayout(0, 1));
 
         //Class Name and Grade
@@ -235,7 +246,7 @@ class Gradebook extends JFrame {
         classProgressTitle.add(classGradeLabel);
         classProgressPanel.add(classProgressTitle);
         JProgressBar progBar = new JProgressBar(0, totalWeight);
-        progBar.setValue(completedWeight);
+        progBar.setValue(Math.round(completedWeight));
         progBar.setStringPainted(true);
         classProgressPanel.add(progBar);
 
@@ -293,7 +304,7 @@ class Gradebook extends JFrame {
         g.gridx = 2;
         g.gridy = 0;
         JPanel newClassLabelPanel = new JPanel(new BorderLayout());
-        JLabel newClassLabel = new JLabel("Creating New Class");
+        JLabel newClassLabel = new JLabel("Create a New Class");
         newClassLabel.setHorizontalAlignment(JLabel.CENTER);
         newClassLabel.setFont(f2);
         newClassLabelPanel.add(newClassLabel, BorderLayout.CENTER);
@@ -846,7 +857,6 @@ class Gradebook extends JFrame {
             submitButton.setPreferredSize(labelDimensions);
             submitButton.setMinimumSize(labelDimensions);
             submitButton.setMaximumSize(labelDimensions);
-            //submitButton.setPreferredSize(new Dimension(100, 25));
             submitButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -887,6 +897,9 @@ class Gradebook extends JFrame {
 
                         assignmentPanel.revalidate();
                         assignmentPanel.repaint();
+
+                        drawCurrentClassesPanel(user);
+                        drawCompletedClassesPanel(user);
                     } catch (NumberFormatException ex) {
                         gradeError.setVisible(true);
                     } catch (Exception ex) {
