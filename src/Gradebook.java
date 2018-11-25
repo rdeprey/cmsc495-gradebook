@@ -46,8 +46,17 @@ class Gradebook extends JFrame {
     public Gradebook(final User user) throws Exception {
         Gradebook.user = user;
         String userName = user.getUsername();
-        String date = new SimpleDateFormat("EEEEE MMMMM d, yyyy").format(new Date());
+        String date = new SimpleDateFormat("EEEEE, MMMMM d, yyyy").format(new Date());
         String greetingMessage = determineGreeting();
+
+        // Logout button
+        JButton logoutBtn = new JButton("Logout");
+        logoutBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
 
         JFrame frame = new JFrame("GradeBook");
         frame.setSize(1500, 1000);
@@ -72,12 +81,7 @@ class Gradebook extends JFrame {
         titlePanel.add(title, BorderLayout.CENTER);
         JPanel nameDatePanel = new JPanel(new GridLayout(2, 1));
         nameDatePanel.setBackground(new Color(0, 122, 204));
-        JLabel userNameLabel = new JLabel(userName);
-        userNameLabel.setForeground(Color.WHITE);
-        JLabel dateLabel = new JLabel(date);
-        dateLabel.setForeground(Color.WHITE);
-        nameDatePanel.add(userNameLabel);
-        nameDatePanel.add(dateLabel);
+        nameDatePanel.add(logoutBtn);
         titlePanel.add(nameDatePanel, BorderLayout.EAST);
         contentPane.add(titlePanel, c);
 
@@ -90,7 +94,12 @@ class Gradebook extends JFrame {
         greetingLabel.setFont(f2);
         greetingPanel.add(new JLabel());
         greetingPanel.add(greetingLabel);
-        greetingPanel.add(new JLabel(userName, SwingConstants.CENTER));
+        JLabel usernameLbl = new JLabel(userName, SwingConstants.CENTER);
+        usernameLbl.setFont(f2);
+        greetingPanel.add(usernameLbl);
+        JLabel dateLbl = new JLabel("<html><p style='text-align:center;'>" + date + "</p></html>");
+        dateLbl.setHorizontalAlignment(JLabel.CENTER);
+        greetingPanel.add(dateLbl);
         greetingPanel.add(new JLabel());
         contentPane.add(greetingPanel, c);
 
