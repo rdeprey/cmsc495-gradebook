@@ -554,7 +554,6 @@ class Gradebook extends JFrame {
                                                             Assignment.addAssignment(assignment);
                                                             counter = 0;
                                                         } catch (Exception ex) {
-                                                            // TODO: Show error message if assignment can't be added to the database
                                                             System.out.println("Failed to add assignment to the database");
                                                         }
                                                     } else {
@@ -570,7 +569,10 @@ class Gradebook extends JFrame {
                             // Redraw the progress panels when new classes are added
                             drawCurrentClassesPanel(user);
                             drawCompletedClassesPanel(user);
-                            tabbedPane.addTab(className, null, createCurrentClassTab(className, classId));
+
+                            if (classEndDate.after(new Date())) {
+                                tabbedPane.addTab(className, null, createCurrentClassTab(className, classId));
+                            }
 
                             // Restore the add class tab to its original state
                             classInfoPanel.removeAll();
