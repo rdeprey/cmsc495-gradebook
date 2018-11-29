@@ -38,11 +38,14 @@ import java.util.regex.Pattern;
 
 
 public class Login extends Application {
-
     private Object httpSession;
     private User currentUser;
     private static final Pattern VALID_EMAILADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -245,13 +248,6 @@ public class Login extends Application {
         });
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
-
-    }
     private final String filename = "Logins.txt";
     private String line;
     private final boolean append = true;

@@ -13,7 +13,10 @@
  * /uiswing/examples/components/TabbedPaneDemoProject/src/components/TabbedPaneDemo.java
  *********************************************************************************************************/
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class User {
     private int userId;
@@ -83,8 +86,10 @@ public class User {
     public static User getUser(String username, String password) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
-            Statement stmt = dbCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE username='" + username + "' AND password='" + password + "'");
+            PreparedStatement ps = dbCon.prepareStatement("SELECT * FROM users WHERE username=? AND password=?");
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 return getUserFromResultSet(rs);
@@ -101,8 +106,9 @@ public class User {
     public static User getUser(String emailAddress) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
-            Statement stmt = dbCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE emailAddress='" + emailAddress + "'");
+            PreparedStatement ps = dbCon.prepareStatement("SELECT * FROM users WHERE emailAddress=?");
+            ps.setString(1, emailAddress);
+            ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 return getUserFromResultSet(rs);
@@ -119,8 +125,9 @@ public class User {
     public static Integer getToken(int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
-            Statement stmt = dbCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT resetToken FROM Users WHERE userId=" + userId);
+            PreparedStatement ps = dbCon.prepareStatement("SELECT resetToken FROM Users WHERE userId=?");
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 return rs.getInt("resetToken");

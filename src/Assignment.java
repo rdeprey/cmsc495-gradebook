@@ -13,7 +13,10 @@
  * /uiswing/examples/components/TabbedPaneDemoProject/src/components/TabbedPaneDemo.java
  *********************************************************************************************************/
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -149,8 +152,10 @@ class Assignment {
     public static ArrayList<Assignment> getAssignmentsForClass(int userId, int classId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
-            Statement stmt = dbCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Assignments WHERE userId=" + userId + " AND classId=" + classId);
+            PreparedStatement ps = dbCon.prepareStatement("SELECT * FROM Assignments WHERE userId=? AND classId=?");
+            ps.setInt(1,userId);
+            ps.setInt(2, classId);
+            ResultSet rs = ps.executeQuery();
 
             ArrayList<Assignment> assignments = new ArrayList<Assignment>();
 

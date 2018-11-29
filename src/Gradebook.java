@@ -836,7 +836,6 @@ class Gradebook extends JFrame {
             gradeError.setVisible(false);
 
             h.gridx = 4;
-//            h.anchor = GridBagConstraints.LINE_END;
             JTextField assignmentGradeTextField = new JTextField();
             assignmentGradeTextField.setPreferredSize(labelDimensions);
             assignmentGradeTextField.setMaximumSize(labelDimensions);

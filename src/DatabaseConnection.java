@@ -24,6 +24,7 @@ class DatabaseConnection {
         // Get the file with the connection data
         File jarFile = new File(Gradebook.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         String path = jarFile + File.separator + "dbconnection.txt";
+        //String path = "dbconnection.txt";
         FileInputStream fileInputStream = new FileInputStream(path);
         BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(fileInputStream));
 

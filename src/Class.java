@@ -13,7 +13,10 @@
  * /uiswing/examples/components/TabbedPaneDemoProject/src/components/TabbedPaneDemo.java
  *********************************************************************************************************/
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -164,8 +167,9 @@ class Class {
     public static ArrayList<Class> getCurrentClasses(int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
-            Statement stmt = dbCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Classes WHERE classEndDate >= GETDATE() AND userId=" + userId);
+            PreparedStatement ps = dbCon.prepareStatement("SELECT * FROM Classes WHERE classEndDate >= GETDATE() AND userId=?");
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
 
             ArrayList<Class> classes = new ArrayList<Class>();
 
@@ -187,8 +191,9 @@ class Class {
     public static ArrayList<Class> getCompletedClasses(int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
-            Statement stmt = dbCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Classes WHERE classEndDate < GETDATE() AND userId=" + userId);
+            PreparedStatement ps = dbCon.prepareStatement("SELECT * FROM Classes WHERE classEndDate < GETDATE() AND userId=?");
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
 
             ArrayList<Class> classes = new ArrayList<Class>();
 
@@ -210,8 +215,10 @@ class Class {
     private static Integer getClassId(String className, int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
-            Statement stmt = dbCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT classId FROM Classes WHERE className='" + className + "' AND userId=" + userId);
+            PreparedStatement ps = dbCon.prepareStatement("SELECT classId FROM Classes WHERE className=? AND userId=?");
+            ps.setString(1, className);
+            ps.setInt(2, userId);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 return rs.getInt("classId");
