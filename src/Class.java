@@ -231,4 +231,29 @@ class Class {
 
         return null;
     }
+
+    private static boolean deleteClass(int userId, int classId) throws Exception {
+        Connection dbCon = new DatabaseConnection().getConnection();
+        try {
+            // Delete the assignments for a class
+            Assignment.deleteAssignmentsForClass(userId, classId);
+
+            // Delete the class
+            PreparedStatement ps = dbCon.prepareStatement("DELETE FROM Classes WHERE userId=? AND classId=?");
+            ps.setInt(1, userId);
+            ps.setInt(2, classId);
+            int i = ps.executeUpdate();
+
+            if (i == 1) {
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            dbCon.close();
+        }
+
+        return false;
+    }
 }

@@ -30,7 +30,7 @@ class Assignment {
     private float assignmentGrade;
 
     // Default constructor
-    private Assignment() {
+    public Assignment() {
 
     }
 
@@ -132,7 +132,7 @@ class Assignment {
 
     }
 
-    public static void updateAssignment(int assignmentId, float assignmentGrade) throws Exception {
+    public static boolean updateAssignment(int assignmentId, float assignmentGrade) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
             PreparedStatement ps = dbCon.prepareStatement("UPDATE Assignments SET assignmentGrade=? WHERE assignmentId=?");
@@ -141,12 +141,15 @@ class Assignment {
             int i = ps.executeUpdate();
 
             if (i == 1) {
+                return true;
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
             dbCon.close();
         }
+
+        return false;
     }
 
     public static ArrayList<Assignment> getAssignmentsForClass(int userId, int classId) throws Exception {
@@ -172,5 +175,19 @@ class Assignment {
         }
 
         return null;
+    }
+
+    public static void deleteAssignmentsForClass(int userId, int classId) throws Exception {
+        Connection dbCon = new DatabaseConnection().getConnection();
+        try {
+            PreparedStatement ps = dbCon.prepareStatement("DELETE FROM Assignments WHERE userId=? AND classId=?");
+            ps.setInt(1, userId);
+            ps.setInt(2, classId);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            dbCon.close();
+        }
     }
 }
