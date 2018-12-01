@@ -41,6 +41,7 @@ class Gradebook extends JFrame {
     private static final JPanel completedClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
     private static final JPanel classInfoPanel = createAddClassPanel();
     private static final JTabbedPane tabbedPane = new JTabbedPane();
+    private static final int sizeLimit = 100; // Maximum number of classes to retrieve
 
     //creates GUI
     public Gradebook(final User user) throws Exception {
@@ -154,8 +155,11 @@ class Gradebook extends JFrame {
         tabbedPane.addTab("New Class", null, newClassPanel); // Add tab to tab container
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1); // keyboard event
 
-        //Actual Class
-        //Class Panel
+        if (currentClasses.size() > sizeLimit) {
+            throw new ArithmeticException("List of current classes is too large");
+        }
+
+        // Class panel
         for (int i = 0; i < currentClasses.size(); i++) {
             String className = currentClasses.get(i).getClassName();
             JComponent parentPanel = createCurrentClassTab(className, currentClasses.get(i).getClassId());
@@ -209,6 +213,10 @@ class Gradebook extends JFrame {
                     float completedAssignmentWeight = 0;
                     float currentGrade = 0;
 
+                    if (assignments.size() > sizeLimit) {
+                        throw new ArithmeticException("List of assignments is too large");
+                    }
+
                     for (int j = 0; j < assignments.size(); j++) {
                         if (assignments.get(j).getAssignmentGrade() != 0.0) {
                             float currentWeight = assignments.get(j).getAssignmentWeight();
@@ -231,7 +239,7 @@ class Gradebook extends JFrame {
     private static void drawCompletedClassesPanel(User user) {
         try {
             ArrayList<Class> completedClasses = Class.getCompletedClasses(user.getUserId());
-            if (completedClasses.size() > 0) {
+            if (completedClasses.size() > 0 && completedClasses.size() <= sizeLimit) {
                 completedClassesPanel.removeAll();
                 completedPanel.removeAll();
 
@@ -240,6 +248,8 @@ class Gradebook extends JFrame {
                     completedPanel.add(createCompClassPanel(completedClasses.get(i).getClassName(), completedClasses.get(i).convertToLetterGrade()));
                 }
                 completedClassesPanel.revalidate();
+            } else if (completedClasses.size() > sizeLimit) {
+                throw new ArithmeticException("List of completed classes is too large.");
             }
         } catch (Exception ex) {
             System.out.println("We're sorry, but we cannot access your classes at this time. Please try again later.");
@@ -284,6 +294,10 @@ class Gradebook extends JFrame {
     }
 
     private static boolean isInteger(String value) {
+        if (value.length() > sizeLimit) {
+            throw new ArithmeticException("String value is too large.");
+        }
+
         for (int i = 0; i < value.length(); i++) {
             if (i == 0 && value.charAt(i) == '-') {
                 if (value.length() == 1) {
@@ -558,6 +572,10 @@ class Gradebook extends JFrame {
                                                         }
                                                     } else {
                                                         counter++;
+
+                                                        if (counter > 150) {
+                                                            throw new ArithmeticException("Counter is too large.");
+                                                        }
                                                     }
                                                 }
                                             }
@@ -606,6 +624,10 @@ class Gradebook extends JFrame {
     private static JPanel createAssignmentForm(int numOfAssignments) {
         Font f3 = new Font("Monospaced", Font.BOLD, 12);
 
+        if (numOfAssignments > sizeLimit) {
+            throw new ArithmeticException("The number of assignments is too large.");
+        }
+
         JPanel assignmentsFormPanel = new JPanel(new GridLayout(1 + numOfAssignments, 1));
         assignmentsFormPanel.setSize(new Dimension(1100, 700));
 
@@ -643,8 +665,13 @@ class Gradebook extends JFrame {
         assignmentsFormPanel.add(assignmentsLabelPanel);
 
         int assignNo = 1;
+
         //create each assignment's form
         for (int i = 0; i < numOfAssignments; i++) {
+            if ((i + 1) > sizeLimit) {
+                throw new ArithmeticException("Counter is too large.");
+            }
+
             JPanel anAssignmentPanel = new JPanel(new GridBagLayout());
             anAssignmentPanel.setSize(new Dimension(1100, 700));
             GridBagConstraints g = new GridBagConstraints();
@@ -1042,6 +1069,11 @@ class Gradebook extends JFrame {
 
         try {
             ArrayList<Assignment> assignmentsForClass = Assignment.getAssignmentsForClass(user.getUserId(), classIdVal);
+
+            if (assignmentsForClass.size() > sizeLimit) {
+                throw new ArithmeticException("List of assignments is too large.");
+            }
+
             if (assignmentsForClass != null) {
                 JPanel assignmentsPanel = new JPanel(new GridLayout(assignmentsForClass.size(), 1, 0, 0));
                 GridBagConstraints aConstraints = new GridBagConstraints();

@@ -51,7 +51,7 @@ class Class {
             try {
                 return getClassId(this.className, this.userId);
             } catch (Exception ex) {
-                // TODO: Handle exception if you can't get the class ID
+                System.out.println("Can't get classId.");
             }
         }
 

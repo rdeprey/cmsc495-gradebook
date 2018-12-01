@@ -40,8 +40,13 @@ class DatabaseConnection {
                 username = st;
             } else if (count == 2) {
                 password = st;
+                break;
             }
+
             count++;
+            if (count >= Integer.MAX_VALUE) {
+                throw new RuntimeException("Reading file caused integer overflow");
+            }
         }
 
         String jdbcUrl = host + ":1433;DatabaseName=gradebookdb";

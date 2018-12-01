@@ -18,12 +18,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class User {
+class User {
     private int userId;
     private String emailAddress;
     private String username;
     private String password;
-    private int resetToken;
 
     // Default constructor
     public User() {}
@@ -48,10 +47,6 @@ public class User {
         return this.username;
     }
 
-    public String getPassword() {
-        return this.password;
-    }
-
     // Setters
     private void setUserId(int userId) {
         this.userId = userId;
@@ -67,10 +62,6 @@ public class User {
 
     private void setPassword(String password) {
         this.password = password;
-    }
-
-    public void setResetToken(int resetToken) {
-        this.resetToken = resetToken;
     }
 
     // Methods needed to retrieve user data from the database
@@ -120,58 +111,5 @@ public class User {
         }
 
         return null;
-    }
-
-    public static Integer getToken(int userId) throws Exception {
-        Connection dbCon = new DatabaseConnection().getConnection();
-        try {
-            PreparedStatement ps = dbCon.prepareStatement("SELECT resetToken FROM Users WHERE userId=?");
-            ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt("resetToken");
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        } finally {
-            dbCon.close();
-        }
-
-        return null;
-    }
-
-    // Deletes the reset token after the user resets his/her password
-    public static void deleteToken(int userId) throws Exception {
-        Connection dbCon = new DatabaseConnection().getConnection();
-        try {
-            PreparedStatement ps = dbCon.prepareStatement("UPDATE Users SET resetToken=NULL WHERE userId=?");
-            ps.setInt(1, userId);
-            int i = ps.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        } finally {
-            dbCon.close();
-        }
-    }
-
-    // When the user actually updates his/her password
-    public static boolean resetPassword(int userId, String password) throws Exception {
-        Connection dbCon = new DatabaseConnection().getConnection();
-        try {
-            PreparedStatement ps = dbCon.prepareStatement("UPDATE Users SET password=? WHERE userId=?");
-            ps.setString(1, password);
-            ps.setInt(2, userId);
-            int i = ps.executeUpdate();
-
-            if (i == 1) {
-                return true;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        } finally {
-            dbCon.close();
-        }
-        return false;
     }
 }
