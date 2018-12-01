@@ -188,7 +188,7 @@ class Gradebook extends JFrame {
             //Good Afternoon 12 to 4pm
             greeting = "Good Afternoon";
         } else {
-            //Good Night 8 pm to 5am
+            //Good Evening 4 pm to 5am
             greeting = "Good Evening";
         }
 
@@ -319,6 +319,7 @@ class Gradebook extends JFrame {
         isValid.put("endDate", false);
         isValid.put("numberOfAssignments", false);
 
+
         final JPanel classInfoPanel = new JPanel(new GridBagLayout());
         classInfoPanel.setSize(new Dimension(1100, 700));
         GridBagConstraints g = new GridBagConstraints();
@@ -348,6 +349,11 @@ class Gradebook extends JFrame {
         final JLabel classNameError = new JLabel();
         classNameError.setForeground(Color.red);
         classNameError.setVisible(false);
+
+        g.gridx = 5;
+        JLabel nameAst = new JLabel("*");
+        nameAst.setForeground(Color.red);
+        classInfoPanel.add(nameAst, g);
 
         g.gridx = 6;
         g.gridy = 2;
@@ -382,6 +388,11 @@ class Gradebook extends JFrame {
         final JLabel classStartDateError = new JLabel();
         classStartDateError.setVisible(false);
         classStartDateError.setForeground(Color.RED);
+
+        g.gridx = 5;
+        JLabel stDateAst = new JLabel("*");
+        stDateAst.setForeground(Color.red);
+        classInfoPanel.add(stDateAst, g);
 
         g.gridx = 6;
         g.gridy = 4;
@@ -422,6 +433,11 @@ class Gradebook extends JFrame {
         final JLabel classEndDateError = new JLabel();
         classEndDateError.setVisible(false);
         classEndDateError.setForeground(Color.RED);
+
+        g.gridx = 5;
+        JLabel endDateAst = new JLabel("*");
+        endDateAst.setForeground(Color.red);
+        classInfoPanel.add(endDateAst, g);
 
         g.gridx = 6;
         g.gridy = 6;
@@ -466,6 +482,11 @@ class Gradebook extends JFrame {
         final JLabel numberOfAssignmentsError = new JLabel();
         numberOfAssignmentsError.setVisible(false);
         numberOfAssignmentsError.setForeground(Color.RED);
+
+        g.gridx = 5;
+        JLabel numAssignAst = new JLabel("*");
+        numAssignAst.setForeground(Color.red);
+        classInfoPanel.add(numAssignAst, g);
 
         g.gridx = 6;
         g.gridy = 8;
@@ -649,18 +670,34 @@ class Gradebook extends JFrame {
         dueDateLabel.setFont(f3);
         assignmentsLabelPanel.add(dueDateLabel, f);
 
+        //TODO: align asterisks on labels, adjust gridbagconstraints
         f.gridx = 4;
+        JLabel dueDateAst = new JLabel("*");
+        dueDateAst.setForeground(Color.red);
+        assignmentsLabelPanel.add(dueDateAst, f);
+
+        f.gridx = 5;
         f.gridwidth = 2;
         JLabel assignNameLabel = new JLabel("Assignment Name");
         assignNameLabel.setPreferredSize(new Dimension(260, 20));
         assignNameLabel.setFont(f3);
         assignmentsLabelPanel.add(assignNameLabel, f);
 
+        f.gridx = 6;
+        JLabel assNameAst = new JLabel("*");
+        assNameAst.setForeground(Color.red);
+        assignmentsLabelPanel.add(assNameAst, f);
+
         f.gridx = 8;
         f.gridwidth = 1;
         JLabel assignWeightLabel = new JLabel("Assignment Weight");
         assignWeightLabel.setFont(f3);
         assignmentsLabelPanel.add(assignWeightLabel, f);
+
+        f.gridx = 10;
+        JLabel assWeightAst = new JLabel("*");
+        assWeightAst.setForeground(Color.red);
+        assignmentsLabelPanel.add(assWeightAst, f);
 
         assignmentsFormPanel.add(assignmentsLabelPanel);
 
@@ -793,6 +830,7 @@ class Gradebook extends JFrame {
         return assignmentsFormPanel;
     }
 
+    //
     private static JPanel classAssignmentPanel(int assignmentId, Date dueDate, String assignmentName, float assignmentWeight, float grade) {
         Dimension labelDimensions = new Dimension(183, 25);
         JPanel assignmentPanel = new JPanel(new GridBagLayout());
@@ -959,6 +997,7 @@ class Gradebook extends JFrame {
         return assignmentPanel;
     }
 
+
     private static JComponent createCurrentClassTab(String classNameVal, int classIdVal) {
         Dimension assignmentLabelDimesions = new Dimension(183, 25);
         JComponent parentPanel = new JPanel(new BorderLayout());
@@ -981,11 +1020,42 @@ class Gradebook extends JFrame {
         statusPanel.add(currentGradeLabel);
         headerPanel.add(statusPanel);
 
+
+        ActionListener bglistener = new ActionListener() {
+
+            float goalTotalWeight;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ("A".equals(e.getActionCommand())) {
+                    goalTotalWeight = 90.0f;
+
+                } else if ("B".equals(e.getActionCommand())) {
+                    goalTotalWeight = 80.0f;
+
+                } else if ("C".equals(e.getActionCommand())) {
+                    goalTotalWeight = 70.0f;
+
+                } else if ("D".equals(e.getActionCommand())) {
+                    goalTotalWeight = 60.0f;
+
+                }
+            }
+        };
+
         JPanel goalGradePanel = new JPanel(new GridLayout(0, 1));
         JRadioButton A = new JRadioButton("A (90-100)");
+        A.setActionCommand("A");
+        A.addActionListener(bglistener);
         JRadioButton B = new JRadioButton("B (80-89)");
+        B.setActionCommand("B");
+        B.addActionListener(bglistener);
         JRadioButton C = new JRadioButton("C (70-79)");
+        C.setActionCommand("C");
+        C.addActionListener(bglistener);
         JRadioButton D = new JRadioButton("D (60-69)");
+        D.setActionCommand("D");
+        D.addActionListener(bglistener);
         goalGradePanel.add(new JLabel("Goal Grade     ", SwingConstants.RIGHT));
         goalGradePanel.add(A);
         goalGradePanel.add(B);
@@ -1009,7 +1079,7 @@ class Gradebook extends JFrame {
         h.gridx = 0;
         h.gridy = 0;
         h.gridwidth = 1;
-        h.insets = new Insets(10,10,0,10);
+        h.insets = new Insets(10, 10, 0, 10);
         h.fill = GridBagConstraints.HORIZONTAL;
         h.anchor = GridBagConstraints.NORTHWEST;
         JLabel headline = new JLabel("Assignments");
@@ -1066,7 +1136,7 @@ class Gradebook extends JFrame {
 
         classPanelConstraints.gridy = 1;
         classPanel.add(assignLabelPanel, classPanelConstraints);
-
+//
         try {
             ArrayList<Assignment> assignmentsForClass = Assignment.getAssignmentsForClass(user.getUserId(), classIdVal);
 
@@ -1098,3 +1168,4 @@ class Gradebook extends JFrame {
         return parentPanel;
     }
 }
+
