@@ -29,6 +29,7 @@ class Class {
     private Date classEndDate;
     private float classGrade;
 
+
     // Default constructor
     private Class() {
 

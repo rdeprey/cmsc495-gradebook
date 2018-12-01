@@ -42,6 +42,7 @@ class Gradebook extends JFrame {
     private static final JPanel classInfoPanel = createAddClassPanel();
     private static final JTabbedPane tabbedPane = new JTabbedPane();
     private static final int sizeLimit = 100; // Maximum number of classes to retrieve
+    private static BGlistener bglistener = new BGlistener();
 
     //creates GUI
     public Gradebook(final User user) throws Exception {
@@ -830,7 +831,7 @@ class Gradebook extends JFrame {
         return assignmentsFormPanel;
     }
 
-    //
+
     private static JPanel classAssignmentPanel(int assignmentId, Date dueDate, String assignmentName, float assignmentWeight, float grade) {
         Dimension labelDimensions = new Dimension(183, 25);
         JPanel assignmentPanel = new JPanel(new GridBagLayout());
@@ -1021,28 +1022,6 @@ class Gradebook extends JFrame {
         headerPanel.add(statusPanel);
 
 
-        ActionListener bglistener = new ActionListener() {
-
-            float goalTotalWeight;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if ("A".equals(e.getActionCommand())) {
-                    goalTotalWeight = 90.0f;
-
-                } else if ("B".equals(e.getActionCommand())) {
-                    goalTotalWeight = 80.0f;
-
-                } else if ("C".equals(e.getActionCommand())) {
-                    goalTotalWeight = 70.0f;
-
-                } else if ("D".equals(e.getActionCommand())) {
-                    goalTotalWeight = 60.0f;
-
-                }
-            }
-        };
-
         JPanel goalGradePanel = new JPanel(new GridLayout(0, 1));
         JRadioButton A = new JRadioButton("A (90-100)");
         A.setActionCommand("A");
@@ -1119,6 +1098,14 @@ class Gradebook extends JFrame {
         earnedWeight.setFont(tableHeadFont);
         assignLabelPanel.add(earnedWeight, h);
 
+//        h.gridx = 4;
+//        JLabel baselineGrade = new JLabel("Min. Target Grade");
+//        earnedWeight.setPreferredSize(assignmentLabelDimesions);
+//        earnedWeight.setMaximumSize(assignmentLabelDimesions);
+//        earnedWeight.setMinimumSize(assignmentLabelDimesions);
+//        earnedWeight.setFont(tableHeadFont);
+//        assignLabelPanel.add(earnedWeight, h);
+
         h.gridx = 4;
         JLabel grade = new JLabel("Grade");
         grade.setPreferredSize(assignmentLabelDimesions);
@@ -1136,7 +1123,7 @@ class Gradebook extends JFrame {
 
         classPanelConstraints.gridy = 1;
         classPanel.add(assignLabelPanel, classPanelConstraints);
-//
+
         try {
             ArrayList<Assignment> assignmentsForClass = Assignment.getAssignmentsForClass(user.getUserId(), classIdVal);
 
@@ -1166,6 +1153,56 @@ class Gradebook extends JFrame {
         }
 
         return parentPanel;
+    }
+
+    private static class BGlistener implements ActionListener {
+
+        float totalWeight;
+
+        public void actionPerformed(ActionEvent e) {
+            if ("A".equals(e.getActionCommand())) {
+                totalWeight = 90.0f;
+
+            } else if ("B".equals(e.getActionCommand())) {
+                totalWeight = 80.0f;
+
+            } else if ("C".equals(e.getActionCommand())) {
+                totalWeight = 70.0f;
+
+            } else if ("D".equals(e.getActionCommand())) {
+                totalWeight = 60.0f;
+
+            }
+        }
+
+        public float getTotalWeight() {
+            return totalWeight;
+        }
+    }
+    private float calculateBaselineGrade(float assignmentWeight){
+        float baselineGrade = -1;
+        float totalWeight = bglistener.getTotalWeight();
+
+        float aWeight = (totalWeight/100);
+
+        //calculate completedAssignments portion (for loops if assignment Grade != null)
+            //calculateEarnedWeight
+            float earnedWeight= -1;
+            //calculate weightPassed
+            float weightPassed = -1;
+            // earnedWeight/possibleWeights
+            float completedAssignmentsWeight = earnedWeight/weightPassed;
+
+
+        //goal - completedAssignments Portion
+        float weightLeft = totalWeight - weightPassed;
+
+        aWeight -= (completedAssignmentsWeight * weightLeft);
+
+        baselineGrade = assignmentWeight*aWeight;
+
+
+        return baselineGrade;
     }
 }
 
