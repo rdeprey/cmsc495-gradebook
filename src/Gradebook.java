@@ -858,14 +858,22 @@ class Gradebook extends JFrame {
             earnedAssignmentWeightLabel.setMinimumSize(labelDimensions);
             assignmentPanel.add(earnedAssignmentWeightLabel, h);
 
+            //goalGradeLabel calcBaseLine
             h.gridx = 4;
+            JLabel goalGradeLabel = new JLabel(new DecimalFormat("#.#").format(0.0));
+            goalGradeLabel.setPreferredSize(labelDimensions);
+            goalGradeLabel.setMaximumSize(labelDimensions);
+            goalGradeLabel.setMinimumSize(labelDimensions);
+            assignmentPanel.add(goalGradeLabel, h);
+
+            h.gridx = 5;
             JLabel gradeEarnedLabel = new JLabel(new DecimalFormat("#.#").format(grade));
             gradeEarnedLabel.setPreferredSize(labelDimensions);
             gradeEarnedLabel.setMaximumSize(labelDimensions);
             gradeEarnedLabel.setMinimumSize(labelDimensions);
             assignmentPanel.add(gradeEarnedLabel, h);
 
-            h.gridx = 5;
+            h.gridx = 6;
             JLabel spacer = new JLabel(" ");
             spacer.setPreferredSize(labelDimensions);
             spacer.setMaximumSize(labelDimensions);
@@ -884,7 +892,15 @@ class Gradebook extends JFrame {
             gradeError.setForeground(Color.RED);
             gradeError.setVisible(false);
 
+            //
             h.gridx = 4;
+            JLabel goalGradeLabel = new JLabel(new DecimalFormat("#.#").format(grade));
+            goalGradeLabel.setPreferredSize(labelDimensions);
+            goalGradeLabel.setMaximumSize(labelDimensions);
+            goalGradeLabel.setMinimumSize(labelDimensions);
+            assignmentPanel.add(goalGradeLabel, h);
+
+            h.gridx = 5;
             JTextField assignmentGradeTextField = new JTextField();
             assignmentGradeTextField.setPreferredSize(labelDimensions);
             assignmentGradeTextField.setMaximumSize(labelDimensions);
@@ -913,7 +929,7 @@ class Gradebook extends JFrame {
             });
             assignmentPanel.add(assignmentGradeTextField, h);
 
-            h.gridx = 5;
+            h.gridx = 6;
             h.fill = GridBagConstraints.NONE;
             JButton submitButton = new JButton("Submit");
             submitButton.setPreferredSize(labelDimensions);
@@ -1081,15 +1097,17 @@ class Gradebook extends JFrame {
         earnedWeight.setFont(tableHeadFont);
         assignLabelPanel.add(earnedWeight, h);
 
-//        h.gridx = 4;
-//        JLabel baselineGrade = new JLabel("Min. Target Grade");
-//        earnedWeight.setPreferredSize(assignmentLabelDimesions);
-//        earnedWeight.setMaximumSize(assignmentLabelDimesions);
-//        earnedWeight.setMinimumSize(assignmentLabelDimesions);
-//        earnedWeight.setFont(tableHeadFont);
-//        assignLabelPanel.add(earnedWeight, h);
+        //***********
 
         h.gridx = 4;
+        JLabel baselineGrade = new JLabel("Goal Grade");
+        baselineGrade.setPreferredSize(assignmentLabelDimesions);
+        baselineGrade.setMaximumSize(assignmentLabelDimesions);
+        baselineGrade.setMinimumSize(assignmentLabelDimesions);
+        baselineGrade.setFont(tableHeadFont);
+        assignLabelPanel.add(baselineGrade, h);
+
+        h.gridx = 5;
         JLabel grade = new JLabel("Grade");
         grade.setPreferredSize(assignmentLabelDimesions);
         grade.setMaximumSize(assignmentLabelDimesions);
@@ -1097,7 +1115,7 @@ class Gradebook extends JFrame {
         grade.setFont(tableHeadFont);
         assignLabelPanel.add(grade, h);
 
-        h.gridx = 5;
+        h.gridx = 6;
         JLabel headerSpacer = new JLabel(" ");
         headerSpacer.setPreferredSize(assignmentLabelDimesions);
         headerSpacer.setMaximumSize(assignmentLabelDimesions);
