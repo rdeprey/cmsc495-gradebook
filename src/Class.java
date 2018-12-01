@@ -233,7 +233,7 @@ class Class {
         return null;
     }
 
-    private static boolean deleteClass(int userId, int classId) throws Exception {
+    public static boolean deleteClass(int userId, int classId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
             // Delete the assignments for a class

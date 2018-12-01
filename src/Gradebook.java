@@ -56,7 +56,11 @@ class Gradebook extends JFrame {
         logoutBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.exit(0);
+                int a = JOptionPane.showConfirmDialog(null, "Logout?");
+                if(a == JOptionPane.YES_OPTION){
+                    System.exit(0);
+                }
+
             }
         });
 
@@ -1145,6 +1149,27 @@ class Gradebook extends JFrame {
 
                 classPanelConstraints.gridy = 2;
                 classPanel.add(assignmentsPanel, classPanelConstraints);
+
+                classPanelConstraints.gridy = 3;
+                classPanelConstraints.insets = new Insets(10,0,0, 0);
+                classPanelConstraints.fill = GridBagConstraints.WEST;
+                JButton delete = new JButton("Delete Class");
+                delete.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                           // Delete the class and its assignments from the database
+                           Class.deleteClass(user.getUserId(), classIdVal);
+
+                           // Remove the class from current classes panel and tabs
+                           tabbedPane.remove(tabbedPane.getSelectedIndex());
+                           drawCurrentClassesPanel(user);
+                        } catch (Exception ex) {
+                            System.out.println("Can't delete class.");
+                        }
+                    }
+                });
+                classPanel.add(delete, classPanelConstraints);
             }
 
             parentPanel.add(classPanel, BorderLayout.NORTH);
