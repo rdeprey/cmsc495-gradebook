@@ -10,10 +10,7 @@
  * 1. Connect to a Database Using Java Code. (n.d.). Retrieved from https://www.homeandlearn.co.uk/java/connect_to_a_database_using_java_code.html
  *********************************************************************************************************/
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
