@@ -29,20 +29,6 @@ class Assignment {
     private float assignmentWeight;
     private float assignmentGrade;
 
-    //baseline grade work area**********************************************
-    private float baselineGrade;
-    private float classTtlWeight;
-
-    public float getBaselineGrade() {
-        return baselineGrade;
-    }
-
-    public void setBaselineGrade(float baselineGrade) {
-        this.baselineGrade = baselineGrade;
-    }
-
-    //baseline grade work area end******************************************
-
     // Default constructor
     public Assignment() {
 
