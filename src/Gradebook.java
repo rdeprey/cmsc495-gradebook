@@ -92,7 +92,7 @@ class Gradebook extends JFrame {
         contentPane.add(titlePanel, c);
 
         //GreetingPanel
-        c.gridy++;
+        c.gridy += 1;
         c.gridwidth = 2;
         JPanel greetingPanel = new JPanel(new GridLayout(0, 1));
         greetingPanel.setBackground(new Color(102, 194, 255));
@@ -110,7 +110,7 @@ class Gradebook extends JFrame {
         contentPane.add(greetingPanel, c);
 
         //ProgressPanel
-        c.gridy++;
+        c.gridy += 1;
         c.gridwidth = 2;
         drawCurrentClassesPanel(user); // dynamic progress panels
         JScrollPane sp = new JScrollPane(progressPanel);
@@ -121,7 +121,7 @@ class Gradebook extends JFrame {
 
 
         //CompletedPanel
-        c.gridy++;
+        c.gridy += 1;
         c.gridwidth = 2;
         JPanel compClassTitlePanel = new JPanel(new GridLayout(0, 1, 15, 15));
         compClassTitlePanel.setBackground(new Color(179, 224, 255));
@@ -130,7 +130,7 @@ class Gradebook extends JFrame {
         compClassTitlePanel.add(compClassLabel);
         contentPane.add(compClassTitlePanel, c);
 
-        c.gridy++;
+        c.gridy += 1;
         drawCompletedClassesPanel(user);
         JScrollPane completedClassScrollPane = new JScrollPane(completedPanel);
         JPanel completedClassParentPane = new JPanel(new GridLayout(0, 1, 5, 5));
@@ -248,7 +248,7 @@ class Gradebook extends JFrame {
 
                 for (int i = 0; i < completedClasses.size(); i++) {
                     // Dynamic completed class panels
-                    completedPanel.add(createCompClassPanel(completedClasses.get(i).getClassName(), completedClasses.get(i).convertToLetterGrade()));
+                    completedPanel.add(createCompClassPanel(completedClasses.get(i).getClassName(), Class.convertToLetterGrade(completedClasses.get(i).getClassGrade())));
                 }
                 completedClassesPanel.revalidate();
             } else if (completedClasses.size() > sizeLimit) {
@@ -593,7 +593,7 @@ class Gradebook extends JFrame {
                                                             System.out.println("Failed to add assignment to the database");
                                                         }
                                                     } else {
-                                                        counter++;
+                                                        counter += 1;
 
                                                         if (counter > 150) {
                                                             throw new ArithmeticException("Counter is too large.");
@@ -631,17 +631,20 @@ class Gradebook extends JFrame {
                         delete.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                try {
-                                    // Delete the class and its assignments from the database
-                                    Class.deleteClass(user.getUserId(), classX.getClassId());
+                                int a = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel?");
+                                if(a == JOptionPane.YES_OPTION) {
+                                    try {
+                                        // Delete the class and its assignments from the database
+                                        Class.deleteClass(user.getUserId(), classX.getClassId());
 
-                                    // Reset the create new class view
-                                    classInfoPanel.removeAll();
-                                    classInfoPanel.revalidate();
-                                    classInfoPanel.repaint();
-                                    classInfoPanel.add(createAddClassPanel());
-                                } catch (Exception ex) {
-                                    System.out.println("Can't cancel class creation.");
+                                        // Reset the create new class view
+                                        classInfoPanel.removeAll();
+                                        classInfoPanel.revalidate();
+                                        classInfoPanel.repaint();
+                                        classInfoPanel.add(createAddClassPanel());
+                                    } catch (Exception ex) {
+                                        System.out.println("Can't cancel class creation.");
+                                    }
                                 }
                             }
                         });
@@ -739,7 +742,7 @@ class Gradebook extends JFrame {
             g.gridx = 0;
             g.gridy = i;
             JLabel assignNumLabel = new JLabel("Assignment " + assignNo);
-            assignNo++;
+            assignNo += 1;
             anAssignmentPanel.add(assignNumLabel, g);
 
             g.gridx = 2;
@@ -842,7 +845,6 @@ class Gradebook extends JFrame {
 
         return assignmentsFormPanel;
     }
-
 
     private static JPanel classAssignmentPanel(int classId, int assignmentId, Date dueDate, String assignmentName, float assignmentWeight, float grade, float goalGrade) {
         Dimension labelDimensions = new Dimension(157, 25);
@@ -1221,15 +1223,18 @@ class Gradebook extends JFrame {
                 delete.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        try {
-                           // Delete the class and its assignments from the database
-                           Class.deleteClass(user.getUserId(), classIdVal);
+                        int a = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this class?");
+                        if(a == JOptionPane.YES_OPTION) {
+                            try {
+                                // Delete the class and its assignments from the database
+                                Class.deleteClass(user.getUserId(), classIdVal);
 
-                           // Remove the class from current classes panel and tabs
-                           tabbedPane.remove(tabbedPane.getSelectedIndex());
-                           drawCurrentClassesPanel(user);
-                        } catch (Exception ex) {
-                            System.out.println("Can't delete class.");
+                                // Remove the class from current classes panel and tabs
+                                tabbedPane.remove(tabbedPane.getSelectedIndex());
+                                drawCurrentClassesPanel(user);
+                            } catch (Exception ex) {
+                                System.out.println("Can't delete class.");
+                            }
                         }
                     }
                 });

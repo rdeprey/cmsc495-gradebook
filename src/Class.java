@@ -165,6 +165,7 @@ class Class {
         classX.setNumberOfAssignments(rs.getInt("numberOfAssignments"));
         classX.setClassStartDate(rs.getDate("classStartDate"));
         classX.setClassEndDate(rs.getDate("classEndDate"));
+        classX.setClassGrade(rs.getFloat("classGrade"));
         return classX;
     }
 
