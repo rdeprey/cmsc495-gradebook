@@ -31,7 +31,7 @@ class Class {
 
 
     // Default constructor
-    private Class() {
+    public Class() {
 
     }
 
@@ -88,11 +88,11 @@ class Class {
         this.classId = classId;
     }
 
-    private void setUserId(int userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
-    private void setClassName(String className) {
+    public void setClassName(String className) {
         this.className = className;
     }
 
