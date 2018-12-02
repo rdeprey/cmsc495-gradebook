@@ -214,9 +214,10 @@ class Gradebook extends JFrame {
                 progressPanel.add(currentClassesPanel);
 
                 for (int i = 0; i < currentClasses.size(); i++) {
+                    String classGrade = Class.getClassGrade(user.getUserId(), currentClasses.get(i).getClassId());
+                    String letterGrade = (classGrade == null) ? null : classGrade;
                     ArrayList<Assignment> assignments = Assignment.getAssignmentsForClass(user.getUserId(), currentClasses.get(i).getClassId());
                     float completedAssignmentWeight = 0;
-                    float currentGrade = 0;
 
                     if (assignments.size() > sizeLimit) {
                         throw new ArithmeticException("List of assignments is too large");
@@ -226,11 +227,8 @@ class Gradebook extends JFrame {
                         if (assignments.get(j).getAssignmentGrade() != 0.0) {
                             float currentWeight = assignments.get(j).getAssignmentWeight();
                             completedAssignmentWeight += currentWeight;
-                            currentGrade += (currentWeight * (assignments.get(j).getAssignmentGrade() / 100));
                         }
                     }
-
-                    String letterGrade = (completedAssignmentWeight == 0) ? null : Class.convertToLetterGrade((currentGrade / completedAssignmentWeight) * 100);
 
                     progressPanel.add(createClassProgressPanel(currentClasses.get(i).getClassName(), letterGrade, completedAssignmentWeight, 100));
                 }
@@ -846,7 +844,7 @@ class Gradebook extends JFrame {
     }
 
 
-    private static JPanel classAssignmentPanel(int assignmentId, Date dueDate, String assignmentName, float assignmentWeight, float grade, float goalGrade) {
+    private static JPanel classAssignmentPanel(int classId, int assignmentId, Date dueDate, String assignmentName, float assignmentWeight, float grade, float goalGrade) {
         Dimension labelDimensions = new Dimension(157, 25);
         JPanel assignmentPanel = new JPanel(new GridBagLayout());
         GridBagConstraints h = new GridBagConstraints();
@@ -979,6 +977,7 @@ class Gradebook extends JFrame {
 
                         float gradeVal = Float.parseFloat(assignmentGradeTextField.getText());
                         Assignment.updateAssignment(assignmentId, gradeVal);
+                        Class.setClassGrade(user.getUserId(), classId);
 
                         assignmentPanel.remove(earnedAssignmentWeightSpacer);
                         assignmentPanel.remove(assignmentGradeTextField);
@@ -996,21 +995,34 @@ class Gradebook extends JFrame {
                         assignmentPanel.add(earnedAssignmentWeightLabel, h);
 
                         h.gridx = 4;
+                        JLabel goalGradeLabel;
+                        goalGradeLabel = new JLabel(" ");
+                        goalGradeLabel.setPreferredSize(labelDimensions);
+                        goalGradeLabel.setMaximumSize(labelDimensions);
+                        goalGradeLabel.setMinimumSize(labelDimensions);
+                        assignmentPanel.add(goalGradeLabel, h);
+
+                        h.gridx = 5;
                         JLabel gradeEarnedLabel = new JLabel(new DecimalFormat("#.#").format(gradeVal));
                         gradeEarnedLabel.setPreferredSize(labelDimensions);
                         gradeEarnedLabel.setMaximumSize(labelDimensions);
                         gradeEarnedLabel.setMinimumSize(labelDimensions);
                         assignmentPanel.add(gradeEarnedLabel, h);
 
-                        h.gridx = 5;
+                        h.gridx = 6;
                         JLabel spacer = new JLabel(" ");
                         spacer.setPreferredSize(labelDimensions);
                         spacer.setMaximumSize(labelDimensions);
                         spacer.setMinimumSize(labelDimensions);
                         assignmentPanel.add(spacer, h);
 
-                        assignmentPanel.revalidate();
-                        assignmentPanel.repaint();
+                       // assignmentPanel.revalidate();
+                       // assignmentPanel.repaint();
+
+                        int selectedTabIndex = tabbedPane.getSelectedIndex();
+                        String className = tabbedPane.getTitleAt(selectedTabIndex);
+                        tabbedPane.setComponentAt(selectedTabIndex, null);
+                        tabbedPane.setComponentAt(selectedTabIndex, createCurrentClassTab(className, Class.getClassId(className, user.getUserId()),bglistener.getTotalWeight()));
 
                         drawCurrentClassesPanel(user);
                         drawCompletedClassesPanel(user);
@@ -1043,7 +1055,6 @@ class Gradebook extends JFrame {
         classPanelConstraints.weightx = 1;
 
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 150, 0));
-
         JPanel statusPanel = new JPanel(new GridLayout(0, 1));
         String className = classNameVal;
         JLabel classLabel = new JLabel(className, SwingConstants.LEADING);
@@ -1059,7 +1070,6 @@ class Gradebook extends JFrame {
         currentGradeLabel.setFont(f2);
         statusPanel.add(currentGradeLabel);
         headerPanel.add(statusPanel);
-
 
         JPanel goalGradePanel = new JPanel(new GridLayout(5, 1));
         JRadioButton A = new JRadioButton("A (90-100)");
@@ -1195,9 +1205,9 @@ class Gradebook extends JFrame {
                     aConstraints.gridy = j;
 
                     if (goalGradeVal == 0.0f) {
-                        assignmentsPanel.add(classAssignmentPanel(assignmentsForClass.get(j).getAssignmentId(), assignmentsForClass.get(j).getAssignmentDueDate(), assignmentsForClass.get(j).getAssignmentName(), assignmentsForClass.get(j).getAssignmentWeight(), assignmentsForClass.get(j).getAssignmentGrade(), 0.0f), aConstraints);
+                        assignmentsPanel.add(classAssignmentPanel(classIdVal, assignmentsForClass.get(j).getAssignmentId(), assignmentsForClass.get(j).getAssignmentDueDate(), assignmentsForClass.get(j).getAssignmentName(), assignmentsForClass.get(j).getAssignmentWeight(), assignmentsForClass.get(j).getAssignmentGrade(), 0.0f), aConstraints);
                     } else {
-                        assignmentsPanel.add(classAssignmentPanel(assignmentsForClass.get(j).getAssignmentId(), assignmentsForClass.get(j).getAssignmentDueDate(), assignmentsForClass.get(j).getAssignmentName(), assignmentsForClass.get(j).getAssignmentWeight(), assignmentsForClass.get(j).getAssignmentGrade(), calculateBaselineGrade(assignmentsForClass.get(j).getAssignmentWeight(), user.getUserId(), classIdVal)), aConstraints);
+                        assignmentsPanel.add(classAssignmentPanel(classIdVal, assignmentsForClass.get(j).getAssignmentId(), assignmentsForClass.get(j).getAssignmentDueDate(), assignmentsForClass.get(j).getAssignmentName(), assignmentsForClass.get(j).getAssignmentWeight(), assignmentsForClass.get(j).getAssignmentGrade(), calculateBaselineGrade(assignmentsForClass.get(j).getAssignmentWeight(), user.getUserId(), classIdVal)), aConstraints);
                     }
                 }
 
@@ -1269,8 +1279,6 @@ class Gradebook extends JFrame {
         float baselineGrade = 0.0f;
 
         float goalGrade = bglistener.getTotalWeight();
-
-        //these three have to be pulled
         float totalWeight = 0.0f;
         float totalEarnedWeight = 0.0f;
         float weightPassed = 0.0f;

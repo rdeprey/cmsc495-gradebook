@@ -239,7 +239,7 @@ class Class {
         return null;
     }
 
-    private static Integer getClassId(String className, int userId) throws Exception {
+    public static Integer getClassId(String className, int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
             PreparedStatement ps = dbCon.prepareStatement("SELECT classId FROM Classes WHERE className=? AND userId=?");
@@ -275,6 +275,44 @@ class Class {
                 return true;
             }
 
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            dbCon.close();
+        }
+
+        return false;
+    }
+
+    public static boolean setClassGrade(int userId, int classId) throws Exception {
+        Connection dbCon = new DatabaseConnection().getConnection();
+        try {
+            // Get grades for all class assignments
+            ArrayList<Assignment> assignments = Assignment.getAssignmentsForClass(userId, classId);
+            float completedAssignmentWeight = 0;
+            float currentGrade = 0;
+
+            if (assignments.size() > 100) {
+                throw new ArithmeticException("List of assignments is too large");
+            }
+
+            for (int j = 0; j < assignments.size(); j++) {
+                if (assignments.get(j).getAssignmentGrade() != 0.0) {
+                    float currentWeight = assignments.get(j).getAssignmentWeight();
+                    completedAssignmentWeight += currentWeight;
+                    currentGrade += (currentWeight * (assignments.get(j).getAssignmentGrade() / 100));
+                }
+            }
+
+            PreparedStatement ps = dbCon.prepareStatement("UPDATE Classes SET classGrade=? WHERE userId=? AND classId=?");
+            ps.setFloat(1,(currentGrade / completedAssignmentWeight) * 100);
+            ps.setInt(2, userId);
+            ps.setInt(3, classId);
+
+            int rs = ps.executeUpdate();
+            if (rs == 1) {
+                return true;
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
