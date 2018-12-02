@@ -553,8 +553,11 @@ class Gradebook extends JFrame {
                         // Generate the number of assignment fields specified by the user
                         newClassTemplatePanel.add(createAssignmentForm(numOfAssignments));
 
-                        JButton createClassWithAssignmentsBtn = new JButton("Save Class Information");
+                        // Create new panel with border layout for the save and delete buttons
+                        JPanel addClassBtnPanel = new JPanel(new GridBagLayout());
+                        GridBagConstraints btnConstraints = new GridBagConstraints();
 
+                        JButton createClassWithAssignmentsBtn = new JButton("Save Class Information");
                         createClassWithAssignmentsBtn.addActionListener(e1 -> {
                             int classId = classX.getClassId();
 
@@ -624,14 +627,42 @@ class Gradebook extends JFrame {
                             classInfoPanel.repaint();
                             classInfoPanel.add(createAddClassPanel());
                         });
-                        newClassTemplatePanel.add(createClassWithAssignmentsBtn, BorderLayout.PAGE_END);
+
+                        btnConstraints.anchor = GridBagConstraints.PAGE_END;
+                        btnConstraints.fill = GridBagConstraints.CENTER;
+                        btnConstraints.gridx = 1;
+                        btnConstraints.gridy = 0;
+                        addClassBtnPanel.add(createClassWithAssignmentsBtn, btnConstraints);
+
+                        JButton delete = new JButton("Cancel");
+                        delete.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                try {
+                                    // Delete the class and its assignments from the database
+                                    Class.deleteClass(user.getUserId(), classX.getClassId());
+
+                                    // Reset the create new class view
+                                    classInfoPanel.removeAll();
+                                    classInfoPanel.revalidate();
+                                    classInfoPanel.repaint();
+                                    classInfoPanel.add(createAddClassPanel());
+                                } catch (Exception ex) {
+                                    System.out.println("Can't cancel class creation.");
+                                }
+                            }
+                        });
+
+                        btnConstraints.gridx = 0;
+                        addClassBtnPanel.add(delete, btnConstraints);
+                        newClassTemplatePanel.add(addClassBtnPanel, BorderLayout.PAGE_END);
+
                         classInfoPanel.add(newClassTemplatePanel, BorderLayout.PAGE_START);
                     } else {
-                        // Show error message
-
+                       System.out.println("Class wasn't successfully saved to the database.");
                     }
                 } catch (Exception ex) {
-                    // Show error in GUI if class isn't saved to database; don't allow user to continue in application
+                    System.out.println("Class couldn't be saved to the database.");
                 }
             }
         });
