@@ -104,9 +104,9 @@ class Gradebook extends JFrame {
         usernameLbl.setFont(f2);
         greetingPanel.add(usernameLbl);
         JLabel dateLbl = new JLabel("<html><p style='text-align:center;'>" + date + "</p></html>");
-        dateLbl.setHorizontalAlignment(JLabel.CENTER);
+        dateLbl.setHorizontalAlignment(SwingConstants.CENTER);
         greetingPanel.add(dateLbl);
-        greetingPanel.add(new JLabel());
+        greetingPanel.add(new JLabel(" "));
         contentPane.add(greetingPanel, c);
 
         //ProgressPanel
@@ -335,11 +335,16 @@ class Gradebook extends JFrame {
         g.weightx = 1.0;
         g.gridx = 2;
         g.gridy = 0;
-        JPanel newClassLabelPanel = new JPanel(new BorderLayout());
+        JPanel newClassLabelPanel = new JPanel(new GridLayout(0,1));
         JLabel newClassLabel = new JLabel("Create a New Class");
-        newClassLabel.setHorizontalAlignment(JLabel.CENTER);
+        newClassLabel.setHorizontalAlignment(SwingConstants.CENTER);
         newClassLabel.setFont(f2);
-        newClassLabelPanel.add(newClassLabel, BorderLayout.CENTER);
+        JLabel allFieldsRequiredLabel = new JLabel("All Fields Are Required");
+        allFieldsRequiredLabel.setForeground(Color.red);
+        allFieldsRequiredLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        newClassLabelPanel.add(newClassLabel);
+        newClassLabelPanel.add(allFieldsRequiredLabel);
+        newClassLabelPanel.add(new JLabel(""));
         classInfoPanel.add(newClassLabelPanel, g);
 
         g.gridx = 0;
@@ -354,11 +359,6 @@ class Gradebook extends JFrame {
         final JLabel classNameError = new JLabel();
         classNameError.setForeground(Color.red);
         classNameError.setVisible(false);
-
-        g.gridx = 5;
-        JLabel nameAst = new JLabel("*");
-        nameAst.setForeground(Color.red);
-        classInfoPanel.add(nameAst, g);
 
         g.gridx = 6;
         g.gridy = 2;
@@ -394,10 +394,6 @@ class Gradebook extends JFrame {
         classStartDateError.setVisible(false);
         classStartDateError.setForeground(Color.RED);
 
-        g.gridx = 5;
-        JLabel stDateAst = new JLabel("*");
-        stDateAst.setForeground(Color.red);
-        classInfoPanel.add(stDateAst, g);
 
         g.gridx = 6;
         g.gridy = 4;
@@ -438,11 +434,6 @@ class Gradebook extends JFrame {
         final JLabel classEndDateError = new JLabel();
         classEndDateError.setVisible(false);
         classEndDateError.setForeground(Color.RED);
-
-        g.gridx = 5;
-        JLabel endDateAst = new JLabel("*");
-        endDateAst.setForeground(Color.red);
-        classInfoPanel.add(endDateAst, g);
 
         g.gridx = 6;
         g.gridy = 6;
@@ -487,11 +478,6 @@ class Gradebook extends JFrame {
         final JLabel numberOfAssignmentsError = new JLabel();
         numberOfAssignmentsError.setVisible(false);
         numberOfAssignmentsError.setForeground(Color.RED);
-
-        g.gridx = 5;
-        JLabel numAssignAst = new JLabel("*");
-        numAssignAst.setForeground(Color.red);
-        classInfoPanel.add(numAssignAst, g);
 
         g.gridx = 6;
         g.gridy = 8;
@@ -546,9 +532,18 @@ class Gradebook extends JFrame {
                         classInfoPanel.revalidate();
                         classInfoPanel.repaint();
                         final JComponent newClassTemplatePanel = new JPanel(new BorderLayout());
+                        JPanel classTemplatePanel = new JPanel(new GridLayout(0,1));
                         JLabel classTemplateLabel = new JLabel("Entering Assignments into Class", SwingConstants.CENTER);
                         classTemplateLabel.setFont(f2);
-                        newClassTemplatePanel.add(classTemplateLabel, BorderLayout.PAGE_START);
+                        classTemplateLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                        JLabel allFieldsRequiredLabel = new JLabel("All Fields Are Required");
+                        allFieldsRequiredLabel.setForeground(Color.red);
+                        allFieldsRequiredLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                        classTemplatePanel.add(classTemplateLabel);
+                        classTemplatePanel.add(allFieldsRequiredLabel);
+                        classTemplatePanel.add(new JLabel(""));
+
+                        newClassTemplatePanel.add(classTemplatePanel, BorderLayout.PAGE_START);
 
                         // Generate the number of assignment fields specified by the user
                         newClassTemplatePanel.add(createAssignmentForm(numOfAssignments));
@@ -706,12 +701,6 @@ class Gradebook extends JFrame {
         dueDateLabel.setFont(f3);
         assignmentsLabelPanel.add(dueDateLabel, f);
 
-        //TODO: align asterisks on labels, adjust gridbagconstraints
-        f.gridx = 4;
-        JLabel dueDateAst = new JLabel("*");
-        dueDateAst.setForeground(Color.red);
-        assignmentsLabelPanel.add(dueDateAst, f);
-
         f.gridx = 5;
         f.gridwidth = 2;
         JLabel assignNameLabel = new JLabel("Assignment Name");
@@ -719,21 +708,11 @@ class Gradebook extends JFrame {
         assignNameLabel.setFont(f3);
         assignmentsLabelPanel.add(assignNameLabel, f);
 
-        f.gridx = 6;
-        JLabel assNameAst = new JLabel("*");
-        assNameAst.setForeground(Color.red);
-        assignmentsLabelPanel.add(assNameAst, f);
-
         f.gridx = 8;
         f.gridwidth = 1;
         JLabel assignWeightLabel = new JLabel("Assignment Weight");
         assignWeightLabel.setFont(f3);
         assignmentsLabelPanel.add(assignWeightLabel, f);
-
-        f.gridx = 10;
-        JLabel assWeightAst = new JLabel("*");
-        assWeightAst.setForeground(Color.red);
-        assignmentsLabelPanel.add(assWeightAst, f);
 
         assignmentsFormPanel.add(assignmentsLabelPanel);
 
@@ -910,14 +889,22 @@ class Gradebook extends JFrame {
             earnedAssignmentWeightLabel.setMinimumSize(labelDimensions);
             assignmentPanel.add(earnedAssignmentWeightLabel, h);
 
+            //goalGradeLabel calcBaseLine
             h.gridx = 4;
+            JLabel goalGradeLabel = new JLabel(new DecimalFormat("#.#").format(0.0));
+            goalGradeLabel.setPreferredSize(labelDimensions);
+            goalGradeLabel.setMaximumSize(labelDimensions);
+            goalGradeLabel.setMinimumSize(labelDimensions);
+            assignmentPanel.add(goalGradeLabel, h);
+
+            h.gridx = 5;
             JLabel gradeEarnedLabel = new JLabel(new DecimalFormat("#.#").format(grade));
             gradeEarnedLabel.setPreferredSize(labelDimensions);
             gradeEarnedLabel.setMaximumSize(labelDimensions);
             gradeEarnedLabel.setMinimumSize(labelDimensions);
             assignmentPanel.add(gradeEarnedLabel, h);
 
-            h.gridx = 5;
+            h.gridx = 6;
             JLabel spacer = new JLabel(" ");
             spacer.setPreferredSize(labelDimensions);
             spacer.setMaximumSize(labelDimensions);
@@ -936,7 +923,15 @@ class Gradebook extends JFrame {
             gradeError.setForeground(Color.RED);
             gradeError.setVisible(false);
 
+            //
             h.gridx = 4;
+            JLabel goalGradeLabel = new JLabel(new DecimalFormat("#.#").format(grade));
+            goalGradeLabel.setPreferredSize(labelDimensions);
+            goalGradeLabel.setMaximumSize(labelDimensions);
+            goalGradeLabel.setMinimumSize(labelDimensions);
+            assignmentPanel.add(goalGradeLabel, h);
+
+            h.gridx = 5;
             JTextField assignmentGradeTextField = new JTextField();
             assignmentGradeTextField.setPreferredSize(labelDimensions);
             assignmentGradeTextField.setMaximumSize(labelDimensions);
@@ -965,7 +960,7 @@ class Gradebook extends JFrame {
             });
             assignmentPanel.add(assignmentGradeTextField, h);
 
-            h.gridx = 5;
+            h.gridx = 6;
             h.fill = GridBagConstraints.NONE;
             JButton submitButton = new JButton("Submit");
             submitButton.setPreferredSize(labelDimensions);
@@ -1133,15 +1128,17 @@ class Gradebook extends JFrame {
         earnedWeight.setFont(tableHeadFont);
         assignLabelPanel.add(earnedWeight, h);
 
-//        h.gridx = 4;
-//        JLabel baselineGrade = new JLabel("Min. Target Grade");
-//        earnedWeight.setPreferredSize(assignmentLabelDimesions);
-//        earnedWeight.setMaximumSize(assignmentLabelDimesions);
-//        earnedWeight.setMinimumSize(assignmentLabelDimesions);
-//        earnedWeight.setFont(tableHeadFont);
-//        assignLabelPanel.add(earnedWeight, h);
+        //***********
 
         h.gridx = 4;
+        JLabel baselineGrade = new JLabel("Goal Grade");
+        baselineGrade.setPreferredSize(assignmentLabelDimesions);
+        baselineGrade.setMaximumSize(assignmentLabelDimesions);
+        baselineGrade.setMinimumSize(assignmentLabelDimesions);
+        baselineGrade.setFont(tableHeadFont);
+        assignLabelPanel.add(baselineGrade, h);
+
+        h.gridx = 5;
         JLabel grade = new JLabel("Grade");
         grade.setPreferredSize(assignmentLabelDimesions);
         grade.setMaximumSize(assignmentLabelDimesions);
@@ -1149,7 +1146,7 @@ class Gradebook extends JFrame {
         grade.setFont(tableHeadFont);
         assignLabelPanel.add(grade, h);
 
-        h.gridx = 5;
+        h.gridx = 6;
         JLabel headerSpacer = new JLabel(" ");
         headerSpacer.setPreferredSize(assignmentLabelDimesions);
         headerSpacer.setMaximumSize(assignmentLabelDimesions);
@@ -1212,43 +1209,39 @@ class Gradebook extends JFrame {
     }
 
     private static class BGlistener implements ActionListener {
-
         float totalWeight;
 
         public void actionPerformed(ActionEvent e) {
             if ("A".equals(e.getActionCommand())) {
                 totalWeight = 90.0f;
-
             } else if ("B".equals(e.getActionCommand())) {
                 totalWeight = 80.0f;
-
             } else if ("C".equals(e.getActionCommand())) {
                 totalWeight = 70.0f;
-
             } else if ("D".equals(e.getActionCommand())) {
                 totalWeight = 60.0f;
-
             }
         }
-
         public float getTotalWeight() {
             return totalWeight;
         }
     }
-    private float calculateBaselineGrade(float assignmentWeight){
-        float baselineGrade = -1;
-        float totalWeight = bglistener.getTotalWeight();
 
+    private float calculateBaselineGrade(float assignmentWeight){
+        float baselineGrade;
+        float totalWeight = bglistener.getTotalWeight();
         float aWeight = (totalWeight/100);
+        float earnedWeight = 0;
+        float weightPassed = 0;
 
         //calculate completedAssignments portion (for loops if assignment Grade != null)
-            //calculateEarnedWeight
-            float earnedWeight= -1;
-            //calculate weightPassed
-            float weightPassed = -1;
+            //calculateEarnedWeight & weightPassed
+//            for() {
+//                float earnedWeight += ;
+//                float weightPassed += ;
+//            }
             // earnedWeight/possibleWeights
             float completedAssignmentsWeight = earnedWeight/weightPassed;
-
 
         //goal - completedAssignments Portion
         float weightLeft = totalWeight - weightPassed;
@@ -1257,8 +1250,8 @@ class Gradebook extends JFrame {
 
         baselineGrade = assignmentWeight*aWeight;
 
-
         return baselineGrade;
     }
+
 }
 
