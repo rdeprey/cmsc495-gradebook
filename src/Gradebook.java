@@ -1060,7 +1060,7 @@ class Gradebook extends JFrame {
         headerPanel.add(statusPanel);
 
 
-        JPanel goalGradePanel = new JPanel(new GridLayout(0, 1));
+        JPanel goalGradePanel = new JPanel(new GridLayout(5, 1));
         JRadioButton A = new JRadioButton("A (90-100)");
         A.setActionCommand("A");
         A.addActionListener(bglistener);
@@ -1083,6 +1083,18 @@ class Gradebook extends JFrame {
         goalGradePanel.add(B);
         goalGradePanel.add(C);
         goalGradePanel.add(D);
+
+        if (goalGradeVal != 0.0f) {
+            if (goalGradeVal == 90.0f) {
+                A.setSelected(true);
+            } else if (goalGradeVal == 80.0f) {
+                B.setSelected(true);
+            } else if (goalGradeVal == 70.0f) {
+                C.setSelected(true);
+            } else if (goalGradeVal == 60.0f) {
+                D.setSelected(true);
+            }
+        }
 
         headerPanel.add(goalGradePanel);
         classPanelConstraints.gridx = 0;
@@ -1243,6 +1255,7 @@ class Gradebook extends JFrame {
             classX.setUserId(user.getUserId());
             int classId = classX.getClassId();
 
+            // Update the tab to show the goal grade
             tabbedPane.setComponentAt(currentTabIndex, null);
             tabbedPane.setComponentAt(currentTabIndex, createCurrentClassTab(className, classId, totalWeight));
         }
