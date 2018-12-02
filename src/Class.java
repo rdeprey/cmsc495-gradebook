@@ -130,6 +130,32 @@ class Class {
         }
     }
 
+    public static String getClassGrade(int userId, int classId) {
+        try {
+            ArrayList<Assignment> assignments = Assignment.getAssignmentsForClass(userId, classId);
+            float grade = 0.0f;
+            boolean hasAtLeastOneGrade = false;
+            for (int i = 0; i < assignments.size(); i++) {
+                if (assignments.get(i).getAssignmentGrade() != 0.0) {
+                    grade += assignments.get(i).getAssignmentGrade();
+                    hasAtLeastOneGrade = true;
+                }
+            }
+
+            String letterGrade = convertToLetterGrade(grade);
+
+            if (hasAtLeastOneGrade) {
+                return letterGrade;
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
+            System.out.println("Couldn't get assignments.");
+        }
+
+        return null;
+    }
+
     // Methods needed to retrieve class data from the database
     private static Class getClassFromResultSet(ResultSet rs) throws SQLException {
         Class classX = new Class();

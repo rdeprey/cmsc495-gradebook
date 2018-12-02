@@ -847,7 +847,7 @@ class Gradebook extends JFrame {
 
 
     private static JPanel classAssignmentPanel(int assignmentId, Date dueDate, String assignmentName, float assignmentWeight, float grade, float goalGrade) {
-        Dimension labelDimensions = new Dimension(183, 25);
+        Dimension labelDimensions = new Dimension(157, 25);
         JPanel assignmentPanel = new JPanel(new GridBagLayout());
         GridBagConstraints h = new GridBagConstraints();
 
@@ -892,11 +892,7 @@ class Gradebook extends JFrame {
             //goalGradeLabel calcBaseLine
             h.gridx = 4;
             JLabel goalGradeLabel;
-            if (goalGrade == 0.0f) {
-                goalGradeLabel = new JLabel(" ");
-            } else {
-                goalGradeLabel = new JLabel(new DecimalFormat("#.#").format(goalGrade));
-            }
+            goalGradeLabel = new JLabel(" ");
             goalGradeLabel.setPreferredSize(labelDimensions);
             goalGradeLabel.setMaximumSize(labelDimensions);
             goalGradeLabel.setMinimumSize(labelDimensions);
@@ -1038,7 +1034,7 @@ class Gradebook extends JFrame {
     }
 
     private static JComponent createCurrentClassTab(String classNameVal, int classIdVal, float goalGradeVal) {
-        Dimension assignmentLabelDimesions = new Dimension(183, 25);
+        Dimension assignmentLabelDimesions = new Dimension(157, 25);
         JComponent parentPanel = new JPanel(new BorderLayout());
         JComponent classPanel = new JPanel(new GridBagLayout());
         GridBagConstraints classPanelConstraints = new GridBagConstraints();
@@ -1053,8 +1049,13 @@ class Gradebook extends JFrame {
         JLabel classLabel = new JLabel(className, SwingConstants.LEADING);
         classLabel.setFont(f1);
         statusPanel.add(classLabel);
-        char currentGrade = 'A';
-        JLabel currentGradeLabel = new JLabel("Current Grade: " + currentGrade, SwingConstants.LEADING);
+        String currentGrade = Class.getClassGrade(user.getUserId(), classIdVal);
+        JLabel currentGradeLabel;
+        if (currentGrade != null) {
+            currentGradeLabel = new JLabel("Current Grade: " + currentGrade, SwingConstants.LEADING);
+        } else {
+            currentGradeLabel = new JLabel("Current Grade: ", SwingConstants.LEADING);
+        }
         currentGradeLabel.setFont(f2);
         statusPanel.add(currentGradeLabel);
         headerPanel.add(statusPanel);
@@ -1264,38 +1265,43 @@ class Gradebook extends JFrame {
         }
     }
 
-    private static float calculateBaselineGrade(float assignmentWeight, int userId, int classId){
-        float baselineGrade;
-        float totalWeight = bglistener.getTotalWeight();
-        float aWeight = (totalWeight/100);
-        float earnedWeight = 0;
-        float weightPassed = 0;
+    private static float calculateBaselineGrade(float assignmentWeight, int userId, int classId) {
+        float baselineGrade = 0.0f;
 
-        //calculate completedAssignments portion (for loops if assignment Grade != null)
-        //calculateEarnedWeight & weightPassed
+        float goalGrade = bglistener.getTotalWeight();
+
+        //these three have to be pulled
+        float totalWeight = 0.0f;
+        float totalEarnedWeight = 0.0f;
+        float weightPassed = 0.0f;
+
         try {
             ArrayList<Assignment> assignments = Assignment.getAssignmentsForClass(userId, classId);
             for (int i = 0; i < assignments.size(); i++) {
-                earnedWeight += (assignments.get(i).getAssignmentWeight() * (assignments.get(i).getAssignmentGrade() / 100));
-                weightPassed += (assignments.get(i).getAssignmentWeight());
+                totalWeight += assignments.get(i).getAssignmentWeight();
+
+                if (assignments.get(i).getAssignmentGrade() != 0.0) {
+                    totalEarnedWeight += (assignments.get(i).getAssignmentWeight() * (assignments.get(i).getAssignmentGrade() / 100));
+                    weightPassed += assignments.get(i).getAssignmentWeight();
+                }
             }
-            // earnedWeight/possibleWeights
-            float completedAssignmentsWeight = earnedWeight / weightPassed;
 
-            //goal - completedAssignments Portion
-            float weightLeft = totalWeight - weightPassed;
+            float goalWeight = goalGrade / totalWeight;
+            float completedWeight = totalEarnedWeight / totalWeight;
+            goalWeight -= completedWeight;
+            goalWeight *= totalWeight;
+            float weightLeftOver = totalWeight - weightPassed;
+            float weightValue = goalWeight / weightLeftOver;
+            float baseLineWeight = weightValue * assignmentWeight;
+            baselineGrade = (baseLineWeight * 100) / assignmentWeight;
 
-            aWeight -= (completedAssignmentsWeight * weightLeft);
-
-            baselineGrade = assignmentWeight * aWeight;
 
             return baselineGrade;
         } catch (Exception ex) {
             System.out.println("Couldn't get assignments for this user and class.");
         }
 
-        return 0.0f;
+        return baselineGrade;
     }
-
 }
 
