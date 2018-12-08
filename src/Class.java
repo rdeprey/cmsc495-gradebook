@@ -312,7 +312,7 @@ final class Class {
             float completedAssignmentWeight = 0;
             float currentGrade = 0;
 
-            if (assignments.size() > 100) {
+            if (assignments != null && assignments.size() > 100) {
                 throw new ArithmeticException("List of assignments is too large");
             }
 

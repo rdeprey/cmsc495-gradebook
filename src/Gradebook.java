@@ -1,6 +1,6 @@
 /*********************************************************************************************************
  * File name: Gradebook.java
- * Date: November 2018
+ * Date: November/December 2018
  * Author: Haemee Nabors, Rebecca Deprey, Devon Artist, Harry Giles, Brittany White, Ryan Haas
  * Purpose: This class extends the JFrame class to create a JFrame window for the GradeBook GUI. It has
  * methods to allow students to add classes and assignments; add grades for assignments; view their
@@ -18,8 +18,6 @@
  *********************************************************************************************************/
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
@@ -35,52 +33,33 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class Gradebook extends JFrame {
-    private static User user;
+    // Fonts used in the application
     private static final Font f1 = new Font("Monospaced", Font.BOLD, 20);
     private static final Font f2 = new Font("Monospaced", Font.BOLD, 16);
     private static final Font tableHeadFont = new Font("Monospaced", Font.BOLD, 13);
-    private static ArrayList<Class> currentClasses;
+
+    // Panels that will need to be updated during the application life cycle
     private static final JPanel progressPanel = new JPanel(new GridLayout(0, 1, 5, 5));
     private static final JPanel currentClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
     private static final JPanel completedPanel = new JPanel(new GridLayout(0, 1, 5, 5));
     private static final JPanel completedClassesPanel = new JPanel(new GridLayout(0, 1, 5, 5));
-    private static final JPanel classInfoPanel = createAddClassPanel();
-    private static final JTabbedPane tabbedPane = new JTabbedPane();
+    private static final JPanel classInfoPanel = createAddClassPanel(); // Creates the class information panel
+    private static final JTabbedPane tabbedPane = new JTabbedPane(); // Creates the tabbed panel
+
+    // Patterns and limits
+    private static final Pattern validStringRegex = Pattern.compile("[^a-zA-Z0-9\\/\\.\\-\\s$]"); // Regular expression to prevent script injection
     private static final int sizeLimit = 100; // Maximum number of classes to retrieve
+
+    private static User user;
+    private static ArrayList<Class> currentClasses;
     private static BGlistener bglistener = new BGlistener();
-    private static final Pattern validStringRegex = Pattern.compile("[^a-zA-Z0-9\\/\\.\\-\\s$]");
 
-    //creates GUI
+    // The main method that creates the GradeBook GUI
     public Gradebook(final User user) throws Exception {
+        // Initialize the user variable for the currently signed in user
         Gradebook.user = user;
-        String userName = user.getUsername();
-        String date = new SimpleDateFormat("EEEEE, MMMMM d, yyyy").format(new Date());
-        String greetingMessage = determineGreeting();
 
-        // Logout button
-        JButton logoutBtn = new JButton("Logout");
-        logoutBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int a = JOptionPane.showConfirmDialog(null, "Are you sure you want to logout?");
-                if(a == JOptionPane.YES_OPTION){
-                    // Get classes without assignments from the database and delete them since you cannot add
-                    // assignments outside of the add new class process
-                    try {
-                        int userId = user.getUserId();
-                        ArrayList<Integer> classesWithoutAssignments = Class.getClassesWithoutAssignments(userId);
-                        for (int i = 0; i < classesWithoutAssignments.size(); i++) {
-                            Class.deleteClass(userId, classesWithoutAssignments.get(i));
-                        }
-                    } catch (Exception ex) {
-                       ex.printStackTrace();
-                    }
-
-                    System.exit(0);
-                }
-            }
-        });
-
+        // Create the JFrame for the GradeBook GUI
         JFrame frame = new JFrame("GradeBook");
         frame.setSize(1500, 1000);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -95,7 +74,7 @@ class Gradebook extends JFrame {
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        //TitlePanel
+        // Create the title panel at the top of the screen
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setBackground(new Color(0, 122, 204));
         JLabel title = new JLabel("GradeBook", SwingConstants.CENTER);
@@ -104,15 +83,47 @@ class Gradebook extends JFrame {
         titlePanel.add(title, BorderLayout.CENTER);
         JPanel nameDatePanel = new JPanel(new GridLayout(2, 1));
         nameDatePanel.setBackground(new Color(0, 122, 204));
+        // Logout button
+        JButton logoutBtn = new JButton("Logout");
+        logoutBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Confirm that the user wants to logout
+                int a = JOptionPane.showConfirmDialog(null, "Are you sure you want to logout?");
+
+                // If the user confirms that they want to logout
+                if (a == JOptionPane.YES_OPTION){
+                    // Get classes without assignments from the database and delete them since you cannot add
+                    // assignments outside of the add new class process
+                    try {
+                        int userId = user.getUserId();
+                        ArrayList<Integer> classesWithoutAssignments = Class.getClassesWithoutAssignments(userId);
+                        if (classesWithoutAssignments != null) {
+                            for (int i = 0; i < classesWithoutAssignments.size(); i++) {
+                                Class.deleteClass(userId, classesWithoutAssignments.get(i));
+                            }
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+                    // Exit the application
+                    System.exit(0);
+                }
+            }
+        });
         nameDatePanel.add(logoutBtn);
         titlePanel.add(nameDatePanel, BorderLayout.EAST);
         contentPane.add(titlePanel, c);
 
-        //GreetingPanel
+        // Create the greeting panel in the top left corner of the screen
         c.gridy += 1;
         c.gridwidth = 2;
         JPanel greetingPanel = new JPanel(new GridLayout(0, 1));
         greetingPanel.setBackground(new Color(102, 194, 255));
+        String userName = user.getUsername();
+        String date = new SimpleDateFormat("EEEEE, MMMMM d, yyyy").format(new Date());
+        String greetingMessage = determineGreeting();
         JLabel greetingLabel = new JLabel(greetingMessage + ",", SwingConstants.CENTER);
         greetingLabel.setFont(f2);
         greetingPanel.add(new JLabel());
@@ -126,10 +137,10 @@ class Gradebook extends JFrame {
         greetingPanel.add(new JLabel(" "));
         contentPane.add(greetingPanel, c);
 
-        //ProgressPanel
+        // Create the Current Classes panel in the left sidebar
         c.gridy += 1;
         c.gridwidth = 2;
-        drawCurrentClassesPanel(user); // dynamic progress panels
+        drawCurrentClassesPanel(user);
         JScrollPane sp = new JScrollPane(progressPanel);
         JPanel jp = new JPanel(new GridLayout(0, 1, 5, 5));
         jp.setPreferredSize(new Dimension(200, 200));
@@ -137,7 +148,7 @@ class Gradebook extends JFrame {
         contentPane.add(jp, c);
 
 
-        //CompletedPanel
+        // Create the Completed Classes panel in the left sidebar
         c.gridy += 1;
         c.gridwidth = 2;
         JPanel compClassTitlePanel = new JPanel(new GridLayout(0, 1, 15, 15));
@@ -146,7 +157,6 @@ class Gradebook extends JFrame {
         compClassLabel.setFont(f2);
         compClassTitlePanel.add(compClassLabel);
         contentPane.add(compClassTitlePanel, c);
-
         c.gridy += 1;
         drawCompletedClassesPanel(user);
         JScrollPane completedClassScrollPane = new JScrollPane(completedPanel);
@@ -163,7 +173,7 @@ class Gradebook extends JFrame {
         // Create tabbed pane container
         tabbedPane.setPreferredSize(new Dimension(1100, 700));
 
-        //New Class
+        // Create the current class tabs
         final JPanel newClassPanel = new JPanel(new BorderLayout());
         final JPanel newClassFormPanel = new JPanel(new GridBagLayout());
         final GridBagConstraints constraints = new GridBagConstraints();
@@ -177,26 +187,29 @@ class Gradebook extends JFrame {
         tabbedPane.addTab("New Class", null, newClassPanel); // Add tab to tab container
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1); // keyboard event
 
-        if (currentClasses.size() > sizeLimit) {
-            throw new ArithmeticException("List of current classes is too large");
-        }
+        if (currentClasses != null) {
+            if (currentClasses.size() > sizeLimit) {
+                throw new ArithmeticException("List of current classes is too large");
+            }
 
-        // Class panel
-        for (int i = 0; i < currentClasses.size(); i++) {
-            String className = currentClasses.get(i).getClassName();
-            JComponent parentPanel = createCurrentClassTab(className, currentClasses.get(i).getClassId(), 0.0f);
-            tabbedPane.addTab(className, null, parentPanel); // Add tab to tab container
-            tabbedPane.setMnemonicAt(0, KeyEvent.VK_3); // keyboard event
+            // Create the current class panel
+            for (int i = 0; i < currentClasses.size(); i++) {
+                String className = currentClasses.get(i).getClassName();
+                JComponent parentPanel = createCurrentClassTab(className, currentClasses.get(i).getClassId(), 0.0f);
+                tabbedPane.addTab(className, null, parentPanel); // Add tab to tab container
+                tabbedPane.setMnemonicAt(0, KeyEvent.VK_3); // keyboard event
+            }
         }
 
         // Add the tabbed pane to contentPane
         contentPane.add(tabbedPane, c);
 
+        // Set the JFrame size and visibility
         frame.setSize(1000, 800);
         frame.setVisible(true);
-
     }
 
+    // Determines the greeting shown in the top left sidebar based on the current time of day
     private static String determineGreeting() {
         String greeting;
         DateFormat dateFormat = new SimpleDateFormat("HH");
@@ -217,42 +230,61 @@ class Gradebook extends JFrame {
         return greeting;
     }
 
+    // Draws the Current Classes panel in the left sidebar
     private static void drawCurrentClassesPanel(User user) {
         try {
+            // Get the current classes from the database
             currentClasses = Class.getCurrentClasses(user.getUserId());
-            if (currentClasses.size() > 0) {
+
+            // If the user has current classes
+            if (currentClasses != null) {
+                // Clear the current classes panel
                 currentClassesPanel.removeAll();
                 progressPanel.removeAll();
 
+                // Reset the title in the current classes panel
                 currentClassesPanel.setBackground(new Color(179, 224, 255));
                 JLabel currentClassesLabel = new JLabel("Current Classes", SwingConstants.CENTER);
                 currentClassesLabel.setFont(f2);
                 currentClassesPanel.add(currentClassesLabel);
                 progressPanel.add(currentClassesPanel);
 
+                // If the size of the current classes arraylist is greater than the size limit, throw an exception to prevent
+                // security issues caused by overflows
                 if (currentClasses.size() > sizeLimit) {
                     throw new ArithmeticException("List of current classes is too large");
                 }
 
+                // For each current class
                 for (int i = 0; i < currentClasses.size(); i++) {
-                    String classGrade = Class.getClassGrade(user.getUserId(), currentClasses.get(i).getClassId());
-                    String letterGrade = classGrade;
+                    // Get the class grade as a letter value
+                    String letterGrade = Class.getClassGrade(user.getUserId(), currentClasses.get(i).getClassId());
+
+                    // Get the assignments for each current class
                     ArrayList<Assignment> assignments = Assignment.getAssignmentsForClass(user.getUserId(), currentClasses.get(i).getClassId());
                     float completedAssignmentWeight = 0;
 
+                    // If the size of the assignments arraylist is greater than the size limit, throw an exception to prevent
+                    // security issues caused by overflows
                     if (assignments.size() > sizeLimit) {
                         throw new ArithmeticException("List of assignments is too large");
                     }
 
+                    // For each assignment
                     for (int j = 0; j < assignments.size(); j++) {
+                        // If the assignment grade has been added, add it to the completedAssignmentWeight so that
+                        // there's a sum of all the assignment weights
                         if (assignments.get(j).getAssignmentGrade() != 0.0) {
                             float currentWeight = assignments.get(j).getAssignmentWeight();
                             completedAssignmentWeight += currentWeight;
                         }
                     }
 
+                    // Create the progress panels for each class based on the class name, letter grade, and the weight for the completed assignments
                     progressPanel.add(createClassProgressPanel(currentClasses.get(i).getClassName(), letterGrade, completedAssignmentWeight, 100));
                 }
+
+                // Revalidate the GUI to update it
                 currentClassesPanel.revalidate();
             }
         } catch (Exception ex) {
@@ -260,20 +292,31 @@ class Gradebook extends JFrame {
         }
     }
 
+    // Draws the Completed Classes panel in the left sidebar
     private static void drawCompletedClassesPanel(User user) {
         try {
+            // Get the list of completed classes for the user
             ArrayList<Class> completedClasses = Class.getCompletedClasses(user.getUserId());
-            if (completedClasses.size() > 0 && completedClasses.size() <= sizeLimit) {
+
+            // If the size of the completed classes arraylist is greater than the size limit, throw an exception to prevent
+            // security issues caused by overflows
+            if (completedClasses != null && completedClasses.size() > sizeLimit) {
+                throw new ArithmeticException("List of completed classes is too large.");
+            }
+
+            // If the user has completed classes
+            if (completedClasses != null) {
+                // Remove all completed classes previously displayed
                 completedClassesPanel.removeAll();
                 completedPanel.removeAll();
 
+                // Create an updated completed classes panel for each completed class
                 for (int i = 0; i < completedClasses.size(); i++) {
-                    // Dynamic completed class panels
                     completedPanel.add(createCompClassPanel(completedClasses.get(i).getClassName(), Class.convertToLetterGrade(completedClasses.get(i).getClassGrade())));
                 }
+
+                // Revalidate the GUI to update it
                 completedClassesPanel.revalidate();
-            } else if (completedClasses.size() > sizeLimit) {
-                throw new ArithmeticException("List of completed classes is too large.");
             }
         } catch (Exception ex) {
             System.out.println("We're sorry, but we cannot access your classes at this time. Please try again later.");

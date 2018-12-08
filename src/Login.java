@@ -11,6 +11,7 @@
  *********************************************************************************************************/
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
@@ -203,7 +204,6 @@ public final class Login extends Application {
                     Text title = new Text("Please check your email " + currentUser.getEmailAddress()
                             + "\nand input your given security code to continue.");
                     showMultifactorAuthScreen(grid, primaryStage, title, currentUser);
-                   // new Gradebook(currentUser);
                 } else if (counter == maxAttempts) {
                     grid.setVisible(false);
                     GridPane grid2 = new GridPane();
@@ -432,6 +432,8 @@ public final class Login extends Application {
                 openGradebookBtn.setOnAction(actionEvent1 -> {
                     try {
                         new Gradebook(user);
+                        Platform.setImplicitExit(false);
+                        primaryStage.close();
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
                     }
