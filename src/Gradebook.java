@@ -31,6 +31,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class Gradebook extends JFrame {
     private static User user;
@@ -46,9 +48,11 @@ class Gradebook extends JFrame {
     private static final JTabbedPane tabbedPane = new JTabbedPane();
     private static final int sizeLimit = 100; // Maximum number of classes to retrieve
     private static BGlistener bglistener = new BGlistener();
+    private static final Pattern validStringRegex = Pattern.compile("[^a-zA-Z0-9\\/\\.\\-\\s$]");
 
     //creates GUI
     public Gradebook(final User user) throws Exception {
+        Date loginTime = new Date();
         Gradebook.user = user;
         String userName = user.getUsername();
         String date = new SimpleDateFormat("EEEEE, MMMMM d, yyyy").format(new Date());
@@ -384,8 +388,16 @@ class Gradebook extends JFrame {
                     isValid.put("className", false);
                     enableButton(createNewClassBtn, isValid);
                 } else {
-                    isValid.put("className", true);
-                    enableButton(createNewClassBtn, isValid);
+                    Matcher matcher = validStringRegex.matcher(nameTextField.getText());
+                    if (matcher.find()) {
+                        classNameError.setText("Class names can only contain letters, numbers, spaces, and the symbols ., /, and -.");
+                        classNameError.setVisible(true);
+                        isValid.put("className", false);
+                        enableButton(createNewClassBtn, isValid);
+                    } else {
+                        isValid.put("className", true);
+                        enableButton(createNewClassBtn, isValid);
+                    }
                 }
             }
         });
@@ -717,6 +729,7 @@ class Gradebook extends JFrame {
         return classInfoPanel;
     }
 
+    // Sets the validity status of the number of assignments field
     private static void setTextfieldValidity(boolean isInteger, String value, Map<String, Boolean> isValid, JLabel numberOfAssignmentsError, JButton createNewClassBtn) {
         if (!isInteger) {
             numberOfAssignmentsError.setText("Please enter an integer value for the number of assignments");
@@ -872,6 +885,12 @@ class Gradebook extends JFrame {
 
                         assignmentNameError.setText("You must enter an assignment name.");
                         assignmentNameError.setVisible(true);
+                    } else {
+                        Matcher matcher = validStringRegex.matcher(assignNameTF.getText());
+                        if (matcher.find()) {
+                            assignmentNameError.setText("Letters, numbers, spaces, and ., /, - only.");
+                            assignmentNameError.setVisible(true);
+                        }
                     }
                 }
             });
@@ -1093,9 +1112,6 @@ class Gradebook extends JFrame {
                         spacer.setMaximumSize(labelDimensions);
                         spacer.setMinimumSize(labelDimensions);
                         assignmentPanel.add(spacer, h);
-
-                       // assignmentPanel.revalidate();
-                       // assignmentPanel.repaint();
 
                         int selectedTabIndex = tabbedPane.getSelectedIndex();
                         String className = tabbedPane.getTitleAt(selectedTabIndex);
