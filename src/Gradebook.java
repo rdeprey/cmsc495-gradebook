@@ -18,6 +18,10 @@
  *********************************************************************************************************/
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.DateFormat;
@@ -273,6 +277,7 @@ class Gradebook extends JFrame {
         JProgressBar progBar = new JProgressBar(0, totalWeight);
         progBar.setValue(Math.round(completedWeight));
         progBar.setStringPainted(true);
+        progBar.setString(String.valueOf(Math.round(completedWeight)) + "% completed");
         classProgressPanel.add(progBar);
 
         return classProgressPanel;
@@ -322,6 +327,7 @@ class Gradebook extends JFrame {
         isValid.put("endDate", false);
         isValid.put("numberOfAssignments", false);
 
+        JButton createNewClassBtn = new JButton("Add Assignments");
 
         final JPanel classInfoPanel = new JPanel(new GridBagLayout());
         classInfoPanel.setSize(new Dimension(1100, 700));
@@ -373,8 +379,10 @@ class Gradebook extends JFrame {
                     classNameError.setText("You must enter a class name.");
                     classNameError.setVisible(true);
                     isValid.put("className", false);
+                    enableButton(createNewClassBtn, isValid);
                 } else {
                     isValid.put("className", true);
+                    enableButton(createNewClassBtn, isValid);
                 }
             }
         });
@@ -414,8 +422,10 @@ class Gradebook extends JFrame {
                     classStartDateError.setText("You must enter a valid date.");
                     classStartDateError.setVisible(true);
                     isValid.put("startDate", false);
+                    enableButton(createNewClassBtn, isValid);
                 } else {
                     isValid.put("startDate", true);
+                    enableButton(createNewClassBtn, isValid);
                 }
             }
         });
@@ -454,12 +464,15 @@ class Gradebook extends JFrame {
                     classEndDateError.setText("You must enter a valid date.");
                     classEndDateError.setVisible(true);
                     isValid.put("endDate", false);
+                    enableButton(createNewClassBtn, isValid);
                 } else if (classEndDateVal.before(convertStringToDate(classStartDateTextField.getText()))) {
                     classEndDateError.setText("The class end date must be later than the class start date.");
                     classEndDateError.setVisible(true);
                     isValid.put("endDate", false);
+                    enableButton(createNewClassBtn, isValid);
                 } else {
                     isValid.put("endDate", true);
+                    enableButton(createNewClassBtn, isValid);
                 }
             }
         });
@@ -490,15 +503,28 @@ class Gradebook extends JFrame {
             public void focusLost(FocusEvent e) {
                 // Verify that the number of assignments is actually an integer value
                 boolean numAssignmentsIsInteger = isInteger(numOfAssignmentsTextField.getText());
-                if (!numAssignmentsIsInteger) {
-                    numberOfAssignmentsError.setText("Please enter an integer value for the number of assignments");
-                    numberOfAssignmentsError.setVisible(true);
-                    isValid.put("numberOfAssignments", false);
-                } else {
-                    isValid.put("numberOfAssignments", true);
-                }
+                setTextfieldValidity(numAssignmentsIsInteger, isValid, numberOfAssignmentsError, createNewClassBtn);
             }
         });
+
+        numOfAssignmentsTextField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                boolean numAssignmentsIsInteger = isInteger(numOfAssignmentsTextField.getText());
+                setTextfieldValidity(numAssignmentsIsInteger, isValid, numberOfAssignmentsError, createNewClassBtn);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                boolean numAssignmentsIsInteger = isInteger(numOfAssignmentsTextField.getText());
+                setTextfieldValidity(numAssignmentsIsInteger, isValid, numberOfAssignmentsError, createNewClassBtn);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+            }
+        });
+
         classInfoPanel.add(numOfAssignmentsTextField, g);
 
         g.gridx = 0;
@@ -508,7 +534,6 @@ class Gradebook extends JFrame {
         g.gridwidth = 10;
         g.gridx = 0;
         g.gridy = 10;
-        JButton createNewClassBtn = new JButton("Add Assignments");
         createNewClassBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String className = nameTextField.getText();
@@ -665,13 +690,29 @@ class Gradebook extends JFrame {
 
         classInfoPanel.add(createNewClassBtn, g);
 
-//        if (isValid.containsValue(false)) {
-//            createNewClassBtn.setEnabled(false);
-//        } else {
-//            createNewClassBtn.setEnabled(true);
-//        }
+        enableButton(createNewClassBtn, isValid);
 
         return classInfoPanel;
+    }
+
+    private static void setTextfieldValidity(boolean numAssignmentsIsInteger, Map<String, Boolean> isValid, JLabel numberOfAssignmentsError, JButton createNewClassBtn) {
+        if (!numAssignmentsIsInteger) {
+            numberOfAssignmentsError.setText("Please enter an integer value for the number of assignments");
+            numberOfAssignmentsError.setVisible(true);
+            isValid.put("numberOfAssignments", false);
+            enableButton(createNewClassBtn, isValid);
+        } else {
+            isValid.put("numberOfAssignments", true);
+            enableButton(createNewClassBtn, isValid);
+        }
+    }
+
+    private static void enableButton(JButton button, Map<String, Boolean> isValid) {
+        if (isValid.containsValue(false)) {
+            button.setEnabled(false);
+        } else {
+            button.setEnabled(true);
+        }
     }
 
     private static JPanel createAssignmentForm(int numOfAssignments) {
@@ -1062,6 +1103,7 @@ class Gradebook extends JFrame {
         JLabel classLabel = new JLabel(className, SwingConstants.LEADING);
         classLabel.setFont(f1);
         statusPanel.add(classLabel);
+
         String currentGrade = Class.getClassGrade(user.getUserId(), classIdVal);
         JLabel currentGradeLabel;
         if (currentGrade != null) {
