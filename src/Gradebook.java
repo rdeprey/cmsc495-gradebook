@@ -407,7 +407,7 @@ class Gradebook extends JFrame {
 
         g.gridx = 6;
         g.gridy = 4;
-        final JTextField classStartDateTextField = new JTextField("--/--/----", 9);
+        final JTextField classStartDateTextField = new JTextField("MM/DD/YYYY", 9);
         classStartDateTextField.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
                 classStartDateError.setVisible(false);
@@ -417,7 +417,7 @@ class Gradebook extends JFrame {
 
             public void focusLost(FocusEvent e) {
                 if (classStartDateTextField.getText().length() == 0) {
-                    classStartDateTextField.setText("--/--/----");
+                    classStartDateTextField.setText("MM/DD/YYYY");
                     classStartDateTextField.setForeground(new Color(150, 150, 150));
                 }
 
@@ -449,7 +449,7 @@ class Gradebook extends JFrame {
 
         g.gridx = 6;
         g.gridy = 6;
-        final JTextField classEndDateTextField = new JTextField("--/--/----", 9);
+        final JTextField classEndDateTextField = new JTextField("MM/DD/YYYY", 9);
         classEndDateTextField.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
                 classEndDateError.setVisible(false);
@@ -459,7 +459,7 @@ class Gradebook extends JFrame {
 
             public void focusLost(FocusEvent e) {
                 if (classEndDateTextField.getText().length() == 0) {
-                    classEndDateTextField.setText("--/--/----");
+                    classEndDateTextField.setText("MM/DD/YYYY");
                     classEndDateTextField.setForeground(new Color(150, 150, 150));
                 }
 
@@ -507,7 +507,7 @@ class Gradebook extends JFrame {
             public void focusLost(FocusEvent e) {
                 // Verify that the number of assignments is actually an integer value
                 boolean numAssignmentsIsInteger = isInteger(numOfAssignmentsTextField.getText());
-                setTextfieldValidity(numAssignmentsIsInteger, isValid, numberOfAssignmentsError, createNewClassBtn);
+                setTextfieldValidity(numAssignmentsIsInteger, numOfAssignmentsTextField.getText(), isValid, numberOfAssignmentsError, createNewClassBtn);
             }
         });
 
@@ -515,13 +515,13 @@ class Gradebook extends JFrame {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 boolean numAssignmentsIsInteger = isInteger(numOfAssignmentsTextField.getText());
-                setTextfieldValidity(numAssignmentsIsInteger, isValid, numberOfAssignmentsError, createNewClassBtn);
+                setTextfieldValidity(numAssignmentsIsInteger, numOfAssignmentsTextField.getText(), isValid, numberOfAssignmentsError, createNewClassBtn);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 boolean numAssignmentsIsInteger = isInteger(numOfAssignmentsTextField.getText());
-                setTextfieldValidity(numAssignmentsIsInteger, isValid, numberOfAssignmentsError, createNewClassBtn);
+                setTextfieldValidity(numAssignmentsIsInteger, numOfAssignmentsTextField.getText(), isValid, numberOfAssignmentsError, createNewClassBtn);
             }
 
             @Override
@@ -699,13 +699,19 @@ class Gradebook extends JFrame {
         return classInfoPanel;
     }
 
-    private static void setTextfieldValidity(boolean numAssignmentsIsInteger, Map<String, Boolean> isValid, JLabel numberOfAssignmentsError, JButton createNewClassBtn) {
-        if (!numAssignmentsIsInteger) {
+    private static void setTextfieldValidity(boolean isInteger, String value, Map<String, Boolean> isValid, JLabel numberOfAssignmentsError, JButton createNewClassBtn) {
+        if (!isInteger) {
             numberOfAssignmentsError.setText("Please enter an integer value for the number of assignments");
             numberOfAssignmentsError.setVisible(true);
             isValid.put("numberOfAssignments", false);
             enableButton(createNewClassBtn, isValid);
+        } else if (!value.isEmpty() && Integer.parseInt(value) == 0) {
+            numberOfAssignmentsError.setText("Please enter a value greater than zero.");
+            numberOfAssignmentsError.setVisible(true);
+            isValid.put("numberOfAssignments", false);
+            enableButton(createNewClassBtn, isValid);
         } else {
+            numberOfAssignmentsError.setVisible(false);
             isValid.put("numberOfAssignments", true);
             enableButton(createNewClassBtn, isValid);
         }
@@ -792,7 +798,7 @@ class Gradebook extends JFrame {
 
             g.gridx = 2;
             g.gridy = i;
-            final JTextField dateTF = new JTextField("--/--/----");
+            final JTextField dateTF = new JTextField("MM/DD/YYYY");
             dateTF.setPreferredSize(new Dimension(200, 25));
             dateTF.addFocusListener(new FocusListener() {
                 public void focusGained(FocusEvent e) {
@@ -803,7 +809,7 @@ class Gradebook extends JFrame {
 
                 public void focusLost(FocusEvent e) {
                     if (dateTF.getText().length() == 0) {
-                        dateTF.setText("--/--/----");
+                        dateTF.setText("MM/DD/YYYY");
                         dateTF.setForeground(new Color(150, 150, 150));
 
                         Date assignmentDate = convertStringToDate(dateTF.getText());
