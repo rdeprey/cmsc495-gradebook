@@ -348,8 +348,9 @@ public final class Login extends Application {
             throw new ArithmeticException("Maximum number of attempts to login exceeded.");
         }
 
-        int oneUp = count + 1;
+        int oneUp = count;
         attempts = oneUp + 1;
+        count = count + 1;
         return oneUp;
     }
 
