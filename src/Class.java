@@ -13,10 +13,9 @@
  * /uiswing/examples/components/TabbedPaneDemoProject/src/components/TabbedPaneDemo.java
  *********************************************************************************************************/
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -117,7 +116,7 @@ final class Class {
     }
 
     public static String convertToLetterGrade(float grade) {
-        if (grade >= 90.0 && grade <= 100.0) {
+        if (grade >= 90.0) {
             return "A";
         } else if (grade >= 80.0 && grade <= 89.0) {
             return "B";
@@ -186,6 +185,30 @@ final class Class {
         }
 
         return false;
+    }
+
+    public static ArrayList<Integer> getClassesWithoutAssignments(int userId) throws Exception {
+        Connection dbCon = new DatabaseConnection().getConnection();
+        try {
+            PreparedStatement ps = dbCon.prepareStatement("SELECT classId FROM Classes WHERE userId=? AND NOT EXISTS(SELECT * FROM Assignments WHERE Assignments.classId = Classes.classId)");
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            ArrayList<Integer> classIds = new ArrayList<>();
+
+            while (rs.next()) {
+                int id = rs.getInt("classId");
+                classIds.add(id);
+            }
+
+            return classIds;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            dbCon.close();
+        }
+
+        return null;
     }
 
     public static ArrayList<Class> getCurrentClasses(int userId) throws Exception {

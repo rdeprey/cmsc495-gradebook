@@ -52,7 +52,6 @@ class Gradebook extends JFrame {
 
     //creates GUI
     public Gradebook(final User user) throws Exception {
-        Date loginTime = new Date();
         Gradebook.user = user;
         String userName = user.getUsername();
         String date = new SimpleDateFormat("EEEEE, MMMMM d, yyyy").format(new Date());
@@ -65,9 +64,20 @@ class Gradebook extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int a = JOptionPane.showConfirmDialog(null, "Are you sure you want to logout?");
                 if(a == JOptionPane.YES_OPTION){
+                    // Get classes without assignments from the database and delete them since you cannot add
+                    // assignments outside of the add new class process
+                    try {
+                        int userId = user.getUserId();
+                        ArrayList<Integer> classesWithoutAssignments = Class.getClassesWithoutAssignments(userId);
+                        for (int i = 0; i < classesWithoutAssignments.size(); i++) {
+                            Class.deleteClass(userId, classesWithoutAssignments.get(i));
+                        }
+                    } catch (Exception ex) {
+                       ex.printStackTrace();
+                    }
+
                     System.exit(0);
                 }
-
             }
         });
 
@@ -226,7 +236,7 @@ class Gradebook extends JFrame {
 
                 for (int i = 0; i < currentClasses.size(); i++) {
                     String classGrade = Class.getClassGrade(user.getUserId(), currentClasses.get(i).getClassId());
-                    String letterGrade = (classGrade == null) ? null : classGrade;
+                    String letterGrade = classGrade;
                     ArrayList<Assignment> assignments = Assignment.getAssignmentsForClass(user.getUserId(), currentClasses.get(i).getClassId());
                     float completedAssignmentWeight = 0;
 
