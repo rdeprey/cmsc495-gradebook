@@ -723,6 +723,11 @@ class Gradebook extends JFrame {
             numberOfAssignmentsError.setVisible(true);
             isValid.put("numberOfAssignments", false);
             enableButton(createNewClassBtn, isValid);
+        } else if (value.isEmpty()) {
+            numberOfAssignmentsError.setText("Please enter the number of assignments.");
+            numberOfAssignmentsError.setVisible(true);
+            isValid.put("numberOfAssignments", false);
+            enableButton(createNewClassBtn, isValid);
         } else {
             numberOfAssignmentsError.setVisible(false);
             isValid.put("numberOfAssignments", true);
