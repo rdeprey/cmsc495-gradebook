@@ -40,7 +40,7 @@ class DatabaseConnection {
                 break;
             }
 
-            count++;
+            count += 1;
             if (count >= Integer.MAX_VALUE) {
                 throw new RuntimeException("Reading file caused integer overflow");
             }

@@ -217,6 +217,10 @@ class Gradebook extends JFrame {
                 currentClassesPanel.add(currentClassesLabel);
                 progressPanel.add(currentClassesPanel);
 
+                if (currentClasses.size() > sizeLimit) {
+                    throw new ArithmeticException("List of current classes is too large");
+                }
+
                 for (int i = 0; i < currentClasses.size(); i++) {
                     String classGrade = Class.getClassGrade(user.getUserId(), currentClasses.get(i).getClassId());
                     String letterGrade = (classGrade == null) ? null : classGrade;
@@ -1332,6 +1336,11 @@ class Gradebook extends JFrame {
 
         try {
             ArrayList<Assignment> assignments = Assignment.getAssignmentsForClass(userId, classId);
+
+            if (assignments.size() > sizeLimit) {
+                throw new ArithmeticException("List of assignments is too large");
+            }
+
             for (int i = 0; i < assignments.size(); i++) {
                 totalWeight += assignments.get(i).getAssignmentWeight();
 

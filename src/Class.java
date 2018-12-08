@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
-class Class {
+final class Class {
     private int classId;
     private int userId;
     private String className;

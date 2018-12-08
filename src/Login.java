@@ -37,7 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class Login extends Application {
+public final class Login extends Application {
     private Object httpSession;
     private User currentUser;
     private static final Pattern VALID_EMAILADDRESS_REGEX =
@@ -344,7 +344,11 @@ public class Login extends Application {
     }
 
     private int counter(){
-        int oneUp = count++;
+        if (count >= 3) {
+            throw new ArithmeticException("Maximum number of attempts to login exceeded.");
+        }
+
+        int oneUp = count + 1;
         attempts = oneUp + 1;
         return oneUp;
     }

@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
-class Assignment {
+final class Assignment {
     private int assignmentId;
     private int userId;
     private int classId;
