@@ -59,7 +59,7 @@ class Gradebook extends JFrame {
         logoutBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int a = JOptionPane.showConfirmDialog(null, "Logout?");
+                int a = JOptionPane.showConfirmDialog(null, "Are you sure you want to logout?");
                 if(a == JOptionPane.YES_OPTION){
                     System.exit(0);
                 }
@@ -425,21 +425,24 @@ class Gradebook extends JFrame {
                 int currentYear  = localDate.getYear();
 
                 Date classStartDateVal = convertStringToDate(classStartDateTextField.getText());
-                LocalDate startLocalDate = classStartDateVal.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                int startYear = startLocalDate.getYear();
                 if (classStartDateVal == null) {
                     classStartDateError.setText("You must enter a valid date.");
                     classStartDateError.setVisible(true);
                     isValid.put("startDate", false);
                     enableButton(createNewClassBtn, isValid);
-                } else if (startYear != currentYear) {
-                    classStartDateError.setText("The start date must be within the current year.");
-                    classStartDateError.setVisible(true);
-                    isValid.put("startDate", false);
-                    enableButton(createNewClassBtn, isValid);
                 } else {
-                    isValid.put("startDate", true);
-                    enableButton(createNewClassBtn, isValid);
+                    LocalDate startLocalDate = classStartDateVal.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    int startYear = startLocalDate.getYear();
+
+                    if (startYear != currentYear) {
+                        classStartDateError.setText("The start date must be within the current year.");
+                        classStartDateError.setVisible(true);
+                        isValid.put("startDate", false);
+                        enableButton(createNewClassBtn, isValid);
+                    } else {
+                        isValid.put("startDate", true);
+                        enableButton(createNewClassBtn, isValid);
+                    }
                 }
             }
         });
