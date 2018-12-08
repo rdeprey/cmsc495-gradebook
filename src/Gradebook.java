@@ -609,30 +609,35 @@ class Gradebook extends JFrame {
                                                 if (k instanceof JTextField) {
                                                     switch (counter) {
                                                         case 0:
-                                                            assignmentDate = ((JTextField) k).getText();
+                                                            assignmentDate = (((JTextField) k).getText().equals("MM/DD/YYYY")) ? null : ((JTextField) k).getText();
                                                             break;
                                                         case 1:
-                                                            assignmentName = ((JTextField) k).getText();
+                                                            assignmentName = (((JTextField) k).getText().equals("Assignment Name")) ? null : ((JTextField) k).getText();
                                                             break;
                                                         case 2:
-                                                            assignmentWeight = ((JTextField) k).getText();
+                                                            assignmentWeight = (((JTextField) k).getText().equals("Weight")) ? null : ((JTextField) k).getText();
                                                             break;
                                                     }
 
                                                     if (counter == 2) {
                                                         counter = 0;
-                                                        // Create an assignment object
-                                                        Assignment assignment = new Assignment(user.getUserId(), classId, assignmentName, convertStringToDate(assignmentDate), Float.parseFloat(assignmentWeight));
-                                                        assignmentDate = null;
-                                                        assignmentName = null;
-                                                        assignmentWeight = null;
 
-                                                        // Try to add the assignment object to the database
-                                                        try {
-                                                            Assignment.addAssignment(assignment);
-                                                            counter = 0;
-                                                        } catch (Exception ex) {
-                                                            System.out.println("Failed to add assignment to the database");
+                                                        if (assignmentDate != null && assignmentName != null && assignmentWeight != null) {
+                                                            // Create an assignment object
+                                                            Assignment assignment = new Assignment(user.getUserId(), classId, assignmentName, convertStringToDate(assignmentDate), Float.parseFloat(assignmentWeight));
+                                                            assignmentDate = null;
+                                                            assignmentName = null;
+                                                            assignmentWeight = null;
+
+                                                            // Try to add the assignment object to the database
+                                                            try {
+                                                                Assignment.addAssignment(assignment);
+                                                                counter = 0;
+                                                            } catch (Exception ex) {
+                                                                System.out.println("Failed to add assignment to the database");
+                                                            }
+                                                        } else {
+                                                            return;
                                                         }
                                                     } else {
                                                         counter += 1;
@@ -700,7 +705,7 @@ class Gradebook extends JFrame {
                        System.out.println("Class wasn't successfully saved to the database.");
                     }
                 } catch (Exception ex) {
-                    System.out.println("Class couldn't be saved to the database.");
+                    System.out.println("Class and assignments couldn't be saved to the database.");
                 }
             }
         });
@@ -829,9 +834,11 @@ class Gradebook extends JFrame {
                     if (dateTF.getText().length() == 0) {
                         dateTF.setText("MM/DD/YYYY");
                         dateTF.setForeground(new Color(150, 150, 150));
-
+                        assignmentDateError.setText("You must enter a valid date.");
+                        assignmentDateError.setVisible(true);
+                    } else {
                         Date assignmentDate = convertStringToDate(dateTF.getText());
-                        if (dateTF.getText().length() == 0 || assignmentDate == null) {
+                        if (assignmentDate == null) {
                             assignmentDateError.setText("You must enter a valid date.");
                             assignmentDateError.setVisible(true);
                         }
