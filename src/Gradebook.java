@@ -28,10 +28,9 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 
 class Gradebook extends JFrame {
     private static User user;
@@ -421,9 +420,20 @@ class Gradebook extends JFrame {
                     classStartDateTextField.setForeground(new Color(150, 150, 150));
                 }
 
+                Date date = new Date();
+                LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                int currentYear  = localDate.getYear();
+
                 Date classStartDateVal = convertStringToDate(classStartDateTextField.getText());
+                LocalDate startLocalDate = classStartDateVal.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                int startYear = startLocalDate.getYear();
                 if (classStartDateVal == null) {
                     classStartDateError.setText("You must enter a valid date.");
+                    classStartDateError.setVisible(true);
+                    isValid.put("startDate", false);
+                    enableButton(createNewClassBtn, isValid);
+                } else if (startYear < currentYear) {
+                    classStartDateError.setText("The start date must be within the current year.");
                     classStartDateError.setVisible(true);
                     isValid.put("startDate", false);
                     enableButton(createNewClassBtn, isValid);
