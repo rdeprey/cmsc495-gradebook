@@ -432,7 +432,7 @@ class Gradebook extends JFrame {
                     classStartDateError.setVisible(true);
                     isValid.put("startDate", false);
                     enableButton(createNewClassBtn, isValid);
-                } else if (startYear < currentYear) {
+                } else if (startYear != currentYear) {
                     classStartDateError.setText("The start date must be within the current year.");
                     classStartDateError.setVisible(true);
                     isValid.put("startDate", false);
