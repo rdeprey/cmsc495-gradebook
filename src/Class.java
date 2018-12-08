@@ -130,26 +130,22 @@ final class Class {
         }
     }
 
-    public static String getClassGrade(int userId, int classId) {
+    public static String getClassGrade(int userId, int classId) throws Exception {
+        Connection dbCon = new DatabaseConnection().getConnection();
         try {
-            ArrayList<Assignment> assignments = Assignment.getAssignmentsForClass(userId, classId);
-            float grade = 0.0f;
-            boolean hasAtLeastOneGrade = false;
-            for (int i = 0; i < assignments.size(); i++) {
-                if (assignments.get(i).getAssignmentGrade() != 0.0) {
-                    grade += assignments.get(i).getAssignmentGrade();
-                    hasAtLeastOneGrade = true;
-                }
+            PreparedStatement ps = dbCon.prepareStatement("SELECT classGrade FROM Classes WHERE userId=? AND classId=? AND classGrade IS NOT NULL");
+            ps.setInt(1, userId);
+            ps.setInt(2, classId);
+            ResultSet rs = ps.executeQuery();
+
+            String grade = null;
+
+            while (rs.next()) {
+                grade = convertToLetterGrade(rs.getFloat("classGrade"));
             }
 
-            String letterGrade = convertToLetterGrade(grade);
-
-            if (hasAtLeastOneGrade) {
-                return letterGrade;
-            } else {
-                return null;
-            }
-        } catch (Exception ex) {
+            return grade;
+        } catch (SQLException ex) {
             System.out.println("Couldn't get assignments.");
         }
 

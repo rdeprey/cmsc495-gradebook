@@ -1124,16 +1124,20 @@ class Gradebook extends JFrame {
         classLabel.setFont(f1);
         statusPanel.add(classLabel);
 
-        String currentGrade = Class.getClassGrade(user.getUserId(), classIdVal);
-        JLabel currentGradeLabel;
-        if (currentGrade != null) {
-            currentGradeLabel = new JLabel("Current Grade: " + currentGrade, SwingConstants.LEADING);
-        } else {
-            currentGradeLabel = new JLabel("Current Grade: ", SwingConstants.LEADING);
+        try {
+            String currentGrade = Class.getClassGrade(user.getUserId(), classIdVal);
+            JLabel currentGradeLabel;
+            if (currentGrade != null) {
+                currentGradeLabel = new JLabel("Current Grade: " + currentGrade, SwingConstants.LEADING);
+            } else {
+                currentGradeLabel = new JLabel("Current Grade: ", SwingConstants.LEADING);
+            }
+            currentGradeLabel.setFont(f2);
+            statusPanel.add(currentGradeLabel);
+            headerPanel.add(statusPanel);
+        } catch (Exception ex) {
+            System.out.println("Could not get the current class grade for " + classNameVal + " at this time.");
         }
-        currentGradeLabel.setFont(f2);
-        statusPanel.add(currentGradeLabel);
-        headerPanel.add(statusPanel);
 
         JPanel goalGradePanel = new JPanel(new GridLayout(5, 1));
         JRadioButton A = new JRadioButton("A (90-100)");
