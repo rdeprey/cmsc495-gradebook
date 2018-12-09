@@ -1,6 +1,6 @@
 /*********************************************************************************************************
  * File name: Assignment.java
- * Date: November 2018
+ * Date: November/December 2018
  * Author: Haemee Nabors, Rebecca Deprey, Devon Artist, Harry Giles, Brittany White, Ryan Haas
  * Purpose: This class serves as a data transfer object for the Assignment table in the Microsoft SQL
  * database. It maps each field in the database table to private fields for the Assignment objects used
@@ -98,7 +98,7 @@ final class Assignment {
         this.assignmentGrade = assignmentGrade;
     }
 
-    // Methods needed to retrieve assignment data from the database
+    // Creates an Assignment object from the response returned by the database
     private static Assignment getAssignmentFromResultSet(ResultSet rs) throws SQLException {
         Assignment assignment = new Assignment();
         assignment.setAssignmentId(rs.getInt("assignmentId"));
@@ -111,6 +111,7 @@ final class Assignment {
         return assignment;
     }
 
+    // Adds an assignment to the database
     public static void addAssignment(Assignment assignment) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
@@ -132,6 +133,7 @@ final class Assignment {
 
     }
 
+    // Updates an assignment in the database (adds an assignment grade)
     public static boolean updateAssignment(int assignmentId, float assignmentGrade) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
@@ -152,6 +154,7 @@ final class Assignment {
         return false;
     }
 
+    // Gets the assignments for a particular user for a particular class
     public static ArrayList<Assignment> getAssignmentsForClass(int userId, int classId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
@@ -177,6 +180,7 @@ final class Assignment {
         return null;
     }
 
+    // Deletes assignments from the database
     public static void deleteAssignmentsForClass(int userId, int classId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {

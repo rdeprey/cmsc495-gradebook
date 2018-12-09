@@ -1,6 +1,6 @@
 /*********************************************************************************************************
  * File name: User.java
- * Date: November 2018
+ * Date: November/December 2018
  * Author: Haemee Nabors, Rebecca Deprey, Devon Artist, Harry Giles, Brittany White, Ryan Haas
  * Purpose: This class serves as a data transfer object for the User table in the Microsoft SQL
  * database. It maps each field in the database table to private fields for the User objects used
@@ -64,7 +64,7 @@ final class User {
         this.password = password;
     }
 
-    // Methods needed to retrieve user data from the database
+    // Creates a User object from the response returned by the database
     private static User getUserFromResultSet(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getInt("userId"));
@@ -74,6 +74,7 @@ final class User {
         return user;
     }
 
+    // Gets a user from the database based on a username and password
     public static User getUser(String username, String password) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
@@ -94,6 +95,7 @@ final class User {
         return null;
     }
 
+    // Gets a user from the database based on an email address
     public static User getUser(String emailAddress) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {

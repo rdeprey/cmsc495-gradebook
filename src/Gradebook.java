@@ -36,6 +36,7 @@ class Gradebook extends JFrame {
     // Fonts used in the application
     private static final Font f1 = new Font("Monospaced", Font.BOLD, 20);
     private static final Font f2 = new Font("Monospaced", Font.BOLD, 16);
+    private static final Font f3 = new Font("Monospaced", Font.BOLD, 12);
     private static final Font tableHeadFont = new Font("Monospaced", Font.BOLD, 13);
 
     // Panels that will need to be updated during the application life cycle
@@ -184,10 +185,12 @@ class Gradebook extends JFrame {
         constraints.anchor = GridBagConstraints.PAGE_START;
         newClassFormPanel.add(classInfoPanel, constraints);
         newClassPanel.add(newClassFormPanel, BorderLayout.CENTER);
-        tabbedPane.addTab("New Class", null, newClassPanel); // Add tab to tab container
-        tabbedPane.setMnemonicAt(0, KeyEvent.VK_1); // keyboard event
+        tabbedPane.addTab("New Class", null, newClassPanel);
+        tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
         if (currentClasses != null) {
+            // If the size of the current classes arraylist is greater than the size limit, throw an exception to prevent
+            // security issues caused by overflows
             if (currentClasses.size() > sizeLimit) {
                 throw new ArithmeticException("List of current classes is too large");
             }
@@ -323,11 +326,11 @@ class Gradebook extends JFrame {
         }
     }
 
+    // Create the progress panels for each class
     private static JPanel createClassProgressPanel(String className, String classGrade,
                                                    float completedWeight, int totalWeight) {
+        // Show the class title, class grade, and progress bar
         JPanel classProgressPanel = new JPanel(new GridLayout(0, 1));
-
-        //Class Name and Grade
         JPanel classProgressTitle = new JPanel(new GridLayout(0, 2));
         JLabel classNameLabel = new JLabel(className);
         JLabel classGradeLabel = new JLabel(classGrade, SwingConstants.RIGHT);
@@ -339,20 +342,21 @@ class Gradebook extends JFrame {
         progBar.setStringPainted(true);
         progBar.setString(String.valueOf(Math.round(completedWeight)) + "% completed");
         classProgressPanel.add(progBar);
-
         return classProgressPanel;
     }
 
+    // Create the completed class panel
     private static JPanel createCompClassPanel(String className, String classGrade) {
+        // Show the class title and class grade
         JPanel compClassPanel = new JPanel(new GridLayout(0, 2));
         JLabel compClassName = new JLabel(className);
         JLabel compClassGrade = new JLabel(classGrade, SwingConstants.RIGHT);
         compClassPanel.add(compClassName);
         compClassPanel.add(compClassGrade);
-
         return compClassPanel;
     }
 
+    // Converts strings to dates
     private static Date convertStringToDate(String date) {
         try {
             return new SimpleDateFormat("MM/dd/yyyy").parse(date.trim());
@@ -361,18 +365,23 @@ class Gradebook extends JFrame {
         }
     }
 
+    // Checks a string to see if it's an integer
     private static boolean isInteger(String value) {
+        // If the size of the characters in the string is greater than the size limit, throw an exception to prevent
+        // security issues caused by overflows
         if (value.length() > sizeLimit) {
             throw new ArithmeticException("String value is too large.");
         }
 
         for (int i = 0; i < value.length(); i++) {
             if (i == 0 && value.charAt(i) == '-') {
+                // Return false if the string has one character and it's '-'
                 if (value.length() == 1) {
                     return false;
                 }
                 continue;
             }
+            // If the character value is less than zero, return false
             if (Character.digit(value.charAt(i), 10) < 0) {
                 return false;
             }
@@ -380,15 +389,17 @@ class Gradebook extends JFrame {
         return true;
     }
 
+    // Create the Add Class Panel
     private static JPanel createAddClassPanel() {
+        // Store the validation state for the form fields
         Map<String, Boolean> isValid = new HashMap<>();
         isValid.put("className", false);
         isValid.put("startDate", false);
         isValid.put("endDate", false);
         isValid.put("numberOfAssignments", false);
 
+        // Create the new class form
         JButton createNewClassBtn = new JButton("Add Assignments");
-
         final JPanel classInfoPanel = new JPanel(new GridBagLayout());
         classInfoPanel.setSize(new Dimension(1100, 700));
         GridBagConstraints g = new GridBagConstraints();
@@ -411,6 +422,7 @@ class Gradebook extends JFrame {
         newClassLabelPanel.add(new JLabel(""));
         classInfoPanel.add(newClassLabelPanel, g);
 
+        // Spacer
         g.gridx = 0;
         g.gridy = 1;
         g.insets = new Insets(0, 0, 0, 100);
@@ -427,14 +439,18 @@ class Gradebook extends JFrame {
         g.gridx = 6;
         g.gridy = 2;
         final JTextField nameTextField = new JTextField(10);
+        // Show/hide validation errors based on value in field and focus state
         nameTextField.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
+                // Hide validation error when field is in focus
                 classNameError.setVisible(false);
             }
 
             @Override
             public void focusLost(FocusEvent e) {
+                // When focus is lost, show a validation error if the field is empty or contains invalid characters.
+                // Set field validity status.
                 if (nameTextField.getText().isEmpty()) {
                     classNameError.setText("You must enter a class name.");
                     classNameError.setVisible(true);
@@ -468,18 +484,23 @@ class Gradebook extends JFrame {
         classStartDateError.setVisible(false);
         classStartDateError.setForeground(Color.RED);
 
-
         g.gridx = 6;
         g.gridy = 4;
         final JTextField classStartDateTextField = new JTextField("MM/DD/YYYY", 9);
+        // Show/hide validation errors based on value in field and focus state
         classStartDateTextField.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
+                // Hide validation error when field is in focus
+                // Remove input masking for date format
                 classStartDateError.setVisible(false);
                 classStartDateTextField.setText("");
                 classStartDateTextField.setForeground(new Color(50, 50, 50));
             }
 
             public void focusLost(FocusEvent e) {
+                // When focus is lost, show a validation error if the field is empty, if the value entered is not a
+                // date, or if the year is not within the current year.
+                // Set field validity status
                 if (classStartDateTextField.getText().length() == 0) {
                     classStartDateTextField.setText("MM/DD/YYYY");
                     classStartDateTextField.setForeground(new Color(150, 150, 150));
@@ -528,14 +549,20 @@ class Gradebook extends JFrame {
         g.gridx = 6;
         g.gridy = 6;
         final JTextField classEndDateTextField = new JTextField("MM/DD/YYYY", 9);
+        // Show/hide validation errors based on value in field and focus state
         classEndDateTextField.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
+                // Hide validation error when field is in focus
+                // Remove input masking for the date format
                 classEndDateError.setVisible(false);
                 classEndDateTextField.setText("");
                 classEndDateTextField.setForeground(new Color(50, 50, 50));
             }
 
             public void focusLost(FocusEvent e) {
+                // When focus is lost, show a validation error if the field is empty, if the value isn't a date, and if
+                // the end date is earlier than the start date.
+                // Set field validity status
                 if (classEndDateTextField.getText().length() == 0) {
                     classEndDateTextField.setText("MM/DD/YYYY");
                     classEndDateTextField.setForeground(new Color(150, 150, 150));
@@ -575,9 +602,11 @@ class Gradebook extends JFrame {
         g.gridx = 6;
         g.gridy = 8;
         final JTextField numOfAssignmentsTextField = new JTextField(5);
+        // Show/hide validation errors based on value in field and focus state
         numOfAssignmentsTextField.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
+                // Hide validation error when field is in focus
                 numberOfAssignmentsError.setVisible(false);
             }
 
@@ -589,6 +618,8 @@ class Gradebook extends JFrame {
             }
         });
 
+        // On change, check that the value entered is a valid integer and that it's greater than zero
+        // Set the field validity
         numOfAssignmentsTextField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -606,7 +637,6 @@ class Gradebook extends JFrame {
             public void changedUpdate(DocumentEvent e) {
             }
         });
-
         classInfoPanel.add(numOfAssignmentsTextField, g);
 
         g.gridx = 0;
@@ -616,8 +646,10 @@ class Gradebook extends JFrame {
         g.gridwidth = 10;
         g.gridx = 0;
         g.gridy = 10;
+        // Create the "Add Assignments" button event handler
         createNewClassBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                // Get the values from the form fields
                 String className = nameTextField.getText();
                 Date classStartDate = convertStringToDate(classStartDateTextField.getText());
                 Date classEndDate = convertStringToDate(classEndDateTextField.getText());
@@ -647,7 +679,6 @@ class Gradebook extends JFrame {
                         classTemplatePanel.add(classTemplateLabel);
                         classTemplatePanel.add(allFieldsRequiredLabel);
                         classTemplatePanel.add(new JLabel(""));
-
                         newClassTemplatePanel.add(classTemplatePanel, BorderLayout.PAGE_START);
 
                         // Generate the number of assignment fields specified by the user
@@ -661,7 +692,7 @@ class Gradebook extends JFrame {
                         createClassWithAssignmentsBtn.addActionListener(e1 -> {
                             int classId = classX.getClassId();
 
-                            // Create a class object
+                            // Create an assignment object by iterating through the nested JPanels and accessing the data in the JTextfields
                             for (Component b : newClassTemplatePanel.getComponents()) {
                                 if (b instanceof JPanel) {
                                     int counter = 0;
@@ -672,6 +703,7 @@ class Gradebook extends JFrame {
                                         if (f instanceof JPanel) {
                                             for (Component k : ((JPanel) f).getComponents()) {
                                                 if (k instanceof JTextField) {
+                                                    // Get the values entered for each assignment
                                                     switch (counter) {
                                                         case 0:
                                                             assignmentDate = (((JTextField) k).getText().equals("MM/DD/YYYY")) ? null : ((JTextField) k).getText();
@@ -684,17 +716,21 @@ class Gradebook extends JFrame {
                                                             break;
                                                     }
 
+                                                    // There are three JTextfields per line; reset the counter after every three
                                                     if (counter == 2) {
                                                         counter = 0;
 
+                                                        // If none of the fields were null
                                                         if (assignmentDate != null && assignmentName != null && assignmentWeight != null) {
-                                                            // Create an assignment object
+                                                            // Create the assignment object
                                                             Assignment assignment = new Assignment(user.getUserId(), classId, assignmentName, convertStringToDate(assignmentDate), Float.parseFloat(assignmentWeight));
+
+                                                            // Reset the fields for the next assignment
                                                             assignmentDate = null;
                                                             assignmentName = null;
                                                             assignmentWeight = null;
 
-                                                            // Try to add the assignment object to the database
+                                                            // Try to add the assignment object to the database and reset the counter
                                                             try {
                                                                 Assignment.addAssignment(assignment);
                                                                 counter = 0;
@@ -707,6 +743,8 @@ class Gradebook extends JFrame {
                                                     } else {
                                                         counter += 1;
 
+                                                        // If the size of the counter is greater than 150, throw an exception to prevent
+                                                        // security issues caused by overflows
                                                         if (counter > 150) {
                                                             throw new ArithmeticException("Counter is too large.");
                                                         }
@@ -722,6 +760,7 @@ class Gradebook extends JFrame {
                             drawCurrentClassesPanel(user);
                             drawCompletedClassesPanel(user);
 
+                            // Make sure the class is a current class and if so, create a new tab for it
                             if (classEndDate.after(new Date())) {
                                 tabbedPane.addTab(className, null, createCurrentClassTab(className, classId, 0.0f));
                             }
@@ -733,12 +772,14 @@ class Gradebook extends JFrame {
                             classInfoPanel.add(createAddClassPanel());
                         });
 
+                        // Add the "Create Class with Assignments" button
                         btnConstraints.anchor = GridBagConstraints.PAGE_END;
                         btnConstraints.fill = GridBagConstraints.CENTER;
                         btnConstraints.gridx = 1;
                         btnConstraints.gridy = 0;
                         addClassBtnPanel.add(createClassWithAssignmentsBtn, btnConstraints);
 
+                        // Add a cancel button to remove the class from the database and take the user back to the Add New Class screen
                         JButton delete = new JButton("Cancel");
                         delete.addActionListener(new ActionListener() {
                             @Override
@@ -760,11 +801,9 @@ class Gradebook extends JFrame {
                                 }
                             }
                         });
-
                         btnConstraints.gridx = 0;
                         addClassBtnPanel.add(delete, btnConstraints);
                         newClassTemplatePanel.add(addClassBtnPanel, BorderLayout.PAGE_END);
-
                         classInfoPanel.add(newClassTemplatePanel, BorderLayout.PAGE_START);
                     } else {
                        System.out.println("Class wasn't successfully saved to the database.");
@@ -774,38 +813,40 @@ class Gradebook extends JFrame {
                 }
             }
         });
-
         classInfoPanel.add(createNewClassBtn, g);
-
         enableButton(createNewClassBtn, isValid);
-
         return classInfoPanel;
     }
 
     // Sets the validity status of the number of assignments field
     private static void setTextfieldValidity(boolean isInteger, String value, Map<String, Boolean> isValid, JLabel numberOfAssignmentsError, JButton createNewClassBtn) {
+        // Checks to make sure the value entered is an integer
         if (!isInteger) {
             numberOfAssignmentsError.setText("Please enter an integer value for the number of assignments");
             numberOfAssignmentsError.setVisible(true);
             isValid.put("numberOfAssignments", false);
             enableButton(createNewClassBtn, isValid);
         } else if (!value.isEmpty() && Integer.parseInt(value) == 0) {
+            // Checks to make sure the value isn't null and that it's not zero
             numberOfAssignmentsError.setText("Please enter a value greater than zero.");
             numberOfAssignmentsError.setVisible(true);
             isValid.put("numberOfAssignments", false);
             enableButton(createNewClassBtn, isValid);
         } else if (value.isEmpty()) {
+            // Checks to make sure that the value isn't null
             numberOfAssignmentsError.setText("Please enter the number of assignments.");
             numberOfAssignmentsError.setVisible(true);
             isValid.put("numberOfAssignments", false);
             enableButton(createNewClassBtn, isValid);
         } else {
+            // The value is a valid integer
             numberOfAssignmentsError.setVisible(false);
             isValid.put("numberOfAssignments", true);
             enableButton(createNewClassBtn, isValid);
         }
     }
 
+    // Enables the "Add Assignments" button on the Add New Class tab if all of the fields are valid
     private static void enableButton(JButton button, Map<String, Boolean> isValid) {
         if (isValid.containsValue(false)) {
             button.setEnabled(false);
@@ -814,16 +855,20 @@ class Gradebook extends JFrame {
         }
     }
 
+    // Creates the assignment panels that are used to collect the assignment information (due date, assignment name,
+    // and assignment weight) from the user.
     private static JPanel createAssignmentForm(int numOfAssignments) {
-        Font f3 = new Font("Monospaced", Font.BOLD, 12);
-
+        // If the size of the number of assignments is greater than the size limit, throw an exception to prevent
+        // security issues caused by overflows
         if (numOfAssignments > sizeLimit) {
             throw new ArithmeticException("The number of assignments is too large.");
         }
 
+        // Create the parent panel that holds the assignment form panels
         JPanel assignmentsFormPanel = new JPanel(new GridLayout(1 + numOfAssignments, 1));
         assignmentsFormPanel.setSize(new Dimension(1100, 700));
 
+        // Create the panel that shows the labels above the assignment rows
         JPanel assignmentsLabelPanel = new JPanel(new GridBagLayout());
         GridBagConstraints f = new GridBagConstraints();
         f.fill = GridBagConstraints.HORIZONTAL;
@@ -857,10 +902,11 @@ class Gradebook extends JFrame {
 
         assignmentsFormPanel.add(assignmentsLabelPanel);
 
+        // Create the panels for each assignment row
         int assignNo = 1;
-
-        //create each assignment's form
         for (int i = 0; i < numOfAssignments; i++) {
+            // If the size of the current value plus one is greater than the size limit, throw an exception to prevent
+            // security issues caused by overflows
             if ((i + 1) > sizeLimit) {
                 throw new ArithmeticException("Counter is too large.");
             }
@@ -889,14 +935,17 @@ class Gradebook extends JFrame {
             g.gridy = i;
             final JTextField dateTF = new JTextField("MM/DD/YYYY");
             dateTF.setPreferredSize(new Dimension(200, 25));
+            // Show/hide validation errors based on focus
             dateTF.addFocusListener(new FocusListener() {
                 public void focusGained(FocusEvent e) {
+                    // When in focus, hide validation error and date placeholder
                     dateTF.setText("");
                     dateTF.setForeground(new Color(50, 50, 50));
                     assignmentDateError.setVisible(false);
                 }
 
                 public void focusLost(FocusEvent e) {
+                    // When focus is lost, show a validation error if the date field is empty or contains an invalid date
                     if (dateTF.getText().length() == 0) {
                         dateTF.setText("MM/DD/YYYY");
                         dateTF.setForeground(new Color(150, 150, 150));
@@ -924,14 +973,17 @@ class Gradebook extends JFrame {
             g.gridy = i;
             final JTextField assignNameTF = new JTextField("Assignment Name");
             assignNameTF.setPreferredSize(new Dimension(240, 25));
+            // Show/hide validation errors based on focus
             assignNameTF.addFocusListener(new FocusListener() {
                 public void focusGained(FocusEvent e) {
+                    // When in focus, hide validation error
                     assignNameTF.setText("");
                     assignNameTF.setForeground(new Color(50, 50, 50));
                     assignmentNameError.setVisible(false);
                 }
 
                 public void focusLost(FocusEvent e) {
+                    // When focus is lost, show a validation error if the field is empty or the string contains invalid characters
                     if (assignNameTF.getText().length() == 0) {
                         assignNameTF.setText("Assignment Name");
                         assignNameTF.setForeground(new Color(150, 150, 150));
@@ -960,14 +1012,18 @@ class Gradebook extends JFrame {
             g.gridy = i;
             final JTextField assignWeightTextField = new JTextField("Weight");
             assignWeightTextField.setPreferredSize(new Dimension(200, 25));
+            // Show/hide validation errors based on focus
             assignWeightTextField.addFocusListener(new FocusListener() {
                 public void focusGained(FocusEvent e) {
+                    // When in focus, hide validation error
                     assignWeightTextField.setText("");
                     assignWeightTextField.setForeground(new Color(50, 50, 50));
                     assignmentWeightError.setVisible(false);
                 }
 
                 public void focusLost(FocusEvent e) {
+                    // When focus is lost, show a validation error if the field is empty or contains a value that
+                    // isn't a valid float
                     if (assignWeightTextField.getText().length() == 0) {
                         assignWeightTextField.setText("Weight");
                         assignWeightTextField.setForeground(new Color(150, 150, 150));
@@ -987,13 +1043,12 @@ class Gradebook extends JFrame {
                 }
             });
             anAssignmentPanel.add(assignWeightTextField, g);
-
             assignmentsFormPanel.add(anAssignmentPanel);
         }
-
         return assignmentsFormPanel;
     }
 
+    // Creates the assignment panels that are displayed in the current class tabs in the main panel of the GUI
     private static JPanel classAssignmentPanel(int classId, int assignmentId, Date dueDate, String assignmentName, float assignmentWeight, float grade, float goalGrade) {
         Dimension labelDimensions = new Dimension(157, 25);
         JPanel assignmentPanel = new JPanel(new GridBagLayout());
@@ -1027,6 +1082,7 @@ class Gradebook extends JFrame {
         assingmentWeight.setMinimumSize(labelDimensions);
         assignmentPanel.add(assingmentWeight, h);
 
+        // If the assignment does have a grade, show the grade and earned weight values
         if (grade != 0.0) {
             float earnedAssignmentWeight = assignmentWeight * (grade / 100);
 
@@ -1060,6 +1116,8 @@ class Gradebook extends JFrame {
             spacer.setMinimumSize(labelDimensions);
             assignmentPanel.add(spacer, h);
         } else {
+            // If the assignment doesn't have a grade yet, include a JTextfield and JButton in the panel to allow the
+            // user to add one
             h.gridx = 3;
             JLabel earnedAssignmentWeightSpacer = new JLabel(" ");
             earnedAssignmentWeightSpacer.setPreferredSize(labelDimensions);
@@ -1089,15 +1147,18 @@ class Gradebook extends JFrame {
             assignmentGradeTextField.setPreferredSize(labelDimensions);
             assignmentGradeTextField.setMaximumSize(labelDimensions);
             assignmentGradeTextField.setMinimumSize(labelDimensions);
+            // Show/hide validation error based on focus
             assignmentGradeTextField.addFocusListener(new FocusListener() {
                 @Override
                 public void focusGained(FocusEvent e) {
+                    // While in focus, hide the validation error
                     assignmentGradeTextField.setText("");
                     gradeError.setVisible(false);
                 }
 
                 @Override
                 public void focusLost(FocusEvent e) {
+                    // When focus is lost, show a validation error if the field is null or not a valid float
                     if (assignmentGradeTextField.getText().length() == 0) {
                         assignmentGradeTextField.setText("Enter grade %");
 
@@ -1119,16 +1180,20 @@ class Gradebook extends JFrame {
             submitButton.setPreferredSize(labelDimensions);
             submitButton.setMinimumSize(labelDimensions);
             submitButton.setMaximumSize(labelDimensions);
+            // Submit button action when the user submits a grade for an assignment
             submitButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
+                        // Hide any validation errors
                         gradeError.setVisible(false);
 
+                        // Get the grade value entered and update the assignment and class grades in the database
                         float gradeVal = Float.parseFloat(assignmentGradeTextField.getText());
                         Assignment.updateAssignment(assignmentId, gradeVal);
                         Class.setClassGrade(user.getUserId(), classId);
 
+                        // Update the GUI to show the earned weight and grade values
                         assignmentPanel.remove(earnedAssignmentWeightSpacer);
                         assignmentPanel.remove(assignmentGradeTextField);
                         assignmentPanel.remove(submitButton);
@@ -1192,6 +1257,7 @@ class Gradebook extends JFrame {
         return assignmentPanel;
     }
 
+    // Create the current class tabs
     private static JComponent createCurrentClassTab(String classNameVal, int classIdVal, float goalGradeVal) {
         Dimension assignmentLabelDimesions = new Dimension(157, 25);
         JComponent parentPanel = new JPanel(new BorderLayout());
@@ -1201,6 +1267,7 @@ class Gradebook extends JFrame {
         classPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
         classPanelConstraints.weightx = 1;
 
+        // Create the header that shows the class name and grade
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 150, 0));
         JPanel statusPanel = new JPanel(new GridLayout(0, 1));
         String className = classNameVal;
@@ -1211,6 +1278,7 @@ class Gradebook extends JFrame {
         try {
             String currentGrade = Class.getClassGrade(user.getUserId(), classIdVal);
             JLabel currentGradeLabel;
+            // Only show the class grade when the student has at least one graded assignment
             if (currentGrade != null) {
                 currentGradeLabel = new JLabel("Current Grade: " + currentGrade, SwingConstants.LEADING);
             } else {
@@ -1223,6 +1291,7 @@ class Gradebook extends JFrame {
             System.out.println("Could not get the current class grade for " + classNameVal + " at this time.");
         }
 
+        // Create the goal grade selector
         JPanel goalGradePanel = new JPanel(new GridLayout(5, 1));
         JRadioButton A = new JRadioButton("A (90-100)");
         A.setActionCommand("A");
@@ -1247,6 +1316,7 @@ class Gradebook extends JFrame {
         goalGradePanel.add(C);
         goalGradePanel.add(D);
 
+        // The goal grade values
         if (goalGradeVal != 0.0f) {
             if (goalGradeVal == 90.0f) {
                 A.setSelected(true);
@@ -1264,6 +1334,7 @@ class Gradebook extends JFrame {
         classPanelConstraints.gridy = 0;
         classPanel.add(headerPanel, classPanelConstraints);
 
+        // Create the panel with the column labels
         JPanel assignLabelPanel = new JPanel(new GridBagLayout());
         GridBagConstraints h = new GridBagConstraints();
         h.weightx = 1;
@@ -1339,9 +1410,12 @@ class Gradebook extends JFrame {
         classPanelConstraints.gridy = 1;
         classPanel.add(assignLabelPanel, classPanelConstraints);
 
+        // Show the assignments for the class
         try {
             ArrayList<Assignment> assignmentsForClass = Assignment.getAssignmentsForClass(user.getUserId(), classIdVal);
 
+            // If the size of the assignments for class arraylist is greater than the size limit, throw an exception to prevent
+            // security issues caused by overflows
             if (assignmentsForClass.size() > sizeLimit) {
                 throw new ArithmeticException("List of assignments is too large.");
             }
@@ -1356,6 +1430,7 @@ class Gradebook extends JFrame {
                 for (int j = 0; j < assignmentsForClass.size(); j++) {
                     aConstraints.gridy = j;
 
+                    // Calculate and and show the goal grade values for each assignment if the user has selected a goal grade for the class
                     if (goalGradeVal == 0.0f) {
                         assignmentsPanel.add(classAssignmentPanel(classIdVal, assignmentsForClass.get(j).getAssignmentId(), assignmentsForClass.get(j).getAssignmentDueDate(), assignmentsForClass.get(j).getAssignmentName(), assignmentsForClass.get(j).getAssignmentWeight(), assignmentsForClass.get(j).getAssignmentGrade(), 0.0f), aConstraints);
                     } else {
@@ -1370,6 +1445,8 @@ class Gradebook extends JFrame {
                 classPanelConstraints.insets = new Insets(10,0,0, 0);
                 classPanelConstraints.fill = GridBagConstraints.WEST;
                 JButton delete = new JButton("Delete Class");
+
+                // Delete class button action
                 delete.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -1399,6 +1476,7 @@ class Gradebook extends JFrame {
         return parentPanel;
     }
 
+    // Listens for changes to the goal grade selector
     private static class BGlistener implements ActionListener {
         float totalWeight;
 
@@ -1430,6 +1508,8 @@ class Gradebook extends JFrame {
         }
     }
 
+    // Calculates the minimum grade needed on each ungraded assignment in a class to achieve a user-selected goal grade
+    // in the overall class
     private static float calculateBaselineGrade(float assignmentWeight, int userId, int classId) {
         float baselineGrade = 0.0f;
 
@@ -1441,10 +1521,13 @@ class Gradebook extends JFrame {
         try {
             ArrayList<Assignment> assignments = Assignment.getAssignmentsForClass(userId, classId);
 
+            // If the size of the assignments arraylist is greater than the size limit, throw an exception to prevent
+            // security issues caused by overflows
             if (assignments.size() > sizeLimit) {
                 throw new ArithmeticException("List of assignments is too large");
             }
 
+            // Get the total weight, total earned weight, and weight completed for all assignments for a class
             for (int i = 0; i < assignments.size(); i++) {
                 totalWeight += assignments.get(i).getAssignmentWeight();
 
@@ -1462,8 +1545,6 @@ class Gradebook extends JFrame {
             float weightValue = goalWeight / weightLeftOver;
             float baseLineWeight = weightValue * assignmentWeight;
             baselineGrade = (baseLineWeight * 100) / assignmentWeight;
-
-
             return baselineGrade;
         } catch (Exception ex) {
             System.out.println("Couldn't get assignments for this user and class.");

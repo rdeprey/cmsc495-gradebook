@@ -1,6 +1,6 @@
 /*********************************************************************************************************
  * File name: AESEncrypter.java
- * Date: November 2018
+ * Date: November/December 2018
  * Author: Haemee Nabors, Rebecca Deprey, Devon Artist, Harry Giles, Brittany White, Ryan Haas
  * Purpose: This class encrypts and decrypts the log files uses to store data on attempts to log into the
  * application.
@@ -15,6 +15,7 @@ class AESEncrypter {
     private Cipher ecipher;
     private Cipher dcipher;
 
+    // Constructor
     AESEncrypter(SecretKey key) throws Exception {
         ecipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         dcipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
@@ -22,10 +23,12 @@ class AESEncrypter {
         dcipher.init(Cipher.DECRYPT_MODE, key);
     }
 
+    // Encrypts strings
     public void encrypt(String str) throws Exception {
         Base64.getEncoder().encodeToString(ecipher.doFinal(str.getBytes(StandardCharsets.UTF_8)));
     }
 
+    // Decrypts strings
     public String decrypt(String str) throws Exception {
         return new String(dcipher.doFinal(Base64.getDecoder().decode(str)));
     }

@@ -1,6 +1,6 @@
 /*********************************************************************************************************
  * File name: Class.java
- * Date: November 2018
+ * Date: November/December 2018
  * Author: Haemee Nabors, Rebecca Deprey, Devon Artist, Harry Giles, Brittany White, Ryan Haas
  * Purpose: This class serves as a data transfer object for the Class table in the Microsoft SQL
  * database. It maps each field in the database table to private fields for the Class objects used
@@ -34,7 +34,7 @@ final class Class {
 
     }
 
-    // Create a class
+    // Creates a class
     public Class(int userId, String className, int numberOfAssignments, Date classStartDate, Date classEndDate) {
         this.userId = userId;
         this.className = className;
@@ -115,6 +115,7 @@ final class Class {
         return convertToLetterGrade(this.classGrade);
     }
 
+    // Converts float value grade to letter grade
     public static String convertToLetterGrade(float grade) {
         if (grade >= 90.0) {
             return "A";
@@ -129,6 +130,7 @@ final class Class {
         }
     }
 
+    // Gets the letter grade for a class
     public static String getClassGrade(int userId, int classId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
@@ -151,7 +153,7 @@ final class Class {
         return null;
     }
 
-    // Methods needed to retrieve class data from the database
+    // Creates a Class object from the response returned by the database
     private static Class getClassFromResultSet(ResultSet rs) throws SQLException {
         Class classX = new Class();
         classX.setClassId(rs.getInt("classId"));
@@ -164,6 +166,7 @@ final class Class {
         return classX;
     }
 
+    // Adds a class to the database
     public static boolean addClass(Class classX) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
@@ -187,6 +190,7 @@ final class Class {
         return false;
     }
 
+    // Gets classes that don't have any assignments associated with them
     public static ArrayList<Integer> getClassesWithoutAssignments(int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
@@ -211,6 +215,7 @@ final class Class {
         return null;
     }
 
+    // Gets all classes with an end date greater than or equal to the current date
     public static ArrayList<Class> getCurrentClasses(int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
@@ -235,6 +240,7 @@ final class Class {
         return null;
     }
 
+    // Gets all classes with an end date before the current date
     public static ArrayList<Class> getCompletedClasses(int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
@@ -259,6 +265,7 @@ final class Class {
         return null;
     }
 
+    // Gets the ID for a class from the database
     public static Integer getClassId(String className, int userId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
@@ -279,6 +286,7 @@ final class Class {
         return null;
     }
 
+    // Deletes a class and its related assignments from the database
     public static boolean deleteClass(int userId, int classId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
@@ -304,6 +312,7 @@ final class Class {
         return false;
     }
 
+    // Sets the grade for a class in the database
     public static boolean setClassGrade(int userId, int classId) throws Exception {
         Connection dbCon = new DatabaseConnection().getConnection();
         try {
