@@ -1270,8 +1270,7 @@ class Gradebook extends JFrame {
         // Create the header that shows the class name and grade
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 150, 0));
         JPanel statusPanel = new JPanel(new GridLayout(0, 1));
-        String className = classNameVal;
-        JLabel classLabel = new JLabel(className, SwingConstants.LEADING);
+        JLabel classLabel = new JLabel(classNameVal, SwingConstants.LEADING);
         classLabel.setFont(f1);
         statusPanel.add(classLabel);
 

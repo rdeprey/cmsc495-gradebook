@@ -274,7 +274,7 @@ final class Class {
             ps.setInt(2, userId);
             ResultSet rs = ps.executeQuery();
 
-            while (rs.next()) {
+            if (rs.next()) {
                 return rs.getInt("classId");
             }
         } catch (SQLException ex) {
