@@ -28,14 +28,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.Properties;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import java.util.*;
+import java.util.logging.*;
+import java.util.regex.*;
 
 public final class Login extends Application {
     private Object httpSession;
@@ -224,6 +219,7 @@ public final class Login extends Application {
                     System.out.println(counter);
                 }
             } catch (Exception ex) {
+                System.out.println(ex.getStackTrace());
                 System.out.println("Unable to access the database");
             }
         });
